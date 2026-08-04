@@ -1,0 +1,903 @@
+"use strict";
+/**
+ * Trackator Exporter
+ * ==================
+ * Generates .md (with Mermaid) and .html (interactive) outputs.
+ */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Exporter = void 0;
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
+const Visualizer_1 = require("../visualizer/Visualizer");
+class Exporter {
+    constructor(structure) {
+        this.structure = structure;
+        this.visualizer = new Visualizer_1.Visualizer(structure);
+    }
+    /**
+     * Main export method - handles all formats
+     */
+    async export(options) {
+        const outputFiles = [];
+        // Ensure output directory exists
+        const resolvedPath = options.outputPath || options.outputDir;
+        const outputDir = path.dirname(resolvedPath);
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, { recursive: true });
+        }
+        if (options.format === 'md' || options.format === 'all') {
+            const mdFile = options.format === 'all'
+                ? resolvedPath.replace(/\.html?$/, '.md')
+                : resolvedPath;
+            this.exportMarkdown(mdFile, options);
+            outputFiles.push(mdFile);
+        }
+        if (options.format === 'html' || options.format === 'all') {
+            const htmlFile = resolvedPath;
+            this.exportHTML(htmlFile, options);
+            outputFiles.push(htmlFile);
+        }
+        if (options.format === 'json' || options.format === 'all') {
+            const jsonFile = options.format === 'all'
+                ? resolvedPath.replace(/\.(md|html)$/, '.json')
+                : resolvedPath;
+            this.exportJSON(jsonFile);
+            outputFiles.push(jsonFile);
+        }
+        return outputFiles;
+    }
+    /**
+     * Export to Markdown with Mermaid diagrams
+     */
+    exportMarkdown(filePath, options) {
+        const sections = [];
+        // Header
+        sections.push(this.generateMDHeader());
+        sections.push('');
+        // Executive Summary
+        sections.push(this.generateMDSummary());
+        sections.push('');
+        // Protocol Architecture Diagram
+        if (options.includeMermaid ?? true) {
+            sections.push('## Protocol Architecture');
+            sections.push('');
+            sections.push('```mermaid');
+            sections.push(this.visualizer.generateArchitectureDiagram());
+            sections.push('```');
+            sections.push('');
+        }
+        // Contracts in Scope
+        sections.push(this.generateMDContractsTable());
+        sections.push('');
+        // State Variables
+        sections.push(this.generateMDStateVariables(options));
+        sections.push('');
+        // Function Registry
+        sections.push(this.generateMDFunctionRegistry());
+        sections.push('');
+        // Call Graph
+        if (options.includeMermaid ?? true) {
+            sections.push('## Call Graph');
+            sections.push('');
+            sections.push('```mermaid');
+            sections.push(this.visualizer.generateCallGraphDiagram());
+            sections.push('```');
+            sections.push('');
+        }
+        // Access Control Matrix
+        sections.push(this.generateMDAccessControl());
+        sections.push('');
+        // External Calls & Dangerous Patterns
+        sections.push(this.generateMDExternalCalls());
+        sections.push('');
+        // Events Catalog
+        sections.push(this.generateMDEventsCatalog());
+        sections.push('');
+        // Footer
+        sections.push('');
+        sections.push('---');
+        sections.push(`*Generated by 🪨 Trackator v0.1.0 | Static Analysis*`);
+        fs.writeFileSync(filePath, sections.join('\n'), 'utf-8');
+        console.log(`✅ Markdown exported: ${filePath}`);
+    }
+    /**
+     * Export to interactive HTML
+     */
+    exportHTML(filePath, options) {
+        const html = this.generateHTMLContent(options);
+        fs.writeFileSync(filePath, html, 'utf-8');
+        console.log(`✅ HTML exported: ${filePath}`);
+    }
+    /**
+     * Export to JSON for programmatic use
+     */
+    exportJSON(filePath) {
+        // Convert Maps to objects for JSON serialization
+        const serializableStructure = this.serializeProtocolStructure();
+        fs.writeFileSync(filePath, JSON.stringify(serializableStructure, null, 2), 'utf-8');
+        console.log(`✅ JSON exported: ${filePath}`);
+    }
+    /**
+     * Generate complete HTML content with interactivity
+     */
+    generateHTMLContent(options) {
+        return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🪨 Trackator - ${this.structure.name}</title>
+  <style>
+    ${this.getCSS(options.theme ?? 'dark')}
+  </style>
+</head>
+<body>
+  <div class="workspace">
+    <!-- Header -->
+    <header class="header">
+      <h1>🪨 Trackator</h1>
+      <div class="subtitle">${this.structure.name} - Protocol Analysis</div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+      <!-- Explorer Panel -->
+      <aside class="panel explorer" id="explorer">
+        <h3>📂 Explorer</h3>
+        ${this.generateExplorerHTML()}
+      </aside>
+
+      <!-- Content Area -->
+      <main class="panel viewer" id="viewer">
+        <div class="tabs">
+          <button class="tab active" onclick="showTab('overview')">Overview</button>
+          <button class="tab" onclick="showTab('state')">State</button>
+          <button class="tab" onclick="showTab('functions')">Functions</button>
+          <button class="tab" onclick="showTab('access')">Access Control</button>
+          <button class="tab" onclick="showTab('calls')">Calls</button>
+        </div>
+
+        <div class="tab-content active" id="tab-overview">
+          ${this.generateOverviewHTML()}
+        </div>
+
+        <div class="tab-content" id="tab-state">
+          ${this.generateStateHTML()}
+        </div>
+
+        <div class="tab-content" id="tab-functions">
+          ${this.generateFunctionsHTML()}
+        </div>
+
+        <div class="tab-content" id="tab-access">
+          ${this.generateAccessControlHTML()}
+        </div>
+
+        <div class="tab-content" id="tab-calls">
+          ${this.generateCallsHTML()}
+        </div>
+      </main>
+
+      <!-- Alerts Panel -->
+      <aside class="panel alerts" id="alerts">
+        <h3>⚠️ Alerts</h3>
+        ${this.generateAlertsHTML()}
+      </aside>
+    </div>
+
+    <!-- Status Bar -->
+    <footer class="statusbar">
+      <span>Contracts: ${(this.structure.contracts ?? []).length}</span>
+      <span>|</span>
+      <span>Variables: ${this.structure.stateInventory?.totalVariables ?? 0}</span>
+      <span>|</span>
+      <span>Functions: ${this.structure.functionRegistry?.totalFunctions ?? 0}</span>
+      <span>|</span>
+      <span>Dangerous Patterns: ${this.structure.externalCallMap?.dangerousPatterns?.length ?? 0}</span>
+    </footer>
+  </div>
+
+  <script>
+    ${this.getJavaScript()}
+  </script>
+</body>
+</html>`;
+    }
+    // ==================== MARKDOWN GENERATORS ====================
+    generateMDHeader() {
+        const contracts = this.structure.contracts ?? [];
+        const stateInv = this.structure.stateInventory;
+        const funcReg = this.structure.functionRegistry;
+        return `# 🪨 Trackator Report
+
+> **${this.structure.name}** | **${stateInv?.totalVariables ?? 0}** state variables | **${funcReg?.totalFunctions ?? 0}** functions | **${contracts.length}** contracts
+
+---
+
+**Generated:** ${new Date().toISOString().split('T')[0]}  
+**Analysis Type:** Static (Tier 1)  
+**Tool Version:** Trackator v0.1.0`;
+    }
+    generateMDSummary() {
+        const contracts = this.structure.contracts ?? [];
+        const stateInv = this.structure.stateInventory;
+        const funcReg = this.structure.functionRegistry;
+        const extCallMap = this.structure.externalCallMap;
+        const accessCtrl = this.structure.accessControl;
+        // Safely access valueBearing - could be number or array depending on implementation
+        const valueBearingVal = stateInv?.valueBearing;
+        const valueBearing = Array.isArray(valueBearingVal) ? valueBearingVal.length : (valueBearingVal ?? 0);
+        const unprotected = Array.isArray(accessCtrl?.unprotectedFunctions) ? accessCtrl.unprotectedFunctions.length : 0;
+        const dangerous = Array.isArray(extCallMap?.dangerousPatterns) ? extCallMap.dangerousPatterns.length : 0;
+        let riskLevel = 'LOW';
+        if (dangerous > 2 || unprotected > 5)
+            riskLevel = 'MEDIUM';
+        if (dangerous > 5 || unprotected > 10)
+            riskLevel = 'HIGH';
+        return `## Executive Summary
+
+| Metric | Value |
+|--------|-------|
+| Total Contracts | ${contracts.length} |
+| Core Contracts | ${contracts.filter(c => c.kind === 'contract').length} |
+| State Variables | ${stateInv?.totalVariables ?? 0} |
+| Value-Bearing Variables | ${valueBearing} 💰 |
+| Public Functions | ${funcReg?.externalFunctions?.length ?? funcReg?.totalFunctions ?? 0} |
+| Access Control Roles | ${Array.isArray(accessCtrl?.roles) ? accessCtrl.roles.length : 0} |
+| Unprotected Functions | ${unprotected} ⚠️ |
+| Dangerous Patterns | ${dangerous} 🔴 |
+| **Risk Assessment** | **${riskLevel}** |`;
+    }
+    generateMDContractsTable() {
+        const contracts = this.structure.contracts ?? [];
+        let table = `## Contracts in Scope
+
+| Contract | Kind | Functions | State Vars | Modifiers | Key Features |
+|----------|------|-----------|------------|-----------|--------------|
+`;
+        for (const contract of contracts) {
+            if (contract.kind === 'interface')
+                continue;
+            const stateVars = contract.stateVariables.filter(v => v.isStateVar).length;
+            const features = [];
+            if ((contract.inherits ?? []).length > 0)
+                features.push(`Inherits: ${contract.inherits.join(', ')}`);
+            if (contract.events.length > 0)
+                features.push(`${contract.events.length} events`);
+            if (contract.usingFor.length > 0)
+                features.push(`Using: ${contract.usingFor.map(u => u.library[0]).join(', ')}`);
+            table += `| \`${contract.name}\` | ${contract.kind} | ${contract.functions.length} | ${stateVars} | ${contract.modifiers.length} | ${features.slice(0, 2).join('; ')} |\n`;
+        }
+        return table;
+    }
+    generateMDStateVariables(options) {
+        let content = `## State Variables\n\n`;
+        const stateInv = this.structure.stateInventory;
+        const byContract = stateInv?.byContract;
+        if (byContract instanceof Map) {
+            for (const [contract, vars] of Array.from(byContract.entries())) {
+                const stateVars = (vars.variables ?? []).filter(v => v.variable?.isStateVar);
+                if (stateVars.length === 0)
+                    continue;
+                content += `### ${contract}\n\n`;
+                content += `| Variable | Type | Visibility | Value-Bearing? |\n`;
+                content += `|----------|------|-------------|----------------|\n`;
+                for (const v of stateVars) {
+                    const valueBearingVal = stateInv?.valueBearing;
+                    const isValueBearing = Array.isArray(valueBearingVal) ? valueBearingVal.includes(v.variable) : false;
+                    const icon = isValueBearing ? '💰' : '-';
+                    content += `| \`${v.variable.name}\` | \`${v.variable.type}\` | ${v.variable.visibility} | ${icon} |\n`;
+                }
+                content += '\n';
+            }
+        }
+        // Add Mermaid diagram if requested
+        if (options.includeMermaid ?? true) {
+            const diagrams = this.visualizer.generateStateDiagrams();
+            for (const diagram of diagrams) {
+                content += `<details>\n<summary>📊 ${diagram.contract} State Diagram</summary>\n\n`;
+                content += `\`\`\`mermaid\n${diagram.mermaid}\n\`\`\`\n\n</details>\n`;
+            }
+        }
+        return content;
+    }
+    generateMDFunctionRegistry() {
+        let content = `## Function Registry\n\n`;
+        const contracts = this.structure.contracts ?? [];
+        for (const contract of contracts) {
+            const extFuncs = contract.functions.filter(f => f.visibility === 'external' || f.visibility === 'public');
+            if (extFuncs.length === 0)
+                continue;
+            content += `### ${contract}\n\n`;
+            content += `| Function | Visibility | Mutability | Modifiers | External Calls | Line |\n`;
+            content += `|----------|-------------|-------------|-----------|---------------|------|\n`;
+            for (const func of extFuncs) {
+                const calls = func.externalCalls.length;
+                const callIcon = calls > 0 ? `${calls} 📞` : '-';
+                content += `| \`${func.name}${func.parameters.length > 0 ? '(...)' : '()'}\` | ${func.visibility} | ${func.stateMutability} | ${func.modifiers.join(', ') || '-'} | ${callIcon} | L${func.lineStart}-${func.lineEnd} |\n`;
+            }
+            content += '\n';
+        }
+        return content;
+    }
+    generateMDAccessControl() {
+        let content = `## Access Control Matrix\n\n`;
+        const accessCtrl = this.structure.accessControl;
+        const roles = Array.isArray(accessCtrl?.roles) ? accessCtrl.roles : [];
+        const unprotectedFuncs = Array.isArray(accessCtrl?.unprotectedFunctions) ? accessCtrl.unprotectedFunctions : [];
+        if (roles.length === 0) {
+            content += `⚠️ No explicit access control roles detected.\n\n`;
+        }
+        else {
+            content += `| Role | Trust Level | Functions Count | Description |\n`;
+            content += `|------|-------------|-----------------|-------------|\n`;
+            for (const role of roles) {
+                const trustIcon = this.getTrustIconMD(role.trustLevel);
+                content += `| **${role.name}** | ${trustIcon} ${role.trustLevel.toUpperCase()} | ${role.functions.length} | ${role.description} |\n`;
+            }
+            content += '\n';
+        }
+        // Unprotected functions
+        if (unprotectedFuncs.length > 0) {
+            content += `### ⚠️ Unprotected Functions\n\n`;
+            content += `These functions lack explicit access control:\n\n`;
+            for (const func of unprotectedFuncs) {
+                content += `- \`${func}\`\n`;
+            }
+        }
+        // Mermaid diagram
+        content += `\n\`\`\`mermaid\n${this.visualizer.generateAccessControlDiagram()}\n\`\`\`\n`;
+        return content;
+    }
+    getTrustIconMD(level) {
+        switch (level) {
+            case 'critical': return '🔴';
+            case 'high': return '🟠';
+            case 'medium': return '🟡';
+            case 'low': return '🟢';
+            default: return '⚪';
+        }
+    }
+    generateMDExternalCalls() {
+        let content = `## External Calls & Dangerous Patterns\n\n`;
+        const extCallMap = this.structure.externalCallMap;
+        // Summary by target
+        content += `### Call Targets\n\n`;
+        content += `| Target | Number of Calls |\n`;
+        content += `|--------|----------------|\n`;
+        const byTarget = extCallMap?.byTarget;
+        if (byTarget instanceof Map) {
+            for (const [target, calls] of Array.from(byTarget.entries())) {
+                content += `| \`${target}\` | ${calls.length} |\n`;
+            }
+        }
+        // Dangerous patterns
+        const dangerousPatterns = Array.isArray(extCallMap?.dangerousPatterns) ? extCallMap.dangerousPatterns : [];
+        if (dangerousPatterns.length > 0) {
+            content += `\n### 🔴 Dangerous Patterns Detected\n\n`;
+            for (const pattern of dangerousPatterns) {
+                const severityIcon = this.getSeverityIconMD(pattern.severity);
+                content += `#### ${severityIcon} ${pattern.type.toUpperCase()} - ${pattern.contract}.${pattern.function}\n\n`;
+                content += `- **Location:** Line ${pattern.line}\n`;
+                content += `- **Severity:** ${pattern.severity.toUpperCase()}\n`;
+                content += `- **Description:** ${pattern.description}\n\n`;
+            }
+        }
+        return content;
+    }
+    getSeverityIconMD(severity) {
+        switch (severity) {
+            case 'critical': return '🔴';
+            case 'high': return '🟠';
+            case 'medium': return '🟡';
+            case 'low': return '🔵';
+            default: return '⚪';
+        }
+    }
+    generateMDEventsCatalog() {
+        let content = `## Events Catalog\n\n`;
+        const eventCatalog = this.structure.eventCatalog;
+        const byContract = eventCatalog?.byContract;
+        if (byContract instanceof Map) {
+            for (const [contract, events] of Array.from(byContract.entries())) {
+                content += `### ${contract}\n\n`;
+                content += `| Event | Parameters | Anonymous |\n`;
+                content += `|-------|------------|-----------|\n`;
+                for (const event of events) {
+                    const params = event.parameters.map(p => p.indexed ? `${p.type} ${p.name} (indexed)` : `${p.type} ${p.name}`).join(', ');
+                    content += `| \`${event.name}\` | ${params || 'void'} | ${event.anonymous ? 'Yes' : 'No'} |\n`;
+                }
+                content += '\n';
+            }
+        }
+        return content;
+    }
+    // ==================== HTML GENERATORS ====================
+    getCSS(theme) {
+        const themes = {
+            'vscode-dark': `
+        :root {
+          --bg-primary: #1e1e1e;
+          --bg-secondary: #252526;
+          --bg-tertiary: #2d2d30;
+          --text-primary: #d4d4d4;
+          --text-secondary: #858585;
+          --accent-blue: #007acc;
+          --accent-green: #4ec9b0;
+          --accent-orange: #ce9178;
+          --accent-red: #f48771;
+          --border-color: #3e3e42;
+        }
+      `,
+            'dark': `
+        :root {
+          --bg-primary: #0d1117;
+          --bg-secondary: #161b22;
+          --bg-tertiary: #21262d;
+          --text-primary: #c9d1d9;
+          --text-secondary: #8b949e;
+          --accent-blue: #58a6ff;
+          --accent-green: #3fb950;
+          --accent-orange: #d29922;
+          --accent-red: #f85149;
+          --border-color: #30363d;
+        }
+      `,
+            'light': `
+        :root {
+          --bg-primary: #ffffff;
+          --bg-secondary: #f6f8fa;
+          --bg-tertiary: #eaeef2;
+          --text-primary: #24292f;
+          --text-secondary: #57606a;
+          --accent-blue: #0969da;
+          --accent-green: #1a7f37;
+          --accent-orange: #9a6700;
+          --accent-red: #cf222e;
+          --border-color: #d0d7de;
+        }
+      `
+        };
+        return `
+      ${themes[theme] || themes['vscode-dark']}
+      
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        line-height: 1.6;
+      }
+      
+      .workspace {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+      }
+      
+      .header {
+        background: var(--bg-secondary);
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      
+      .header h1 { font-size: 18px; font-weight: 600; }
+      .subtitle { color: var(--text-secondary); font-size: 13px; }
+      
+      .main-layout {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+      }
+      
+      .panel {
+        background: var(--bg-primary);
+        border-right: 1px solid var(--border-color);
+        overflow-y: auto;
+      }
+      
+      .explorer { width: 240px; flex-shrink: 0; }
+      .alerts { width: 280px; flex-shrink: 0; border-left: 1px solid var(--border-color); border-right: none; }
+      .viewer { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+      
+      .panel h3 {
+        padding: 12px 16px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border-color);
+      }
+      
+      /* Explorer Tree */
+      .tree-item {
+        padding: 6px 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        transition: background 0.15s;
+      }
+      .tree-item:hover { background: var(--bg-tertiary); }
+      .tree-item.active { background: var(--accent-blue); color: white; }
+      .tree-children { padding-left: 12px; }
+      .tree-children.hidden { display: none; }
+      
+      /* Tabs */
+      .tabs {
+        display: flex;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+        padding: 0 16px;
+      }
+      .tab {
+        padding: 10px 16px;
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-size: 13px;
+        border-bottom: 2px solid transparent;
+        transition: all 0.15s;
+      }
+      .tab:hover { color: var(--text-primary); }
+      .tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+      
+      .tab-content {
+        display: none;
+        padding: 20px;
+        overflow-y: auto;
+        flex: 1;
+      }
+      .tab-content.active { display: block; }
+      
+      /* Tables */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      th, td {
+        padding: 8px 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+      }
+      th { background: var(--bg-secondary); font-weight: 500; }
+      tr:hover { background: var(--bg-tertiary); }
+      
+      /* Code blocks */
+      code {
+        background: var(--bg-tertiary);
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: 'Fira Code', monospace;
+        font-size: 12px;
+        color: var(--accent-orange);
+      }
+      
+      /* Alert Cards */
+      .alert-card {
+        margin: 8px 12px;
+        padding: 10px 12px;
+        border-radius: 4px;
+        border-left: 3px solid;
+        cursor: pointer;
+        transition: transform 0.15s;
+      }
+      .alert-card:hover { transform: translateX(2px); }
+      .alert-card.critical { border-color: var(--accent-red); background: rgba(244, 87, 113, 0.1); }
+      .alert-card.high { border-color: var(--accent-orange); background: rgba(206, 145, 120, 0.1); }
+      .alert-card.medium { border-color: #d29922; background: rgba(210, 153, 34, 0.1); }
+      
+      .alert-card h4 { font-size: 13px; margin-bottom: 4px; }
+      .alert-card p { font-size: 11px; color: var(--text-secondary); }
+      
+      /* Status bar */
+      .statusbar {
+        background: var(--bg-secondary);
+        padding: 6px 20px;
+        border-top: 1px solid var(--border-color);
+        font-size: 11px;
+        color: var(--text-secondary);
+        display: flex;
+        gap: 16px;
+      }
+      
+      /* Scrollbar */
+      ::-webkit-scrollbar { width: 8px; height: 8px; }
+      ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+      ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+    `;
+    }
+    generateExplorerHTML() {
+        let html = '';
+        const contracts = this.structure.contracts ?? [];
+        for (const contract of contracts) {
+            if (contract.kind !== 'contract' && contract.kind !== 'abstract')
+                continue;
+            const extFuncs = contract.functions.filter(f => f.visibility === 'external' || f.visibility === 'public');
+            html += `<div class="tree-item" onclick="toggleTree('${contract.name}')">▸ ${contract.name}</div>`;
+            html += `<div id="tree-${contract.name}" class="tree-children hidden">`;
+            // State variables
+            const stateVars = contract.stateVariables.filter(v => v.isStateVar);
+            if (stateVars.length > 0) {
+                html += `<div class="tree-item" style="padding-left: 24px;">📊 State (${stateVars.length})</div>`;
+            }
+            // Functions
+            for (const func of extFuncs) {
+                const hasCalls = func.externalCalls.length > 0;
+                const icon = hasCalls ? '📞' : '📝';
+                html += `<div class="tree-item" style="padding-left: 24px;" onclick="showFunctionDetail('${contract.name}', '${func.name}')">${icon} ${func.name}()</div>`;
+            }
+            html += '</div>';
+        }
+        return html;
+    }
+    generateOverviewHTML() {
+        const contracts = this.structure.contracts ?? [];
+        const stateInv = this.structure.stateInventory;
+        const funcReg = this.structure.functionRegistry;
+        const extCallMap = this.structure.externalCallMap;
+        const accessCtrl = this.structure.accessControl;
+        const valueBearingVal = stateInv?.valueBearing;
+        const valueBearing = Array.isArray(valueBearingVal) ? valueBearingVal.length : (valueBearingVal ?? 0);
+        const dangerous = Array.isArray(extCallMap?.dangerousPatterns) ? extCallMap.dangerousPatterns.length : 0;
+        const unprotected = Array.isArray(accessCtrl?.unprotectedFunctions) ? accessCtrl.unprotectedFunctions.length : 0;
+        return `
+      <h2>📊 Overview</h2>
+      <table>
+        <tr><th>Metric</th><th>Value</th></tr>
+        <tr><td>Total Contracts</td><td>${contracts.length}</td></tr>
+        <tr><td>Core Contracts</td><td>${contracts.filter(c => c.kind === 'contract').length}</td></tr>
+        <tr><td>State Variables</td><td>${stateInv?.totalVariables ?? 0}</td></tr>
+        <tr><td>Value-Bearing Variables</td><td>${valueBearing} 💰</td></tr>
+        <tr><td>Public Functions</td><td>${funcReg?.totalFunctions ?? 0}</td></tr>
+        <tr><td>Access Control Roles</td><td>${Array.isArray(accessCtrl?.roles) ? accessCtrl.roles.length : 0}</td></tr>
+        <tr><td>Dangerous Patterns</td><td style="color: var(--accent-red)">${dangerous} 🔴</td></tr>
+        <tr><td>Unprotected Functions</td><td style="color: ${unprotected > 5 ? 'var(--accent-red)' : 'var(--accent-orange)'}">${unprotected}</td></tr>
+      </table>
+    `;
+    }
+    generateStateHTML() {
+        let html = '<h2>📦 State Variables</h2>';
+        const stateInv = this.structure.stateInventory;
+        const byContract = stateInv?.byContract;
+        if (byContract instanceof Map) {
+            for (const [contract, vars] of Array.from(byContract.entries())) {
+                const stateVars = (vars.variables ?? []).filter(v => v.variable?.isStateVar);
+                if (stateVars.length === 0)
+                    continue;
+                html += `<h3>${contract}</h3><table>`;
+                html += '<tr><th>Variable</th><th>Type</th><th>Visibility</th><th>Value-Bearing</th></tr>';
+                for (const v of stateVars) {
+                    const valueBearingVal = stateInv?.valueBearing;
+                    const isValueBearing = Array.isArray(valueBearingVal) ? valueBearingVal.includes(v.variable) : false;
+                    html += `<tr>
+            <td><code>${v.variable.name}</code></td>
+            <td><code>${v.variable.type}</code></td>
+            <td>${v.variable.visibility}</td>
+            <td>${isValueBearing ? '💰 Yes' : '-'}</td>
+          </tr>`;
+                }
+                html += '</table>';
+            }
+        }
+        return html;
+    }
+    generateFunctionsHTML() {
+        let html = '<h2>⚡ Function Registry</h2>';
+        const contracts = this.structure.contracts ?? [];
+        for (const contract of contracts) {
+            const extFuncs = contract.functions.filter(f => f.visibility === 'external' || f.visibility === 'public');
+            if (extFuncs.length === 0)
+                continue;
+            html += `<h3>${contract}</h3><table>`;
+            html += '<tr><th>Function</th><th>Mutability</th><th>Modifiers</th><th>Calls</th><th>Location</th></tr>';
+            for (const func of extFuncs) {
+                html += `<tr>
+          <td><code>${func.name}()</code></td>
+          <td>${func.stateMutability}</td>
+          <td>${func.modifiers.join(', ') || '-'}</td>
+          <td>${func.externalCalls.length > 0 ? `${func.externalCalls.length} 📞` : '-'}</td>
+          <td>L${func.lineStart}-${func.lineEnd}</td>
+        </tr>`;
+            }
+            html += '</table>';
+        }
+        return html;
+    }
+    generateAccessControlHTML() {
+        let html = '<h2>🔐 Access Control Matrix</h2>';
+        const accessCtrl = this.structure.accessControl;
+        const roles = Array.isArray(accessCtrl?.roles) ? accessCtrl.roles : [];
+        const unprotectedFuncs = Array.isArray(accessCtrl?.unprotectedFunctions) ? accessCtrl.unprotectedFunctions : [];
+        if (roles.length === 0) {
+            return html + '<p>No explicit access control roles detected.</p>';
+        }
+        html += '<table>';
+        html += '<tr><th>Role</th><th>Trust Level</th><th>Functions</th><th>Description</th></tr>';
+        for (const role of roles) {
+            const trustColors = {
+                critical: 'var(--accent-red)',
+                high: 'var(--accent-orange)',
+                medium: '#d29922',
+                low: 'var(--accent-green)'
+            };
+            html += `<tr>
+        <td><strong>${role.name}</strong></td>
+        <td style="color: ${trustColors[role.trustLevel]}">${role.trustLevel.toUpperCase()}</td>
+        <td>${role.functions.length}</td>
+        <td>${role.description}</td>
+      </tr>`;
+        }
+        html += '</table>';
+        if (unprotectedFuncs.length > 0) {
+            html += '<h3>⚠️ Unprotected Functions</h3><ul>';
+            for (const func of unprotectedFuncs) {
+                html += `<li><code>${func}</code></li>`;
+            }
+            html += '</ul>';
+        }
+        return html;
+    }
+    generateCallsHTML() {
+        let html = '<h2>📞 External Calls</h2>';
+        const extCallMap = this.structure.externalCallMap;
+        // By target
+        html += '<h3>By Target</h3><table>';
+        html += '<tr><th>Target</th><th>Number of Calls</th></tr>';
+        const byTarget = extCallMap?.byTarget;
+        if (byTarget instanceof Map) {
+            for (const [target, calls] of Array.from(byTarget.entries())) {
+                html += `<tr><td><code>${target}</code></td><td>${calls.length}</td></tr>`;
+            }
+        }
+        html += '</table>';
+        // Dangerous patterns
+        const dangerousPatterns = Array.isArray(extCallMap?.dangerousPatterns) ? extCallMap.dangerousPatterns : [];
+        if (dangerousPatterns.length > 0) {
+            html += '<h3>🔴 Dangerous Patterns</h3>';
+            for (const pattern of dangerousPatterns) {
+                html += `<div class="alert-card ${pattern.severity === 'critical' ? 'critical' : pattern.severity === 'high' ? 'high' : 'medium'}">
+          <h4>${pattern.type.toUpperCase()}</h4>
+          <p><strong>${pattern.contract}.${pattern.name}</strong> at line ${pattern.line}</p>
+          <p>${pattern.description}</p>
+        </div>`;
+            }
+        }
+        return html;
+    }
+    generateAlertsHTML() {
+        const extCallMap = this.structure.externalCallMap;
+        const alerts = Array.isArray(extCallMap?.dangerousPatterns) ? extCallMap.dangerousPatterns : [];
+        if (alerts.length === 0) {
+            return '<p style="padding: 12px; color: var(--text-secondary);">No alerts detected.</p>';
+        }
+        let html = '';
+        for (const alert of alerts) {
+            const severityClass = alert.severity === 'critical' ? 'critical' : alert.severity === 'high' ? 'high' : 'medium';
+            html += `<div class="alert-card ${severityClass}" onclick="scrollToCode('${alert.contract}', '${alert.function}', ${alert.line})">
+        <h4>${alert.severity.toUpperCase()} ${alert.type}</h4>
+        <p>${alert.contract}.${alert.function}:L${alert.line}</p>
+        <p>${alert.description.substring(0, 80)}...</p>
+      </div>`;
+        }
+        return html;
+    }
+    getJavaScript() {
+        return `
+      // Tab switching
+      function showTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + tabName).classList.add('active');
+        event.target.classList.add('active');
+      }
+
+      // Tree toggle
+      function toggleTree(name) {
+        const el = document.getElementById('tree-' + name);
+        el.classList.toggle('hidden');
+        const item = el.previousElementSibling;
+        item.textContent = el.classList.contains('hidden') ? '▸ ' + name.split('-')[1] : '▾ ' + name.split('-')[1];
+      }
+
+      // Show function detail (placeholder)
+      function showFunctionDetail(contract, func) {
+        console.log('Show detail:', contract, func);
+        // Would show detailed view in full implementation
+      }
+
+      // Scroll to code location (placeholder)
+      function scrollToCode(contract, func, line) {
+        console.log('Scroll to:', contract, func, line);
+        // Would scroll/highlight code in full implementation
+      }
+
+      // Initialize first tree as open
+      document.addEventListener('DOMContentLoaded', () => {
+        const firstTree = document.querySelector('.tree-children');
+        if (firstTree) firstTree.classList.remove('hidden');
+      });
+    `;
+    }
+    // ==================== HELPERS ====================
+    serializeProtocolStructure() {
+        const contracts = this.structure.contracts ?? [];
+        const stateInv = this.structure.stateInventory;
+        const funcReg = this.structure.functionRegistry;
+        const extCallMap = this.structure.externalCallMap;
+        const accessCtrl = this.structure.accessControl;
+        const structAny = this.structure;
+        return {
+            name: this.structure.name,
+            rootPath: structAny.rootPath,
+            contracts: contracts,
+            inheritanceMap: Object.fromEntries(structAny.inheritanceMap ?? new Map()),
+            importGraph: Object.fromEntries(structAny.importGraph ?? new Map()),
+            callGraph: structAny.callGraph,
+            stateInventory: {
+                totalVariables: stateInv?.totalVariables ?? 0,
+                totalSlots: stateInv?.totalSlots ?? 0,
+                byContract: stateInv?.byContract instanceof Map ? Object.fromEntries(stateInv.byContract) : {},
+                valueBearing: stateInv?.valueBearing ?? []
+            },
+            functionRegistry: {
+                totalFunctions: funcReg?.totalFunctions ?? 0,
+                byContract: funcReg?.byContract instanceof Map ? Object.fromEntries(funcReg.byContract) : {}
+            },
+            accessControl: {
+                roles: Array.isArray(accessCtrl?.roles) ? accessCtrl.roles : [],
+                unprotectedFunctions: Array.isArray(accessCtrl?.unprotectedFunctions) ? accessCtrl.unprotectedFunctions : []
+            },
+            externalCallMap: {
+                totalCalls: extCallMap?.totalCalls ?? 0,
+                byTarget: extCallMap?.byTarget instanceof Map ? Object.fromEntries(extCallMap.byTarget) : {},
+                dangerousPatterns: Array.isArray(extCallMap?.dangerousPatterns) ? extCallMap.dangerousPatterns : []
+            }
+        };
+    }
+}
+exports.Exporter = Exporter;
+exports.default = Exporter;
+//# sourceMappingURL=Exporter.js.map
