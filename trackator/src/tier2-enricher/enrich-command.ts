@@ -16,6 +16,13 @@ import {
   ProtocolType
 } from '../types';
 import { runEnrichment, getAlertRulesBySeverity, exportEnrichmentResult } from './invariant-generator';
+import { buildFunctionRegistry } from '../tier1-parser/function-registry';
+import { buildCallGraph } from '../tier1-parser/call-graph';
+import { runUnifiedAnalysis } from '../tier3-analyzer/phase-integration';
+import { exportStorageDependencyResult } from './storage-dependency-analyzer';
+import { exportStateCouplingResult } from './state-coupling-detector';
+import { exportSyncAnalysisResult } from './sync-analyzer';
+import { exportValidationResult } from '../tier3-analyzer/evidence-validator';
 
 export interface EnrichOptions {
   output: string;
@@ -24,6 +31,7 @@ export interface EnrichOptions {
   generateAlerts: boolean;
   protocolType?: ProtocolType;
   verbose: boolean;
+  skipAdvanced?: boolean;
 }
 
 /**
@@ -53,7 +61,11 @@ export async function runEnrich(
       console.log(chalk.gray('Loaded ' + contracts.length + ' contracts from previous init'));
     }
   }
-  
+
+  // Rebuild function registry + call graph (not persisted by `init` — rebuilt from contracts)
+  const functionRegistry = buildFunctionRegistry(contracts);
+  const callGraph = buildCallGraph(contracts);
+
   // Step 1: Run enrichment pipeline
   const enrichSpinner = ora('Running enrichment pipeline...').start();
   
@@ -98,7 +110,57 @@ export async function runEnrich(
   // Save raw data
   const jsonPath = path.join(outputDir, 'trackator-enrich.json');
   fs.writeFileSync(jsonPath, JSON.stringify(exportEnrichmentResult(enrichmentResult), null, 2));
-  
+
+  // Step 2: Run advanced 4-phase analysis (storage/coupling/sync/evidence)
+  // Non-fatal: if this fails, base enrichment above is still valid and saved.
+  if (!options.skipAdvanced) {
+    const advancedSpinner = ora('Running advanced analysis (storage/coupling/sync/evidence)...').start();
+    try {
+      const unified = await runUnifiedAnalysis({
+        contracts,
+        functionRegistry,
+        callEdges: callGraph.edges,
+        invariants: enrichmentResult.invariants,
+        outputDir,
+        verbose: options.verbose
+      });
+
+      // Raw per-phase exports — what redteam-trackator's SKILL.md expects
+      if (unified.phase1) {
+        fs.writeFileSync(
+          path.join(outputDir, 'trackator-storage.json'),
+          JSON.stringify(exportStorageDependencyResult(unified.phase1), null, 2)
+        );
+      }
+      if (unified.phase2) {
+        fs.writeFileSync(
+          path.join(outputDir, 'trackator-coupling.json'),
+          JSON.stringify(exportStateCouplingResult(unified.phase2), null, 2)
+        );
+      }
+      if (unified.phase3) {
+        fs.writeFileSync(
+          path.join(outputDir, 'trackator-sync.json'),
+          JSON.stringify(exportSyncAnalysisResult(unified.phase3), null, 2)
+        );
+      }
+      if (unified.phase4) {
+        fs.writeFileSync(
+          path.join(outputDir, 'trackator-evidence.json'),
+          JSON.stringify(exportValidationResult(unified.phase4), null, 2)
+        );
+      }
+
+      advancedSpinner.succeed(
+        `Advanced analysis complete: ${unified.summary.totalFindings} findings ` +
+        `(${unified.summary.confirmedBugs} confirmed, ${unified.summary.potentialBugs} potential)`
+      );
+    } catch (error: any) {
+      advancedSpinner.warn('Advanced analysis failed — base enrichment still saved: ' + error.message);
+      if (options.verbose && error.stack) console.error(error.stack);
+    }
+  }
+
   // Print summary
   const criticalCount = enrichmentResult.alertRules.filter(r => r.severity === 'critical').length;
   const highCount = enrichmentResult.alertRules.filter(r => r.severity === 'high').length;

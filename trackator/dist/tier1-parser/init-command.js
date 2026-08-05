@@ -200,7 +200,7 @@ function printTerminalOutput(outputData, registry, callGraph, inventories) {
             const riskColor = ep.risk.overall === 'critical' ? chalk_1.default.red :
                 ep.risk.overall === 'high' ? chalk_1.default.hex('#ff6b6b') :
                     ep.risk.overall === 'medium' ? chalk_1.default.hex('#ffa726') : chalk_1.default.green;
-            console.log(chalk_1.default.white('  • ' + ep.contract + '.' + ep.function.name + '()'));
+            console.log(chalk_1.default.white('  • ' + ep.contract + '.' + ep.name + '()'));
             console.log(chalk_1.default.gray('     Risk: [' + riskColor(ep.risk.score.toString()) + '] ' + ep.risk.overall.toUpperCase() + ' | Category: ' + ep.category));
         }
         if (entryPoints.length > 15) {
@@ -216,7 +216,7 @@ function printTerminalOutput(outputData, registry, callGraph, inventories) {
         console.log(chalk_1.default.red.bold('│               ⚠ HIGH-RISK FUNCTIONS ALERT                   │'));
         console.log(chalk_1.default.red.bold('├─────────────────────────────────────────────────────────────┤'));
         for (const func of highRiskFuncs.slice(0, 10)) {
-            console.log(chalk_1.default.red('  \u{1F534} ' + func.contract + '.' + func.function.name + '()'));
+            console.log(chalk_1.default.red('  \u{1F534} ' + func.contract + '.' + func.name + '()'));
             console.log(chalk_1.default.gray('     Score: ' + func.risk.score + '/100 | Factors:'));
             for (const factor of func.risk.factors.slice(0, 3)) {
                 const severityIcon = factor.severity === 'critical' ? '\u{1F534}' :
@@ -435,7 +435,7 @@ async function generateMarkdownOutput(outputDir, outputData, diagramSet, registr
         for (const func of highRiskFuncs) {
             const issues = func.risk.factors.map(function (f) { return f.type; }).join(', ');
             const bt = String.fromCharCode(96); // backtick
-            md += '| ' + bt + func.contract + '.' + func.function.name + '()' + bt + ' | ' + func.risk.score + ' | ' + func.risk.overall + ' | ' + issues + ' |\n';
+            md += '| ' + bt + func.contract + '.' + func.name + '()' + bt + ' | ' + func.risk.score + ' | ' + func.risk.overall + ' | ' + issues + ' |\n';
         }
         md += '\n';
     }

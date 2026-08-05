@@ -47,6 +47,13 @@ const chalk_1 = __importDefault(require("chalk"));
 const ora_1 = __importDefault(require("ora"));
 const boxen_1 = __importDefault(require("boxen"));
 const invariant_generator_1 = require("./invariant-generator");
+const function_registry_1 = require("../tier1-parser/function-registry");
+const call_graph_1 = require("../tier1-parser/call-graph");
+const phase_integration_1 = require("../tier3-analyzer/phase-integration");
+const storage_dependency_analyzer_1 = require("./storage-dependency-analyzer");
+const state_coupling_detector_1 = require("./state-coupling-detector");
+const sync_analyzer_1 = require("./sync-analyzer");
+const evidence_validator_1 = require("../tier3-analyzer/evidence-validator");
 /**
  * Main entry point for `trackator enrich` command
  */
@@ -67,6 +74,9 @@ async function runEnrich(inputDir, options) {
             console.log(chalk_1.default.gray('Loaded ' + contracts.length + ' contracts from previous init'));
         }
     }
+    // Rebuild function registry + call graph (not persisted by `init` — rebuilt from contracts)
+    const functionRegistry = (0, function_registry_1.buildFunctionRegistry)(contracts);
+    const callGraph = (0, call_graph_1.buildCallGraph)(contracts);
     // Step 1: Run enrichment pipeline
     const enrichSpinner = (0, ora_1.default)('Running enrichment pipeline...').start();
     const enrichmentResult = (0, invariant_generator_1.runEnrichment)({
@@ -102,6 +112,41 @@ async function runEnrich(inputDir, options) {
     // Save raw data
     const jsonPath = path.join(outputDir, 'trackator-enrich.json');
     fs.writeFileSync(jsonPath, JSON.stringify((0, invariant_generator_1.exportEnrichmentResult)(enrichmentResult), null, 2));
+    // Step 2: Run advanced 4-phase analysis (storage/coupling/sync/evidence)
+    // Non-fatal: if this fails, base enrichment above is still valid and saved.
+    if (!options.skipAdvanced) {
+        const advancedSpinner = (0, ora_1.default)('Running advanced analysis (storage/coupling/sync/evidence)...').start();
+        try {
+            const unified = await (0, phase_integration_1.runUnifiedAnalysis)({
+                contracts,
+                functionRegistry,
+                callEdges: callGraph.edges,
+                invariants: enrichmentResult.invariants,
+                outputDir,
+                verbose: options.verbose
+            });
+            // Raw per-phase exports — what redteam-trackator's SKILL.md expects
+            if (unified.phase1) {
+                fs.writeFileSync(path.join(outputDir, 'trackator-storage.json'), JSON.stringify((0, storage_dependency_analyzer_1.exportStorageDependencyResult)(unified.phase1), null, 2));
+            }
+            if (unified.phase2) {
+                fs.writeFileSync(path.join(outputDir, 'trackator-coupling.json'), JSON.stringify((0, state_coupling_detector_1.exportStateCouplingResult)(unified.phase2), null, 2));
+            }
+            if (unified.phase3) {
+                fs.writeFileSync(path.join(outputDir, 'trackator-sync.json'), JSON.stringify((0, sync_analyzer_1.exportSyncAnalysisResult)(unified.phase3), null, 2));
+            }
+            if (unified.phase4) {
+                fs.writeFileSync(path.join(outputDir, 'trackator-evidence.json'), JSON.stringify((0, evidence_validator_1.exportValidationResult)(unified.phase4), null, 2));
+            }
+            advancedSpinner.succeed(`Advanced analysis complete: ${unified.summary.totalFindings} findings ` +
+                `(${unified.summary.confirmedBugs} confirmed, ${unified.summary.potentialBugs} potential)`);
+        }
+        catch (error) {
+            advancedSpinner.warn('Advanced analysis failed — base enrichment still saved: ' + error.message);
+            if (options.verbose && error.stack)
+                console.error(error.stack);
+        }
+    }
     // Print summary
     const criticalCount = enrichmentResult.alertRules.filter(r => r.severity === 'critical').length;
     const highCount = enrichmentResult.alertRules.filter(r => r.severity === 'high').length;

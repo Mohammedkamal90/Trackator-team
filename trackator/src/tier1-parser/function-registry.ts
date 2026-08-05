@@ -5,18 +5,34 @@
 
 import {
   SolidityContract,
-  FunctionDef
+  FunctionDef,
+  AccessControlEntry as CanonicalAccessControlEntry,
+  FunctionCategory as CanonicalFunctionCategory,
+  AccessControlLevel as CanonicalAccessControlLevel
 } from '../types';
 
 export interface RegisteredFunction {
+  // --- Canonical fields (types.ts-compatible; required by tier3-analyzer consumers) ---
+  id: string;
   contract: string;
-  function: FunctionDef;
   signature: string;           // e.g., "transfer(address,uint256)"
-  selector: string;            // 4-byte function selector
-  category: FunctionCategory;
-  accessControl: AccessControlInfo;
+  name: string;
+  function?: string;           // canonical alias for name (per types.ts contract)
+  category: CanonicalFunctionCategory;
+  accessControl: CanonicalAccessControlEntry;
   risk: RiskAssessment;
-  stateImpact: StateImpactInfo;
+  stateReads: string[];
+  stateWrites: string[];
+  externalCalls: string[];     // best-effort; local analysis only tracks a count, not call targets — may be empty. Cross-reference callEdges for real target data.
+  stateImpact?: string;        // human-readable description
+  lineDeclared: number;
+
+  // --- Local-only extensions (kept for init-command.ts terminal/markdown rendering and internal tooling) ---
+  functionDef: FunctionDef;          // full AST node (was `function` — renamed to avoid colliding with canonical string alias above)
+  selector: string;                  // 4-byte function selector
+  rawCategory: RawFunctionCategory;  // pre-mapping 12-value local category
+  accessControlDetail: AccessControlInfo;
+  stateImpactDetail: StateImpactInfo;
   gasProfile: GasProfile;
 }
 
@@ -27,7 +43,7 @@ export interface FunctionSignature {
   canonical: string;
 }
 
-export type FunctionCategory = 
+export type RawFunctionCategory = 
   | 'admin'          // Owner/admin functions
   | 'access-control' // Role management
   | 'core-logic'     // Main protocol operations
@@ -135,22 +151,96 @@ export function buildFunctionRegistry(contracts: SolidityContract[]): Map<string
 function registerFunction(func: FunctionDef, contract: SolidityContract): RegisteredFunction {
   const signature = buildSignature(func);
   const selector = computeSelector(signature.canonical);
-  const category = categorizeFunction(func, contract);
-  const accessControl = analyzeAccessControl(func);
-  const risk = assessRisk(func, accessControl);
-  const stateImpact = analyzeStateImpact(func);
+  const rawCategory = categorizeFunction(func, contract);
+  const accessControlDetail = analyzeAccessControl(func);
+  const risk = assessRisk(func, accessControlDetail);
+  const stateImpactDetail = analyzeStateImpact(func);
   const gasProfile = estimateGasProfile(func);
-  
+
   return {
+    // Canonical fields
+    id: `${contract.name}.${signature.canonical}`,
     contract: contract.name,
-    function: func,
     signature: signature.canonical,
-    selector,
-    category,
-    accessControl,
+    name: func.name,
+    function: func.name,
+    category: mapToCanonicalCategory(rawCategory),
+    accessControl: mapToCanonicalAccessControl(accessControlDetail, func),
     risk,
-    stateImpact,
+    stateReads: stateImpactDetail.reads,
+    stateWrites: stateImpactDetail.writes,
+    externalCalls: [], // local analysis only tracks a count (stateImpactDetail.externalCalls); no per-call target names available here — cross-reference callEdges for real target data
+    stateImpact: `${stateImpactDetail.reads.length} reads, ${stateImpactDetail.writes.length} writes` +
+      (stateImpactDetail.mints ? ', mints' : '') +
+      (stateImpactDetail.burns ? ', burns' : '') +
+      (stateImpactDetail.transfers ? ', transfers' : ''),
+    lineDeclared: func.lineStart,
+
+    // Local-only extensions
+    functionDef: func,
+    selector,
+    rawCategory,
+    accessControlDetail,
+    stateImpactDetail,
     gasProfile
+  };
+}
+
+/**
+ * Map local 12-value category to canonical 10-value FunctionCategory.
+ * 6 values match directly; 6 local-only values are remapped (verified against
+ * codebase usage — nothing outside this file depends on the raw values).
+ */
+function mapToCanonicalCategory(raw: RawFunctionCategory): CanonicalFunctionCategory {
+  const map: Record<RawFunctionCategory, CanonicalFunctionCategory> = {
+    'admin': 'admin',
+    'access-control': 'access-control',
+    'core-logic': 'core-logic',
+    'oracle': 'oracle',
+    'constructor': 'constructor',
+    'emergency': 'emergency',
+    'view': 'utility',
+    'external': 'callback',
+    'event-emitter': 'utility',
+    'modifier': 'access-control',
+    'helper': 'utility',
+    'unknown': 'utility'
+  };
+  return map[raw];
+}
+
+/**
+ * Map local AccessControlInfo to canonical AccessControlEntry.
+ * `level` is derived from local's richer `mechanism` field (not a naive
+ * rename — local's AccessControlLevel values don't overlap with canonical's).
+ */
+function mapToCanonicalAccessControl(
+  local: AccessControlInfo,
+  func: FunctionDef
+): CanonicalAccessControlEntry {
+  let level: CanonicalAccessControlEntry['level'];
+  if (func.visibility === 'internal' || func.visibility === 'private') {
+    level = 'internal';
+  } else if (local.mechanism === 'onlyOwner') {
+    level = 'admin-only';
+  } else if (local.mechanism === 'onlyRole') {
+    level = 'role-based';
+  } else if (local.mechanism === 'require' || local.mechanism === 'custom') {
+    level = 'restricted';
+  } else {
+    level = 'public';
+  }
+
+  const modifiers = func.modifiers || (local.modifierName ? [local.modifierName] : []);
+
+  return {
+    level,
+    rolesRequired: local.roleRequired ? [local.roleRequired] : [],
+    modifiers,
+    ownerOnly: local.mechanism === 'onlyOwner',
+    visibility: func.visibility,
+    restrictions: local.bypassable ? local.bypassMethods : undefined,
+    length: modifiers.length
   };
 }
 
@@ -200,7 +290,7 @@ function computeSelector(signature: string): string {
 /**
  * Categorize function by its purpose and behavior
  */
-function categorizeFunction(func: FunctionDef, contract: SolidityContract): FunctionCategory {
+function categorizeFunction(func: FunctionDef, contract: SolidityContract): RawFunctionCategory {
   const name = func.name.toLowerCase();
   const modifiers = func.modifiers.map(m => m.toLowerCase());
   
@@ -528,8 +618,8 @@ function estimateGasProfile(func: FunctionDef): GasProfile {
 export function findFunctions(
   registry: Map<string, RegisteredFunction[]>,
   criteria: Partial<{
-    category: FunctionCategory;
-    accessLevel: AccessControlLevel;
+    category: CanonicalFunctionCategory;
+    accessLevel: CanonicalAccessControlLevel;
     minRisk: number;
     hasExternalCalls: boolean;
     stateMutability: string;
@@ -555,19 +645,19 @@ export function findFunctions(
       }
       
       if (criteria.hasExternalCalls !== undefined) {
-        if (criteria.hasExternalCalls && func.stateImpact.externalCalls === 0) {
+        if (criteria.hasExternalCalls && func.stateImpactDetail.externalCalls === 0) {
           matches = false;
         }
-        if (!criteria.hasExternalCalls && func.stateImpact.externalCalls > 0) {
+        if (!criteria.hasExternalCalls && func.stateImpactDetail.externalCalls > 0) {
           matches = false;
         }
       }
       
-      if (criteria.stateMutability && func.function.stateMutability !== criteria.stateMutability) {
+      if (criteria.stateMutability && func.functionDef.stateMutability !== criteria.stateMutability) {
         matches = false;
       }
       
-      if (criteria.visibility && func.function.visibility !== criteria.visibility) {
+      if (criteria.visibility && func.functionDef.visibility !== criteria.visibility) {
         matches = false;
       }
       
@@ -608,10 +698,10 @@ export function getEntryPoints(
   
   for (const [, functions] of registry) {
     for (const func of functions) {
-      if ((func.function.visibility === 'external' || func.function.visibility === 'public') &&
-          func.function.stateMutability !== 'view' &&
-          func.function.stateMutability !== 'pure' &&
-          !['constructor', 'fallback', 'receive'].includes(func.function.kind)) {
+      if ((func.functionDef.visibility === 'external' || func.functionDef.visibility === 'public') &&
+          func.functionDef.stateMutability !== 'view' &&
+          func.functionDef.stateMutability !== 'pure' &&
+          !['constructor', 'fallback', 'receive'].includes(func.functionDef.kind)) {
         results.push(func);
       }
     }
@@ -631,9 +721,11 @@ export function exportRegistry(registry: Map<string, RegisteredFunction[]>): any
       signature: f.signature,
       selector: f.selector,
       category: f.category,
+      rawCategory: f.rawCategory,
       accessControl: f.accessControl,
       risk: f.risk,
       stateImpact: f.stateImpact,
+      stateImpactDetail: f.stateImpactDetail,
       gasProfile: f.gasProfile
     }));
   }

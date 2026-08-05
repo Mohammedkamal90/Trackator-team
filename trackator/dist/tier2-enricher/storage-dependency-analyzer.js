@@ -1123,7 +1123,7 @@ function exportStorageDependencyResult(result) {
                 ...v
             })),
             multiVariableWriters: result.storageWriteGraph.multiVariableWriters,
-            contentedVariables: result.storageWriteGraph.contentedVariables,
+            contendedVariables: result.storageWriteGraph.contentedVariables,
             summary: result.storageWriteGraph.summary
         },
         sharedStateMatrix: {

@@ -30,21 +30,91 @@ function buildFunctionRegistry(contracts) {
 function registerFunction(func, contract) {
     const signature = buildSignature(func);
     const selector = computeSelector(signature.canonical);
-    const category = categorizeFunction(func, contract);
-    const accessControl = analyzeAccessControl(func);
-    const risk = assessRisk(func, accessControl);
-    const stateImpact = analyzeStateImpact(func);
+    const rawCategory = categorizeFunction(func, contract);
+    const accessControlDetail = analyzeAccessControl(func);
+    const risk = assessRisk(func, accessControlDetail);
+    const stateImpactDetail = analyzeStateImpact(func);
     const gasProfile = estimateGasProfile(func);
     return {
+        // Canonical fields
+        id: `${contract.name}.${signature.canonical}`,
         contract: contract.name,
-        function: func,
         signature: signature.canonical,
-        selector,
-        category,
-        accessControl,
+        name: func.name,
+        function: func.name,
+        category: mapToCanonicalCategory(rawCategory),
+        accessControl: mapToCanonicalAccessControl(accessControlDetail, func),
         risk,
-        stateImpact,
+        stateReads: stateImpactDetail.reads,
+        stateWrites: stateImpactDetail.writes,
+        externalCalls: [], // local analysis only tracks a count (stateImpactDetail.externalCalls); no per-call target names available here — cross-reference callEdges for real target data
+        stateImpact: `${stateImpactDetail.reads.length} reads, ${stateImpactDetail.writes.length} writes` +
+            (stateImpactDetail.mints ? ', mints' : '') +
+            (stateImpactDetail.burns ? ', burns' : '') +
+            (stateImpactDetail.transfers ? ', transfers' : ''),
+        lineDeclared: func.lineStart,
+        // Local-only extensions
+        functionDef: func,
+        selector,
+        rawCategory,
+        accessControlDetail,
+        stateImpactDetail,
         gasProfile
+    };
+}
+/**
+ * Map local 12-value category to canonical 10-value FunctionCategory.
+ * 6 values match directly; 6 local-only values are remapped (verified against
+ * codebase usage — nothing outside this file depends on the raw values).
+ */
+function mapToCanonicalCategory(raw) {
+    const map = {
+        'admin': 'admin',
+        'access-control': 'access-control',
+        'core-logic': 'core-logic',
+        'oracle': 'oracle',
+        'constructor': 'constructor',
+        'emergency': 'emergency',
+        'view': 'utility',
+        'external': 'callback',
+        'event-emitter': 'utility',
+        'modifier': 'access-control',
+        'helper': 'utility',
+        'unknown': 'utility'
+    };
+    return map[raw];
+}
+/**
+ * Map local AccessControlInfo to canonical AccessControlEntry.
+ * `level` is derived from local's richer `mechanism` field (not a naive
+ * rename — local's AccessControlLevel values don't overlap with canonical's).
+ */
+function mapToCanonicalAccessControl(local, func) {
+    let level;
+    if (func.visibility === 'internal' || func.visibility === 'private') {
+        level = 'internal';
+    }
+    else if (local.mechanism === 'onlyOwner') {
+        level = 'admin-only';
+    }
+    else if (local.mechanism === 'onlyRole') {
+        level = 'role-based';
+    }
+    else if (local.mechanism === 'require' || local.mechanism === 'custom') {
+        level = 'restricted';
+    }
+    else {
+        level = 'public';
+    }
+    const modifiers = func.modifiers || (local.modifierName ? [local.modifierName] : []);
+    return {
+        level,
+        rolesRequired: local.roleRequired ? [local.roleRequired] : [],
+        modifiers,
+        ownerOnly: local.mechanism === 'onlyOwner',
+        visibility: func.visibility,
+        restrictions: local.bypassable ? local.bypassMethods : undefined,
+        length: modifiers.length
     };
 }
 /**
@@ -388,17 +458,17 @@ function findFunctions(registry, criteria) {
                 matches = false;
             }
             if (criteria.hasExternalCalls !== undefined) {
-                if (criteria.hasExternalCalls && func.stateImpact.externalCalls === 0) {
+                if (criteria.hasExternalCalls && func.stateImpactDetail.externalCalls === 0) {
                     matches = false;
                 }
-                if (!criteria.hasExternalCalls && func.stateImpact.externalCalls > 0) {
+                if (!criteria.hasExternalCalls && func.stateImpactDetail.externalCalls > 0) {
                     matches = false;
                 }
             }
-            if (criteria.stateMutability && func.function.stateMutability !== criteria.stateMutability) {
+            if (criteria.stateMutability && func.functionDef.stateMutability !== criteria.stateMutability) {
                 matches = false;
             }
-            if (criteria.visibility && func.function.visibility !== criteria.visibility) {
+            if (criteria.visibility && func.functionDef.visibility !== criteria.visibility) {
                 matches = false;
             }
             if (matches) {
@@ -427,10 +497,10 @@ function getEntryPoints(registry) {
     const results = [];
     for (const [, functions] of registry) {
         for (const func of functions) {
-            if ((func.function.visibility === 'external' || func.function.visibility === 'public') &&
-                func.function.stateMutability !== 'view' &&
-                func.function.stateMutability !== 'pure' &&
-                !['constructor', 'fallback', 'receive'].includes(func.function.kind)) {
+            if ((func.functionDef.visibility === 'external' || func.functionDef.visibility === 'public') &&
+                func.functionDef.stateMutability !== 'view' &&
+                func.functionDef.stateMutability !== 'pure' &&
+                !['constructor', 'fallback', 'receive'].includes(func.functionDef.kind)) {
                 results.push(func);
             }
         }
@@ -447,9 +517,11 @@ function exportRegistry(registry) {
             signature: f.signature,
             selector: f.selector,
             category: f.category,
+            rawCategory: f.rawCategory,
             accessControl: f.accessControl,
             risk: f.risk,
             stateImpact: f.stateImpact,
+            stateImpactDetail: f.stateImpactDetail,
             gasProfile: f.gasProfile
         }));
     }

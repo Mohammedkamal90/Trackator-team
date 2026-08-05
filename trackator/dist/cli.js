@@ -81,6 +81,7 @@ program
     .option('--breakdown <file>', 'Protocol Breakdown file to ingest')
     .option('-o, --output <dir>', 'Output directory', './trackator-output')
     .option('--generate-alerts', 'Generate alert rules from X-Ray/Breakdown data', true)
+    .option('--skip-advanced', 'Skip storage/coupling/sync/evidence analysis (faster, v1.0-equivalent output)', false)
     .option('--protocol-type <type>', 'Override protocol type detection')
     .option('-v, --verbose', 'Verbose output', false)
     .action(async (input, options) => {
