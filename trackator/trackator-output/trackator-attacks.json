@@ -1,0 +1,151 @@
+{
+  "_metadata": {
+    "generatedAt": "2026-08-06T04:14:42.340Z",
+    "version": "1.0.0-fixA",
+    "description": "Weaponized coupling attack scenarios for RedTeam integration"
+  },
+  "summary": {
+    "totalAttacksGenerated": 0,
+    "criticalAttacks": 0,
+    "highSeverityAttacks": 0,
+    "byAttackType": {},
+    "averageFeasibilityScore": 0,
+    "totalValueAtRisk": "Protocol-dependent (see individual attack estimates)",
+    "topTargets": []
+  },
+  "attackSurfaceSummary": [],
+  "rankedTargets": [],
+  "quickAttackPatterns": [
+    {
+      "patternName": "Atomicity Double-Spend",
+      "applicableTo": [],
+      "steps": [
+        "Identify permissionless function pair sharing value-bearing variable",
+        "Call function A to initiate state change",
+        "Immediately call function B before consistency check",
+        "Extract profit from inconsistent state"
+      ],
+      "estimatedTimeToPoC": "2-4 hours",
+      "difficulty": "intermediate"
+    },
+    {
+      "patternName": "Oracle TOCTOU",
+      "applicableTo": [],
+      "steps": [
+        "Find oracle/price dependency with stale data acceptance",
+        "Set up favorable price condition",
+        "Trigger price-dependent function before oracle updates",
+        "Profit from price discrepancy"
+      ],
+      "estimatedTimeToPoC": "4-8 hours",
+      "difficulty": "advanced"
+    },
+    {
+      "patternName": "Callback State Injection",
+      "applicableTo": [],
+      "steps": [
+        "Identify external call with state dependency",
+        "Prepare malicious callback contract",
+        "Trigger parent function to make external call",
+        "Inject state change during callback execution",
+        "Parent function continues with corrupted state"
+      ],
+      "estimatedTimeToPoC": "6-12 hours",
+      "difficulty": "expert"
+    },
+    {
+      "patternName": "Cluster Cascade",
+      "applicableTo": [
+        "High-cohesion function clusters (3+ functions)"
+      ],
+      "steps": [
+        "Map cluster functions and shared variables",
+        "Identify permissionless entry point",
+        "Plan state modification sequence",
+        "Execute multi-function chain",
+        "Amplify effect at each step"
+      ],
+      "estimatedTimeToPoC": "8-16 hours",
+      "difficulty": "expert"
+    }
+  ],
+  "integrationHints": [
+    {
+      "category": "entry-point",
+      "hint": "Start with P0-Critical targets from rankedTargets array",
+      "trackatorField": "redteamOptimizedOutput.rankedTargets",
+      "priority": "critical"
+    },
+    {
+      "category": "state-setup",
+      "hint": "Use attackSteps[].prerequisites to determine required initial state",
+      "trackatorField": "attackScenarios[].prerequisites",
+      "priority": "high"
+    },
+    {
+      "category": "trigger",
+      "hint": "Build PoC following attackSteps[] sequence exactly",
+      "trackatorField": "attackScenarios[].attackSteps",
+      "priority": "critical"
+    },
+    {
+      "category": "amplify",
+      "hint": "For maximum impact, combine atomicity violation with reentrancy if guards missing",
+      "trackatorField": "atomicityViolations[].hasReentrancyGuard",
+      "priority": "high"
+    },
+    {
+      "category": "extract",
+      "hint": "Follow profitExtraction guidance from couplingExploits for value extraction",
+      "trackatorField": "couplingExploits[].profitExtraction",
+      "priority": "medium"
+    }
+  ],
+  "criticalAttackScenarios": [],
+  "atomicityViolations": [],
+  "toctouAttacks": [
+    {
+      "attackId": "TOCTOU_HC_1",
+      "sourceCoupling": {
+        "id": "HC_1",
+        "type": "multi-contract-consistency",
+        "severity": "medium",
+        "source": {
+          "contract": "OracleWrapper"
+        },
+        "target": {
+          "contract": "FeeCollector"
+        },
+        "mechanism": "Multiple contracts appear to track related state",
+        "sharedState": [
+          "admin"
+        ],
+        "description": "OracleWrapper and FeeCollector both have variables: [admin]",
+        "exploitationScenario": "Desynchronization between contracts can lead to inconsistent state",
+        "recommendation": "Implement explicit synchronization or single-source-of-truth pattern",
+        "detectionConfidence": "possible"
+      },
+      "timeWindow": {
+        "exists": true,
+        "triggerCondition": "cross-contract state drift occurs"
+      },
+      "attackSequence": {
+        "step1": {
+          "action": "Manipulate state that target function depends on",
+          "timing": "T+0 (initial state setup)"
+        },
+        "step2": {
+          "action": "Trigger source function with now-stale assumption",
+          "timing": "T+ε (after state changed but before detected)"
+        }
+      },
+      "requiredConditions": [
+        "Ability to call OracleWrapper.source",
+        "State can be manipulated between check and use",
+        "Assumption remains undetected"
+      ],
+      "severity": "medium",
+      "detectionDifficulty": "moderate"
+    }
+  ]
+}

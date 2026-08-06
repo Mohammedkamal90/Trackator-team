@@ -1,6 +1,6 @@
 # Plugin: Fork Test Plugin
 
-**Phase**: 5 (Fork Testing)
+**Phase**: 4 (Fork Testing)
 **Purpose**: Validate hypotheses against REAL mainnet state using Foundry fork testing with Trackator visualization
 **Type**: Validation plugin (confirms or grades findings with real-world evidence)
 
@@ -609,8 +609,7 @@ function calculateForkConfidence(session) {
 
 | Phase | Input to Fork Test | Output from Fork Test |
 |-------|--------------------|----------------------|
-| Phase 2-3 | Traced hypotheses | Confirmation/evidence |
-| Phase 4 | Fuzz-validated findings | Real-world validation |
+| Phase 2-3 | Traced hypotheses (survived block gates) | Confirmation/evidence |
 | Verifier Agent | Receives evidence | Grades confidence |
 
 ### When to Skip
@@ -625,9 +624,9 @@ After fork testing, apply BLOCK GATE logic:
 
 | Fork Result | Block Gate Action | Confidence Boost |
 |-------------|-------------------|------------------|
-| CONFIRMED on fork | Report now | +35% |
-| PROBABLE (partial success) | Report with caveats | +20% |
-| LEAD (interesting failure) | Appendix only | +5% |
+| CONFIRMED on fork | Report now | +50% |
+| PROBABLE (partial success) | Report with caveats | +30% |
+| LEAD (interesting failure) | Appendix only | +10% |
 | DEAD END (proven impossible) | Discard silently | 0% |
 | SKIPPED (no RPC) | Keep pre-fork confidence | 0% |
 

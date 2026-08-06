@@ -163,10 +163,18 @@ function checkExploitableDesignChoice(alert, context) {
 #### Check 5: Storage Invariant Validation (v2.0 NEW)
 
 ```javascript
+// FIX (integration bug, confirmed against live trackator output): this check previously
+// referenced storage.valueBearingVariables / storage.contentedVariables (wrong spelling
+// AND wrong nesting) / storage.sharedStateMatrix.find() (wrong — it's an object, not an
+// array) — every one of the three sub-checks was dead or would crash. Rewritten against
+// the real exported shape:
+//   storage.storageWriteGraph.variableWriters: Array<{key, writers[], isValueBearing}>
+//   storage.storageWriteGraph.contendedVariables: Array<{variable, writerCount, writers[]}>
+//   storage.sharedStateMatrix.cells: Array<{entryPoint, cells: Array<{variable, accessType,
+//     hasExternalCallBefore, hasExternalCallAfter, riskFactors[], ...}>}>  (no numeric
+//     riskScore field exists on a cell — risk is derived from accessType + riskFactors)
 function checkStorageInvariant(alert, context) {
-    // v2.0: Use Storage Dependency Analyzer data to validate storage-related alerts
-
-    if (!context.storage?.valueBearingVariables) {
+    if (!context.storage?.storageWriteGraph) {
         return { isMatch: false, reason: 'No storage data available' };
     }
 
@@ -175,19 +183,18 @@ function checkStorageInvariant(alert, context) {
         return { isMatch: false, reason: 'No target variable in alert' };
     }
 
-    // 5a: Is this a value-bearing variable with proper access control?
-    const isValueBearing = context.storage.valueBearingVariables.some(
-        vbv => vbv.variable === targetVar
-    );
+    const swg = context.storage.storageWriteGraph;
 
-    if (isValueBearing) {
-        const writers = context.storage.variableWriters.get(targetVar) || [];
+    // 5a: Is this a value-bearing variable with a permissionless writer?
+    const writerEntry = (swg.variableWriters || []).find(vw => vw.key === targetVar);
+
+    if (writerEntry && writerEntry.isValueBearing) {
+        const writers = writerEntry.writers || [];
         const hasPermissionless = writers.some(w =>
             w.accessControlLevel === 'none' || w.accessControlLevel === 'permissionless'
         );
 
         if (hasPermissionless) {
-            // Value-bearing variable with permissionless writer = KEEP (real vulnerability)
             return {
                 isMatch: true,
                 type: 'storage_vulnerability',
@@ -195,7 +202,7 @@ function checkStorageInvariant(alert, context) {
                 reason: `${targetVar} holds user funds AND has permissionless writers`,
                 severity: 'critical',
                 trackatorEvidence: {
-                    fieldsUsed: ['storage.valueBearingVariables', 'storage.variableWriters'],
+                    fieldsUsed: ['storage.storageWriteGraph.variableWriters'],
                     writerCount: writers.length,
                     permissionlessCount: writers.filter(w =>
                         w.accessControlLevel === 'none' || w.accessControlLevel === 'permissionless'
@@ -206,7 +213,7 @@ function checkStorageInvariant(alert, context) {
     }
 
     // 5b: Is this a contended variable (potential race condition)?
-    const contendedVar = context.storage.contentedVariables?.find(
+    const contendedVar = (swg.contendedVariables || []).find(
         cv => cv.variable === targetVar && cv.writerCount >= 2
     );
 
@@ -218,31 +225,38 @@ function checkStorageInvariant(alert, context) {
             reason: `${targetVar} has ${contendedVar.writerCount} writers - race condition risk`,
             severity: 'high',
             trackatorEvidence: {
-                fieldsUsed: ['storage.contentedVariables'],
+                fieldsUsed: ['storage.storageWriteGraph.contendedVariables'],
                 writerCount: contendedVar.writerCount,
                 writers: contendedVar.writers
             }
         };
     }
 
-    // 5c: Does this variable appear in shared-state matrix with high risk?
-    const sharedStateEntry = context.storage.sharedStateMatrix?.find(
-        s => s.sharedVariables.includes(targetVar) && s.riskScore > 0.7
-    );
+    // 5c: Does this variable appear in shared-state matrix with elevated risk?
+    // No numeric risk score exists per-cell — treat write access plus any recorded
+    // risk factor (or an external call around the write) as the elevated-risk signal.
+    for (const row of context.storage.sharedStateMatrix?.cells || []) {
+        const cell = (row.cells || []).find(c => c.variable === targetVar);
+        if (!cell) continue;
 
-    if (sharedStateEntry) {
-        return {
-            isMatch: true,
-            type: 'shared_state_risk',
-            recommendation: 'KEEP_WITH_NOTE',
-            reason: `${targetVar} in shared state matrix with risk score ${sharedStateEntry.riskScore}`,
-            severity: 'medium',
-            trackatorEvidence: {
-                fieldsUsed: ['storage.sharedStateMatrix'],
-                entryPoint: sharedStateEntry.entryPoint,
-                hasValueBearing: sharedStateEntry.hasValueBearing
-            }
-        };
+        const isElevatedRisk = (cell.accessType === 'write' || cell.accessType === 'read-write') &&
+            ((cell.riskFactors?.length || 0) > 0 || cell.hasExternalCallBefore || cell.hasExternalCallAfter);
+
+        if (isElevatedRisk) {
+            return {
+                isMatch: true,
+                type: 'shared_state_risk',
+                recommendation: 'KEEP_WITH_NOTE',
+                reason: `${targetVar} written from permissionless entry point ${row.entryPoint} with risk factors: ${(cell.riskFactors || []).join(', ') || 'external call adjacency'}`,
+                severity: 'medium',
+                trackatorEvidence: {
+                    fieldsUsed: ['storage.sharedStateMatrix.cells'],
+                    entryPoint: row.entryPoint,
+                    accessType: cell.accessType,
+                    riskFactors: cell.riskFactors || []
+                }
+            };
+        }
     }
 
     return { isMatch: false };
@@ -260,9 +274,17 @@ function checkStorageInvariant(alert, context) {
 #### Check 6: Cross-Contract Coupling Safety (v2.0 NEW)
 
 ```javascript
+// FIX (integration bug, confirmed against live source + output): this check previously
+// indexed functionDependencyMatrix by bracket lookup (fdm[pairKey]) — real shape is
+// {functions, dependencies: Array<{key: "funcA→funcB", sourceFunction, targetFunction,
+// dependencyType, sharedVariables, couplingStrength (0-100, NOT 0-1), isDirect,
+// isCrossContract, description, riskFactors}>, statistics, couplingClusters}. Also read
+// coupling.strength/coupling.couplingType (fields that don't exist — real field is
+// couplingStrength) and treated hiddenCouplings as a flat array with functionA/functionB/
+// couplingType/strength fields — real shape is {couplings: Array<{id, type, severity,
+// source: {contract,function}, target: {contract,function}, mechanism, sharedState[],
+// description, exploitationScenario, recommendation, detectionConfidence}>, summary}.
 function checkCouplingSafety(alert, context) {
-    // v2.0: Use State Coupling Detector to identify atomicity violations
-
     if (!context.coupling?.functionDependencyMatrix) {
         return { isMatch: false, reason: 'No coupling data available' };
     }
@@ -272,16 +294,20 @@ function checkCouplingSafety(alert, context) {
         return { isMatch: false, reason: 'Alert involves single function' };
     }
 
+    const deps = context.coupling.functionDependencyMatrix.dependencies || [];
+
     // 6a: Check for strong coupling between attacker-accessible functions
     for (let i = 0; i < involvedFunctions.length - 1; i++) {
         const funcA = involvedFunctions[i];
         const funcB = involvedFunctions[i + 1];
-        const pairKey = `${funcA}->${funcB}`;
 
-        const coupling = context.coupling.functionDependencyMatrix[pairKey];
+        const dep = deps.find(d =>
+            d.key === `${funcA}→${funcB}` || d.key === `${funcB}→${funcA}` ||
+            (d.sourceFunction === funcA && d.targetFunction === funcB) ||
+            (d.sourceFunction === funcB && d.targetFunction === funcA)
+        );
 
-        if (coupling && (coupling.strength === 'STRONG' || coupling.strength > 0.7)) {
-            // Both functions accessible to attacker?
+        if (dep && dep.couplingStrength >= 70) {  // 0-100 scale, ">=70" ~= "STRONG"
             const funcAAccessible = isFunctionAccessible(funcA, context);
             const funcBAccessible = isFunctionAccessible(funcB, context);
 
@@ -290,13 +316,13 @@ function checkCouplingSafety(alert, context) {
                     isMatch: true,
                     type: 'atomicity_violation',
                     recommendation: 'KEEP',
-                    reason: `Strong coupling (${pairKey}) exploitable by external actor`,
+                    reason: `Strong coupling (${dep.key}) exploitable by external actor`,
                     severity: 'high',
                     trackatorEvidence: {
-                        fieldsUsed: ['coupling.functionDependencyMatrix'],
-                        couplingStrength: coupling.strength,
-                        sharedVariables: coupling.sharedVariables || [],
-                        couplingType: coupling.couplingType
+                        fieldsUsed: ['coupling.functionDependencyMatrix.dependencies'],
+                        couplingStrength: dep.couplingStrength,
+                        sharedVariables: dep.sharedVariables || [],
+                        dependencyType: dep.dependencyType
                     }
                 };
             }
@@ -304,32 +330,34 @@ function checkCouplingSafety(alert, context) {
     }
 
     // 6b: Check for hidden couplings that match this alert pattern
-    const matchingHiddenCoupling = (context.coupling.hiddenCouplings || []).find(hc =>
-        involvedFunctions.includes(hc.functionA) &&
-        involvedFunctions.includes(hc.functionB)
+    const hiddenCouplings = context.coupling.hiddenCouplings?.couplings || [];
+    const matchingHiddenCoupling = hiddenCouplings.find(hc =>
+        involvedFunctions.includes(hc.source?.function) &&
+        involvedFunctions.includes(hc.target?.function)
     );
 
     if (matchingHiddenCoupling) {
-        const exploitability =
-            matchingHiddenCoupling.couplingType === 'timestamp-dependent' ? 'HIGH - MEV viable' :
-            matchingHiddenCoupling.couplingType === 'transient' ? 'MEDIUM - race condition' : 'LOW';
+        const isHighSeverity = matchingHiddenCoupling.severity === 'critical' ||
+            matchingHiddenCoupling.severity === 'high';
 
         return {
             isMatch: true,
             type: 'hidden_coupling_exploit',
-            recommendation: exploitability.includes('HIGH') ? 'KEEP' : 'KEEP_WITH_NOTE',
-            reason: `Hidden ${matchingHiddenCoupling.couplingType} coupling detected`,
-            severity: exploitability.includes('HIGH') ? 'high' : 'medium',
+            recommendation: isHighSeverity ? 'KEEP' : 'KEEP_WITH_NOTE',
+            reason: `Hidden ${matchingHiddenCoupling.type} coupling detected: ${matchingHiddenCoupling.mechanism}`,
+            severity: matchingHiddenCoupling.severity,
             trackatorEvidence: {
-                fieldsUsed: ['coupling.hiddenCouplings'],
-                couplingType: matchingHiddenCoupling.couplingType,
-                strength: matchingHiddenCoupling.strength,
-                exploitationPotential: exploitability
+                fieldsUsed: ['coupling.hiddenCouplings.couplings'],
+                couplingType: matchingHiddenCoupling.type,
+                detectionConfidence: matchingHiddenCoupling.detectionConfidence,
+                exploitationScenario: matchingHiddenCoupling.exploitationScenario
             }
         };
     }
 
     // 6c: Check invariant function map - does this break invariants?
+    // Real shape: {mappings, violationPaths, protectionGaps} — NOT establishes/
+    // dependsOn/canViolate as previously (incorrectly) documented.
     const impactedInvariants = findImpactedInvariants(involvedFunctions, context.coupling);
     if (impactedInvariants.length > 0) {
         return {
@@ -339,7 +367,7 @@ function checkCouplingSafety(alert, context) {
             reason: `May violate invariants: ${impactedInvariants.join(', ')}`,
             severity: 'high',
             trackatorEvidence: {
-                fieldsUsed: ['coupling.invariantFunctionMap'],
+                fieldsUsed: ['coupling.invariantFunctionMap.violationPaths', 'coupling.invariantFunctionMap.protectionGaps'],
                 impactedInvariants
             }
         };
@@ -415,16 +443,26 @@ function checkSyncConsistency(alert, context) {
     }
 
     // 7b: Check assumption dependency graph for unverified assumptions
+    // FIX (integration bug): producers/consumers/verifiers are now exported by
+    // sync-analyzer.ts (previously always undefined — see FIX note on trackator's
+    // sync-analyzer.ts exportSyncAnalysisResult). Real shapes:
+    //   producers[]: {nodeId, producerFunctions[], productionMechanism, outputVariables[], establishedInvariants[]}
+    //   consumers[]: {nodeId, consumerFunctions[], assumptionMade, validationPerformed, isBlindTrust, impactIfWrong}
+    //   verifiers[]: {nodeId, verifierFunctions[], verificationMechanism, coverage}
+    // There's no explicit "assumptionId" linking them — the shared key is nodeId
+    // (matches AssumptionNode.id), and consumer/producer/verifier functions are nested
+    // arrays of function names, not flat function fields.
     if (context.sync?.assumptionDependencyGraph) {
         const { producers, consumers, verifiers } = context.sync.assumptionDependencyGraph;
 
-        // Find unverified assumptions used by the target function
-        const unverifiedForThisFunc = (producers || []).filter(prod => {
-            const hasVerifier = (verifiers || []).some(v => v.assumptionId === prod.assumptionId);
-            const consumedByTarget = (consumers || []).some(
-                c => c.assumptionId === prod.assumptionId && c.function === alertFunction
+        const unverifiedForThisFunc = (consumers || []).filter(cons => {
+            const consumesHere = (cons.consumerFunctions || []).some(f =>
+                f.functionId === alertFunction || f.functionId?.endsWith(`.${alertFunction}`)
             );
-            return !hasVerifier && consumedByTarget;
+            if (!consumesHere) return false;
+
+            const hasVerifier = (verifiers || []).some(v => v.nodeId === cons.nodeId);
+            return !hasVerifier && cons.isBlindTrust;
         });
 
         if (unverifiedForThisFunc.length > 0) {
@@ -432,30 +470,38 @@ function checkSyncConsistency(alert, context) {
                 isMatch: true,
                 type: 'unverified_assumption_usage',
                 recommendation: 'KEEP',
-                reason: `${unverifiedForThisFunc.length} unverified assumptions used by ${alertFunction}`,
+                reason: `${unverifiedForThisFunc.length} blind-trust assumption(s) used by ${alertFunction} with no verifier node`,
                 severity: 'medium',
                 trackatorEvidence: {
-                    fieldsUsed: ['sync.assumptionDependencyGraph'],
-                    unverifiedAssumptions: unverifiedForThisFunc.map(u => u.assumptionId),
-                    stalenessWindows: unverifiedForThisFunc.map(u => u.stalenessWindow)
+                    fieldsUsed: ['sync.assumptionDependencyGraph.consumers', 'sync.assumptionDependencyGraph.verifiers'],
+                    unverifiedAssumptions: unverifiedForThisFunc.map(u => u.assumptionMade),
+                    nodeIds: unverifiedForThisFunc.map(u => u.nodeId)
                 }
             };
         }
     }
 
     // 7c: Check Evidence Validator pre-classification
+    // FIX (integration bug): findPreClassification() below previously searched for keys
+    // like registry['confirmedVulnerability'] as if classificationRegistry were split into
+    // per-class arrays keyed in camelCase — real shape is a single flat
+    // {entries: ClassifiedFinding[], statistics}, and entries use the 6-class
+    // FindingClassification vocabulary (kebab-case: 'reachable-bug', 'potential-bug',
+    // 'false-positive', 'by-design', 'proven-property', 'insufficient-evidence'), which
+    // is a DIFFERENT enum from FinalVerdict's vocabulary ('confirmed-vulnerability' etc.)
+    // that the old code was searching for. It never matched anything, ever.
     if (context.evidence?.classificationRegistry) {
         const preClass = findPreClassification(alert.id, context.evidence.classificationRegistry);
 
-        if (preClass === 'confirmed-vulnerability') {
+        if (preClass === 'reachable-bug') {
             return {
                 isMatch: true,
                 type: 'pre_validated_finding',
                 recommendation: 'KEEP',
-                reason: 'Evidence Validator already classified as confirmed vulnerability',
+                reason: 'Evidence Validator already classified as a reachable bug',
                 severity: alert.severity || 'high',
                 trackatorEvidence: {
-                    fieldsUsed: ['evidence.classificationRegistry'],
+                    fieldsUsed: ['evidence.classificationRegistry.entries'],
                     preClassification: preClass
                 }
             };
@@ -466,10 +512,10 @@ function checkSyncConsistency(alert, context) {
                 isMatch: true,
                 type: 'pre_disproven',
                 recommendation: 'DISCARD',
-                reason: 'Evidence Validator already disproved this finding',
+                reason: 'Evidence Validator already classified this as a false positive',
                 severity: 'low',
                 trackatorEvidence: {
-                    fieldsUsed: ['evidence.classificationRegistry'],
+                    fieldsUsed: ['evidence.classificationRegistry.entries'],
                     preClassification: preClass
                 }
             };
@@ -482,45 +528,25 @@ function checkSyncConsistency(alert, context) {
 // --- Helper Function for Check 7c ---
 
 /**
- * findPreClassification - Look up a finding's pre-classification in Evidence Validator's classification registry
+ * findPreClassification - Look up a finding's pre-classification in Evidence Validator's
+ * classification registry. Matches by originalFindingId (the source Trackator alert/finding
+ * ID that classifyAllFindings() in evidence-validator.ts recorded), falling back to title
+ * substring match since alert IDs and classification findingIds (F1_n/F2_n/F3R_n/F3A_n) use
+ * different numbering schemes and aren't directly comparable.
  * @param {string} alertId - The alert/finding ID to look up
- * @param {object} registry - The classificationRegistry from context.evidence
- * @returns {string|null} - The pre-classification class, or null if not found
+ * @param {object} registry - The classificationRegistry from context.evidence ({entries, statistics})
+ * @returns {string|null} - One of the 6 FindingClassification values, or null if not found
  */
 function findPreClassification(alertId, registry) {
-    if (!registry || !alertId) return null;
-    
-    // Search each class for this finding ID
-    const classOrder = [
-        'confirmedVulnerability',
-        'potentialVulnerability', 
-        'falsePositive',
-        'byDesign',
-        'informational',
-        'cannotDetermine'
-    ];
-    
-    for (const className of classOrder) {
-        const camelCase = className.charAt(0).toLowerCase() + className.slice(1);
-        const classArray = registry[className] || registry[camelCase] || registry[className.toLowerCase()];
-        
-        if (Array.isArray(classArray)) {
-            const found = classArray.find(f => 
-                f.findingId === alertId || 
-                f.id === alertId || 
-                f.alertId === alertId
-            );
-            if (found) {
-                // Return kebab-case version to match expected output format
-                return className
-                    .replace(/([A-Z])/g, '-$1')
-                    .toLowerCase()
-                    .replace('^-', '');
-            }
-        }
-    }
-    
-    return null;  // No pre-classification found
+    if (!registry?.entries || !alertId) return null;
+
+    const found = registry.entries.find(e =>
+        e.originalFindingId === alertId ||
+        e.findingId === alertId ||
+        e.title?.includes(alertId)
+    );
+
+    return found ? found.classification : null;
 }
 ```
 

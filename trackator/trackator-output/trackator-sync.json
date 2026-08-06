@@ -1,0 +1,2803 @@
+{
+  "timestamp": "2026-08-06T04:14:42.364Z",
+  "assumptionDependencyGraph": {
+    "nodes": [
+      {
+        "id": "NODE_1",
+        "type": "state-variable",
+        "name": "SampleLendingProtocol.totalSupply",
+        "contract": "SampleLendingProtocol",
+        "category": "accounting",
+        "description": "State variable: totalSupply (uint256)",
+        "isValueBearing": true,
+        "securityClassification": "critical"
+      },
+      {
+        "id": "NODE_2",
+        "type": "state-variable",
+        "name": "SampleLendingProtocol.totalBorrowed",
+        "contract": "SampleLendingProtocol",
+        "category": "general-state",
+        "description": "State variable: totalBorrowed (uint256)",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "NODE_3",
+        "type": "state-variable",
+        "name": "SampleLendingProtocol.reserveBalance",
+        "contract": "SampleLendingProtocol",
+        "category": "accounting",
+        "description": "State variable: reserveBalance (uint256)",
+        "isValueBearing": true,
+        "securityClassification": "critical"
+      },
+      {
+        "id": "NODE_4",
+        "type": "state-variable",
+        "name": "SampleLendingProtocol.oracle",
+        "contract": "SampleLendingProtocol",
+        "category": "pricing",
+        "description": "State variable: oracle (OracleWrapper)",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "NODE_5",
+        "type": "state-variable",
+        "name": "SampleLendingProtocol.collateralFactor",
+        "contract": "SampleLendingProtocol",
+        "category": "solvency",
+        "description": "State variable: collateralFactor (uint256)",
+        "isValueBearing": true,
+        "securityClassification": "critical"
+      },
+      {
+        "id": "NODE_6",
+        "type": "state-variable",
+        "name": "SampleLendingProtocol.liquidationBonus",
+        "contract": "SampleLendingProtocol",
+        "category": "general-state",
+        "description": "State variable: liquidationBonus (uint256)",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "NODE_7",
+        "type": "state-variable",
+        "name": "SampleLendingProtocol.interestRate",
+        "contract": "SampleLendingProtocol",
+        "category": "pricing",
+        "description": "State variable: interestRate (uint256)",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "NODE_8",
+        "type": "state-variable",
+        "name": "SampleLendingProtocol.userCollateral",
+        "contract": "SampleLendingProtocol",
+        "category": "solvency",
+        "description": "State variable: userCollateral (mapping(address => uint256))",
+        "isValueBearing": true,
+        "securityClassification": "critical"
+      },
+      {
+        "id": "NODE_9",
+        "type": "state-variable",
+        "name": "SampleLendingProtocol.userDebt",
+        "contract": "SampleLendingProtocol",
+        "category": "accounting",
+        "description": "State variable: userDebt (mapping(address => uint256))",
+        "isValueBearing": true,
+        "securityClassification": "critical"
+      },
+      {
+        "id": "NODE_10",
+        "type": "state-variable",
+        "name": "SampleLendingProtocol.hasDeposited",
+        "contract": "SampleLendingProtocol",
+        "category": "general-state",
+        "description": "State variable: hasDeposited (mapping(address => bool))",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "NODE_11",
+        "type": "state-variable",
+        "name": "SampleLendingProtocol.owner",
+        "contract": "SampleLendingProtocol",
+        "category": "authorization",
+        "description": "State variable: owner (address)",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "NODE_12",
+        "type": "state-variable",
+        "name": "SampleLendingProtocol.guardian",
+        "contract": "SampleLendingProtocol",
+        "category": "general-state",
+        "description": "State variable: guardian (address)",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "NODE_13",
+        "type": "state-variable",
+        "name": "SampleLendingProtocol.paused",
+        "contract": "SampleLendingProtocol",
+        "category": "general-state",
+        "description": "State variable: paused (bool)",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "NODE_14",
+        "type": "state-variable",
+        "name": "SampleLendingProtocol.collateralToken",
+        "contract": "SampleLendingProtocol",
+        "category": "solvency",
+        "description": "State variable: collateralToken (IERC20)",
+        "isValueBearing": true,
+        "securityClassification": "critical"
+      },
+      {
+        "id": "NODE_15",
+        "type": "state-variable",
+        "name": "SampleLendingProtocol.borrowToken",
+        "contract": "SampleLendingProtocol",
+        "category": "general-state",
+        "description": "State variable: borrowToken (IERC20)",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "NODE_16",
+        "type": "state-variable",
+        "name": "SampleLendingProtocol.feeCollector",
+        "contract": "SampleLendingProtocol",
+        "category": "general-state",
+        "description": "State variable: feeCollector (FeeCollector)",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "NODE_17",
+        "type": "state-variable",
+        "name": "OracleWrapper.admin",
+        "contract": "OracleWrapper",
+        "category": "authorization",
+        "description": "State variable: admin (address)",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "NODE_18",
+        "type": "state-variable",
+        "name": "OracleWrapper.spotPrice",
+        "contract": "OracleWrapper",
+        "category": "pricing",
+        "description": "State variable: spotPrice (uint256)",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "NODE_19",
+        "type": "state-variable",
+        "name": "OracleWrapper.twapPrice",
+        "contract": "OracleWrapper",
+        "category": "pricing",
+        "description": "State variable: twapPrice (uint256)",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "NODE_20",
+        "type": "state-variable",
+        "name": "OracleWrapper.lastUpdateTime",
+        "contract": "OracleWrapper",
+        "category": "general-state",
+        "description": "State variable: lastUpdateTime (uint256)",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "NODE_21",
+        "type": "state-variable",
+        "name": "FeeCollector.protocol",
+        "contract": "FeeCollector",
+        "category": "general-state",
+        "description": "State variable: protocol (address)",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "NODE_22",
+        "type": "state-variable",
+        "name": "FeeCollector.treasury",
+        "contract": "FeeCollector",
+        "category": "general-state",
+        "description": "State variable: treasury (address)",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "NODE_23",
+        "type": "state-variable",
+        "name": "FeeCollector.admin",
+        "contract": "FeeCollector",
+        "category": "authorization",
+        "description": "State variable: admin (address)",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "NODE_24",
+        "type": "state-variable",
+        "name": "FeeCollector.totalFeesCollected",
+        "contract": "FeeCollector",
+        "category": "general-state",
+        "description": "State variable: totalFeesCollected (uint256)",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "NODE_25",
+        "type": "state-variable",
+        "name": "FeeCollector.feesByToken",
+        "contract": "FeeCollector",
+        "category": "general-state",
+        "description": "State variable: feesByToken (mapping(address => uint256))",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_1",
+        "type": "invariant",
+        "name": "INV_1",
+        "contract": "",
+        "category": "accounting",
+        "description": "Total supply accounting must balance",
+        "isValueBearing": true,
+        "securityClassification": "critical"
+      },
+      {
+        "id": "INV_INV_2",
+        "type": "invariant",
+        "name": "INV_2",
+        "contract": "",
+        "category": "bounds",
+        "description": "No underflow or overflow in arithmetic operations",
+        "isValueBearing": false,
+        "securityClassification": "critical"
+      },
+      {
+        "id": "INV_INV_3",
+        "type": "invariant",
+        "name": "INV_3",
+        "contract": "",
+        "category": "accounting",
+        "description": "Collateral value must always cover borrowed amount",
+        "isValueBearing": true,
+        "securityClassification": "critical"
+      },
+      {
+        "id": "INV_INV_4",
+        "type": "invariant",
+        "name": "INV_4",
+        "contract": "",
+        "category": "oracle",
+        "description": "Oracle prices must be within acceptable bounds",
+        "isValueBearing": false,
+        "securityClassification": "critical"
+      },
+      {
+        "id": "INV_INV_5",
+        "type": "invariant",
+        "name": "INV_5",
+        "contract": "",
+        "category": "bounds",
+        "description": "Interest rates must remain within configured bounds",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "INV_INV_6",
+        "type": "invariant",
+        "name": "INV_6",
+        "contract": "",
+        "category": "accounting",
+        "description": "Exchange rate between underlying and cToken must be accurate",
+        "isValueBearing": true,
+        "securityClassification": "critical"
+      },
+      {
+        "id": "INV_INV_NB_TOTALSUPPLY",
+        "type": "invariant",
+        "name": "INV_NB_TOTALSUPPLY",
+        "contract": "",
+        "category": "bounds",
+        "description": "totalSupply must stay within expected range",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "INV_INV_NB_TOTALBORROWED",
+        "type": "invariant",
+        "name": "INV_NB_TOTALBORROWED",
+        "contract": "",
+        "category": "bounds",
+        "description": "totalBorrowed must stay within expected range",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "INV_INV_NB_RESERVEBALANCE",
+        "type": "invariant",
+        "name": "INV_NB_RESERVEBALANCE",
+        "contract": "",
+        "category": "bounds",
+        "description": "reserveBalance must stay within expected range",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "INV_INV_NB_COLLATERALFACTOR",
+        "type": "invariant",
+        "name": "INV_NB_COLLATERALFACTOR",
+        "contract": "",
+        "category": "bounds",
+        "description": "collateralFactor must stay within expected range",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "INV_INV_NB_LIQUIDATIONBONUS",
+        "type": "invariant",
+        "name": "INV_NB_LIQUIDATIONBONUS",
+        "contract": "",
+        "category": "bounds",
+        "description": "liquidationBonus must stay within expected range",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "INV_INV_NB_INTERESTRATE",
+        "type": "invariant",
+        "name": "INV_NB_INTERESTRATE",
+        "contract": "",
+        "category": "bounds",
+        "description": "interestRate must stay within expected range",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "INV_INV_NB_USERCOLLATERAL",
+        "type": "invariant",
+        "name": "INV_NB_USERCOLLATERAL",
+        "contract": "",
+        "category": "bounds",
+        "description": "userCollateral must stay within expected range",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "INV_INV_NB_USERDEBT",
+        "type": "invariant",
+        "name": "INV_NB_USERDEBT",
+        "contract": "",
+        "category": "bounds",
+        "description": "userDebt must stay within expected range",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "INV_INV_NB_SPOTPRICE",
+        "type": "invariant",
+        "name": "INV_NB_SPOTPRICE",
+        "contract": "",
+        "category": "bounds",
+        "description": "spotPrice must stay within expected range",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "INV_INV_NB_TWAPPRICE",
+        "type": "invariant",
+        "name": "INV_NB_TWAPPRICE",
+        "contract": "",
+        "category": "bounds",
+        "description": "twapPrice must stay within expected range",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "INV_INV_NB_LASTUPDATETIME",
+        "type": "invariant",
+        "name": "INV_NB_LASTUPDATETIME",
+        "contract": "",
+        "category": "bounds",
+        "description": "lastUpdateTime must stay within expected range",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "INV_INV_NB_TOTALFEESCOLLECTED",
+        "type": "invariant",
+        "name": "INV_NB_TOTALFEESCOLLECTED",
+        "contract": "",
+        "category": "bounds",
+        "description": "totalFeesCollected must stay within expected range",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "INV_INV_NB_FEESBYTOKEN",
+        "type": "invariant",
+        "name": "INV_NB_FEESBYTOKEN",
+        "contract": "",
+        "category": "bounds",
+        "description": "feesByToken must stay within expected range",
+        "isValueBearing": false,
+        "securityClassification": "high"
+      },
+      {
+        "id": "INV_INV_AUTH_TOTALSUPPLY",
+        "type": "invariant",
+        "name": "INV_AUTH_TOTALSUPPLY",
+        "contract": "",
+        "category": "permission",
+        "description": "totalSupply must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_TOTALBORROWED",
+        "type": "invariant",
+        "name": "INV_AUTH_TOTALBORROWED",
+        "contract": "",
+        "category": "permission",
+        "description": "totalBorrowed must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_RESERVEBALANCE",
+        "type": "invariant",
+        "name": "INV_AUTH_RESERVEBALANCE",
+        "contract": "",
+        "category": "permission",
+        "description": "reserveBalance must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_ORACLE",
+        "type": "invariant",
+        "name": "INV_AUTH_ORACLE",
+        "contract": "",
+        "category": "permission",
+        "description": "oracle must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_COLLATERALFACTOR",
+        "type": "invariant",
+        "name": "INV_AUTH_COLLATERALFACTOR",
+        "contract": "",
+        "category": "permission",
+        "description": "collateralFactor must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_LIQUIDATIONBONUS",
+        "type": "invariant",
+        "name": "INV_AUTH_LIQUIDATIONBONUS",
+        "contract": "",
+        "category": "permission",
+        "description": "liquidationBonus must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_INTERESTRATE",
+        "type": "invariant",
+        "name": "INV_AUTH_INTERESTRATE",
+        "contract": "",
+        "category": "permission",
+        "description": "interestRate must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_USERCOLLATERAL",
+        "type": "invariant",
+        "name": "INV_AUTH_USERCOLLATERAL",
+        "contract": "",
+        "category": "permission",
+        "description": "userCollateral must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_USERDEBT",
+        "type": "invariant",
+        "name": "INV_AUTH_USERDEBT",
+        "contract": "",
+        "category": "permission",
+        "description": "userDebt must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_HASDEPOSITED",
+        "type": "invariant",
+        "name": "INV_AUTH_HASDEPOSITED",
+        "contract": "",
+        "category": "permission",
+        "description": "hasDeposited must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_OWNER",
+        "type": "invariant",
+        "name": "INV_AUTH_OWNER",
+        "contract": "",
+        "category": "permission",
+        "description": "owner must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_GUARDIAN",
+        "type": "invariant",
+        "name": "INV_AUTH_GUARDIAN",
+        "contract": "",
+        "category": "permission",
+        "description": "guardian must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_PAUSED",
+        "type": "invariant",
+        "name": "INV_AUTH_PAUSED",
+        "contract": "",
+        "category": "permission",
+        "description": "paused must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_COLLATERALTOKEN",
+        "type": "invariant",
+        "name": "INV_AUTH_COLLATERALTOKEN",
+        "contract": "",
+        "category": "permission",
+        "description": "collateralToken must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_BORROWTOKEN",
+        "type": "invariant",
+        "name": "INV_AUTH_BORROWTOKEN",
+        "contract": "",
+        "category": "permission",
+        "description": "borrowToken must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_FEECOLLECTOR",
+        "type": "invariant",
+        "name": "INV_AUTH_FEECOLLECTOR",
+        "contract": "",
+        "category": "permission",
+        "description": "feeCollector must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_ADMIN",
+        "type": "invariant",
+        "name": "INV_AUTH_ADMIN",
+        "contract": "",
+        "category": "permission",
+        "description": "admin must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_SPOTPRICE",
+        "type": "invariant",
+        "name": "INV_AUTH_SPOTPRICE",
+        "contract": "",
+        "category": "permission",
+        "description": "spotPrice must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_TWAPPRICE",
+        "type": "invariant",
+        "name": "INV_AUTH_TWAPPRICE",
+        "contract": "",
+        "category": "permission",
+        "description": "twapPrice must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_LASTUPDATETIME",
+        "type": "invariant",
+        "name": "INV_AUTH_LASTUPDATETIME",
+        "contract": "",
+        "category": "permission",
+        "description": "lastUpdateTime must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_PROTOCOL",
+        "type": "invariant",
+        "name": "INV_AUTH_PROTOCOL",
+        "contract": "",
+        "category": "permission",
+        "description": "protocol must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_TREASURY",
+        "type": "invariant",
+        "name": "INV_AUTH_TREASURY",
+        "contract": "",
+        "category": "permission",
+        "description": "treasury must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_TOTALFEESCOLLECTED",
+        "type": "invariant",
+        "name": "INV_AUTH_TOTALFEESCOLLECTED",
+        "contract": "",
+        "category": "permission",
+        "description": "totalFeesCollected must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      },
+      {
+        "id": "INV_INV_AUTH_FEESBYTOKEN",
+        "type": "invariant",
+        "name": "INV_AUTH_FEESBYTOKEN",
+        "contract": "",
+        "category": "permission",
+        "description": "feesByToken must only be modified by authorized functions",
+        "isValueBearing": false,
+        "securityClassification": "medium"
+      }
+    ],
+    "edges": [],
+    "graphStatistics": {
+      "totalNodes": 68,
+      "totalEdges": 0,
+      "producerCount": 25,
+      "consumerCount": 68,
+      "verifierCount": 25,
+      "blindTrustCount": 68,
+      "crossContractEdges": 0,
+      "averageDependenciesPerNode": 0,
+      "leastVerifiedNode": "NODE_1"
+    }
+  },
+  "desynchronizationAnalysis": {
+    "synchronizationGroups": [
+      {
+        "groupId": "GROUP_1",
+        "groupName": "Global Accounting Consistency",
+        "groupType": "global-per-user-accounting",
+        "variables": [
+          {
+            "variableName": "totalSupply",
+            "contract": "SampleLendingProtocol",
+            "role": "derived",
+            "updateFrequency": "low",
+            "updaterFunctions": [],
+            "readerFunctions": []
+          },
+          {
+            "variableName": "totalBorrowed",
+            "contract": "SampleLendingProtocol",
+            "role": "derived",
+            "updateFrequency": "low",
+            "updaterFunctions": [],
+            "readerFunctions": []
+          },
+          {
+            "variableName": "reserveBalance",
+            "contract": "SampleLendingProtocol",
+            "role": "derived",
+            "updateFrequency": "low",
+            "updaterFunctions": [],
+            "readerFunctions": []
+          }
+        ],
+        "contractsInvolved": [
+          "SampleLendingProtocol"
+        ],
+        "synchronizationOwner": "SampleLendingProtocol",
+        "syncPoints": [],
+        "currentSyncStatus": "synchronized",
+        "desyncDetection": "none",
+        "restorationMethod": "manual-intervention",
+        "riskIfDesynchronized": "Protocol must ensure sum of user balances equals total supply"
+      },
+      {
+        "groupId": "GROUP_2",
+        "groupName": "Debt-Collateral Solvency",
+        "groupType": "debt-collateral-matching",
+        "variables": [
+          {
+            "variableName": "totalBorrowed",
+            "contract": "SampleLendingProtocol",
+            "role": "derived",
+            "updateFrequency": "low",
+            "updaterFunctions": [],
+            "readerFunctions": []
+          },
+          {
+            "variableName": "userDebt",
+            "contract": "SampleLendingProtocol",
+            "role": "derived",
+            "updateFrequency": "low",
+            "updaterFunctions": [],
+            "readerFunctions": []
+          },
+          {
+            "variableName": "borrowToken",
+            "contract": "SampleLendingProtocol",
+            "role": "derived",
+            "updateFrequency": "low",
+            "updaterFunctions": [],
+            "readerFunctions": []
+          },
+          {
+            "variableName": "collateralFactor",
+            "contract": "SampleLendingProtocol",
+            "role": "derived",
+            "updateFrequency": "low",
+            "updaterFunctions": [],
+            "readerFunctions": []
+          },
+          {
+            "variableName": "userCollateral",
+            "contract": "SampleLendingProtocol",
+            "role": "derived",
+            "updateFrequency": "low",
+            "updaterFunctions": [],
+            "readerFunctions": []
+          },
+          {
+            "variableName": "collateralToken",
+            "contract": "SampleLendingProtocol",
+            "role": "derived",
+            "updateFrequency": "low",
+            "updaterFunctions": [],
+            "readerFunctions": []
+          }
+        ],
+        "contractsInvolved": [
+          "SampleLendingProtocol"
+        ],
+        "synchronizationOwner": "SampleLendingProtocol",
+        "syncPoints": [],
+        "currentSyncStatus": "synchronized",
+        "desyncDetection": "none",
+        "restorationMethod": "manual-intervention",
+        "riskIfDesynchronized": "Total debt must be covered by collateral at all times"
+      },
+      {
+        "groupId": "GROUP_3",
+        "groupName": "Interest Accrual Accuracy",
+        "groupType": "interest-accrual",
+        "variables": [
+          {
+            "variableName": "interestRate",
+            "contract": "SampleLendingProtocol",
+            "role": "derived",
+            "updateFrequency": "low",
+            "updaterFunctions": [],
+            "readerFunctions": []
+          }
+        ],
+        "contractsInvolved": [
+          "SampleLendingProtocol"
+        ],
+        "synchronizationOwner": "SampleLendingProtocol",
+        "syncPoints": [],
+        "currentSyncStatus": "synchronized",
+        "desyncDetection": "none",
+        "restorationMethod": "manual-intervention",
+        "riskIfDesynchronized": "Accrued interest/rewards must match elapsed time and rates"
+      }
+    ],
+    "desyncSources": [
+      {
+        "sourceId": "DS_1",
+        "sourceType": "reentrancy-gap",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "deposit"
+        },
+        "affectedGroups": [],
+        "description": "deposit has reentrancy vulnerability exposing intermediate state",
+        "triggerCondition": "Malicious reentrant call during execution",
+        "detectionDifficulty": "easy",
+        "severity": "critical",
+        "mitigation": "Implement CEI pattern or reentrancy guard (OpenZeppelin Guards)"
+      },
+      {
+        "sourceId": "DS_2",
+        "sourceType": "reentrancy-gap",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "borrow"
+        },
+        "affectedGroups": [],
+        "description": "borrow has reentrancy vulnerability exposing intermediate state",
+        "triggerCondition": "Malicious reentrant call during execution",
+        "detectionDifficulty": "easy",
+        "severity": "critical",
+        "mitigation": "Implement CEI pattern or reentrancy guard (OpenZeppelin Guards)"
+      },
+      {
+        "sourceId": "DS_3",
+        "sourceType": "reentrancy-gap",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "repay"
+        },
+        "affectedGroups": [],
+        "description": "repay has reentrancy vulnerability exposing intermediate state",
+        "triggerCondition": "Malicious reentrant call during execution",
+        "detectionDifficulty": "easy",
+        "severity": "critical",
+        "mitigation": "Implement CEI pattern or reentrancy guard (OpenZeppelin Guards)"
+      },
+      {
+        "sourceId": "DS_4",
+        "sourceType": "reentrancy-gap",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "liquidate"
+        },
+        "affectedGroups": [],
+        "description": "liquidate has reentrancy vulnerability exposing intermediate state",
+        "triggerCondition": "Malicious reentrant call during execution",
+        "detectionDifficulty": "easy",
+        "severity": "critical",
+        "mitigation": "Implement CEI pattern or reentrancy guard (OpenZeppelin Guards)"
+      },
+      {
+        "sourceId": "DS_5",
+        "sourceType": "reentrancy-gap",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "withdraw"
+        },
+        "affectedGroups": [],
+        "description": "withdraw has reentrancy vulnerability exposing intermediate state",
+        "triggerCondition": "Malicious reentrant call during execution",
+        "detectionDifficulty": "easy",
+        "severity": "critical",
+        "mitigation": "Implement CEI pattern or reentrancy guard (OpenZeppelin Guards)"
+      },
+      {
+        "sourceId": "DS_6",
+        "sourceType": "oracle-divergence",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "constructor"
+        },
+        "affectedGroups": [],
+        "description": "Oracle call to OracleWrapper may return manipulated/stale price",
+        "triggerCondition": "Oracle price manipulated via flash loan or MEV",
+        "detectionDifficulty": "hard",
+        "severity": "critical",
+        "mitigation": "Use TWAP oracles, implement circuit breakers, add sanity checks"
+      },
+      {
+        "sourceId": "DS_7",
+        "sourceType": "oracle-divergence",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "liquidate"
+        },
+        "affectedGroups": [],
+        "description": "Oracle call to getPrice may return manipulated/stale price",
+        "triggerCondition": "Oracle price manipulated via flash loan or MEV",
+        "detectionDifficulty": "hard",
+        "severity": "critical",
+        "mitigation": "Use TWAP oracles, implement circuit breakers, add sanity checks"
+      },
+      {
+        "sourceId": "DS_8",
+        "sourceType": "oracle-divergence",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "setOracle"
+        },
+        "affectedGroups": [],
+        "description": "Oracle call to OracleWrapper may return manipulated/stale price",
+        "triggerCondition": "Oracle price manipulated via flash loan or MEV",
+        "detectionDifficulty": "hard",
+        "severity": "critical",
+        "mitigation": "Use TWAP oracles, implement circuit breakers, add sanity checks"
+      },
+      {
+        "sourceId": "DS_9",
+        "sourceType": "oracle-divergence",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "calculateHealthFactor"
+        },
+        "affectedGroups": [],
+        "description": "Oracle call to getPrice may return manipulated/stale price",
+        "triggerCondition": "Oracle price manipulated via flash loan or MEV",
+        "detectionDifficulty": "hard",
+        "severity": "critical",
+        "mitigation": "Use TWAP oracles, implement circuit breakers, add sanity checks"
+      },
+      {
+        "sourceId": "DS_10",
+        "sourceType": "oracle-divergence",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "calculateHealthFactorWithCollateral"
+        },
+        "affectedGroups": [],
+        "description": "Oracle call to getPrice may return manipulated/stale price",
+        "triggerCondition": "Oracle price manipulated via flash loan or MEV",
+        "detectionDifficulty": "hard",
+        "severity": "critical",
+        "mitigation": "Use TWAP oracles, implement circuit breakers, add sanity checks"
+      },
+      {
+        "sourceId": "DS_11",
+        "sourceType": "oracle-divergence",
+        "location": {
+          "contract": "OracleWrapper",
+          "function": "updatePrice"
+        },
+        "affectedGroups": [],
+        "description": "Oracle call to PriceUpdated may return manipulated/stale price",
+        "triggerCondition": "Oracle price manipulated via flash loan or MEV",
+        "detectionDifficulty": "hard",
+        "severity": "critical",
+        "mitigation": "Use TWAP oracles, implement circuit breakers, add sanity checks"
+      }
+    ],
+    "detectedRisks": [],
+    "summary": {
+      "totalSyncGroups": 3,
+      "atRiskGroups": 0,
+      "totalDesyncSources": 11,
+      "criticalDesyncSources": 11,
+      "totalRisks": 0,
+      "criticalRisks": 0,
+      "accountingDriftRisk": "none"
+    }
+  },
+  "syncBoundaries": {
+    "boundaries": [
+      {
+        "boundaryId": "SB_1",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_2",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_3",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_4",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_5",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_6",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_7",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_8",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_9",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_10",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_11",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_12",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_13",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_14",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_15",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_16",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_17",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_18",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_19",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_20",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_21",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_22",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_23",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_24",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_25",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_26",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_27",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_28",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_29",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_30",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_31",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_32",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_33",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "SampleLendingProtocol",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_34",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "OracleWrapper",
+        "targetContext": "OracleWrapper",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_35",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "OracleWrapper",
+        "targetContext": "OracleWrapper",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_36",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "OracleWrapper",
+        "targetContext": "OracleWrapper",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_37",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "FeeCollector",
+        "targetContext": "FeeCollector",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_38",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "FeeCollector",
+        "targetContext": "FeeCollector",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_39",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "FeeCollector",
+        "targetContext": "FeeCollector",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_40",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "FeeCollector",
+        "targetContext": "FeeCollector",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_41",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "FeeCollector",
+        "targetContext": "FeeCollector",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_42",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "FeeCollector",
+        "targetContext": "FeeCollector",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_43",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "FeeCollector",
+        "targetContext": "FeeCollector",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_44",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "FeeCollector",
+        "targetContext": "FeeCollector",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_45",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "FeeCollector",
+        "targetContext": "FeeCollector",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_46",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "FeeCollector",
+        "targetContext": "FeeCollector",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_47",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "FeeCollector",
+        "targetContext": "FeeCollector",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_48",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "FeeCollector",
+        "targetContext": "FeeCollector",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_49",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "FeeCollector",
+        "targetContext": "FeeCollector",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_50",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "FeeCollector",
+        "targetContext": "FeeCollector",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_51",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "FeeCollector",
+        "targetContext": "FeeCollector",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      },
+      {
+        "boundaryId": "SB_52",
+        "boundaryType": "contract-boundary",
+        "sourceContext": "FeeCollector",
+        "targetContext": "FeeCollector",
+        "synchronizationMechanism": "eventual-consistency",
+        "dataCrossing": [
+          {
+            "dataType": "configuration",
+            "direction": "outbound",
+            "freshnessRequirement": "recent",
+            "consistencyRequired": "approximate"
+          }
+        ],
+        "timing": {
+          "maxDelay": "same transaction",
+          "ordering": "strict",
+          "finalityRequirement": "instant"
+        },
+        "failureMode": {
+          "type": "detectable-failure",
+          "detectionMethod": "Return value check",
+          "autoRecovery": false,
+          "manualInterventionRequired": false
+        },
+        "recoveryMechanism": {
+          "type": "auto-revert",
+          "description": "Transaction will revert on failure",
+          "estimatedRecoveryTime": "Immediate"
+        },
+        "strength": "strong"
+      }
+    ],
+    "vulnerableBoundaries": []
+  },
+  "topSyncRelationships": {
+    "relationships": [
+      {
+        "rank": 1,
+        "relationshipId": "REL_1",
+        "relationshipName": "Global Accounting Consistency",
+        "relationshipType": "global-per-user-accounting",
+        "variables": [
+          {
+            "name": "totalSupply",
+            "contract": "SampleLendingProtocol",
+            "type": "",
+            "role": "derived",
+            "securitySensitivity": "critical"
+          },
+          {
+            "name": "totalBorrowed",
+            "contract": "SampleLendingProtocol",
+            "type": "",
+            "role": "derived",
+            "securitySensitivity": "high"
+          },
+          {
+            "name": "reserveBalance",
+            "contract": "SampleLendingProtocol",
+            "type": "",
+            "role": "derived",
+            "securitySensitivity": "critical"
+          }
+        ],
+        "producerFunctions": [],
+        "consumerFunctions": [],
+        "synchronizationOwner": "SampleLendingProtocol",
+        "syncPoints": [],
+        "crossContractDependencies": [],
+        "exactSourceLocations": [],
+        "whyCritical": "Protocol must ensure sum of user balances equals total supply",
+        "riskScore": 90,
+        "exploitationComplexity": "difficult",
+        "specificRecommendations": [
+          "Add invariant checks to detect desynchronization"
+        ]
+      },
+      {
+        "rank": 2,
+        "relationshipId": "REL_2",
+        "relationshipName": "Debt-Collateral Solvency",
+        "relationshipType": "debt-collateral-matching",
+        "variables": [
+          {
+            "name": "totalBorrowed",
+            "contract": "SampleLendingProtocol",
+            "type": "",
+            "role": "derived",
+            "securitySensitivity": "high"
+          },
+          {
+            "name": "userDebt",
+            "contract": "SampleLendingProtocol",
+            "type": "",
+            "role": "derived",
+            "securitySensitivity": "critical"
+          },
+          {
+            "name": "borrowToken",
+            "contract": "SampleLendingProtocol",
+            "type": "",
+            "role": "derived",
+            "securitySensitivity": "high"
+          },
+          {
+            "name": "collateralFactor",
+            "contract": "SampleLendingProtocol",
+            "type": "",
+            "role": "derived",
+            "securitySensitivity": "critical"
+          },
+          {
+            "name": "userCollateral",
+            "contract": "SampleLendingProtocol",
+            "type": "",
+            "role": "derived",
+            "securitySensitivity": "critical"
+          },
+          {
+            "name": "collateralToken",
+            "contract": "SampleLendingProtocol",
+            "type": "",
+            "role": "derived",
+            "securitySensitivity": "critical"
+          }
+        ],
+        "producerFunctions": [],
+        "consumerFunctions": [],
+        "synchronizationOwner": "SampleLendingProtocol",
+        "syncPoints": [],
+        "crossContractDependencies": [],
+        "exactSourceLocations": [],
+        "whyCritical": "Total debt must be covered by collateral at all times",
+        "riskScore": 85,
+        "exploitationComplexity": "difficult",
+        "specificRecommendations": [
+          "Add invariant checks to detect desynchronization"
+        ]
+      },
+      {
+        "rank": 3,
+        "relationshipId": "REL_3",
+        "relationshipName": "Interest Accrual Accuracy",
+        "relationshipType": "interest-accrual",
+        "variables": [
+          {
+            "name": "interestRate",
+            "contract": "SampleLendingProtocol",
+            "type": "",
+            "role": "derived",
+            "securitySensitivity": "high"
+          }
+        ],
+        "producerFunctions": [],
+        "consumerFunctions": [],
+        "synchronizationOwner": "SampleLendingProtocol",
+        "syncPoints": [],
+        "crossContractDependencies": [],
+        "exactSourceLocations": [],
+        "whyCritical": "Accrued interest/rewards must match elapsed time and rates",
+        "riskScore": 60,
+        "exploitationComplexity": "difficult",
+        "specificRecommendations": [
+          "Add invariant checks to detect desynchronization"
+        ]
+      }
+    ],
+    "rankingCriteria": "Ranked by: group type criticality × at-risk status × permissionless writer count × sync point weakness × impact severity",
+    "generatedAt": "2026-08-06T04:14:42.364Z"
+  },
+  "criticalDesyncRisks": []
+}

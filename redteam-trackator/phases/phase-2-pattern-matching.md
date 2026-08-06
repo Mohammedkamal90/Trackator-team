@@ -1,23 +1,15 @@
-# Phase 2: Pattern Matching
+## Phase 2: PATTERN MATCHING
 
-> **Part of**: [RedTeam Trackator SKILL.md](../SKILL.md) | **Phase**: 2 of 6 | **Previous**: [Phase 1 - Intent Filtering](phase-1-intent-filtering.md) | **Next**: [Phase 3 - Creative Attack](phase-3-creative-attack.md)
-
----
-
-## Objective
-
+### Objective
 Cross-reference surviving hypotheses against historical exploit pattern cards to find matches and assess reachability.
 
----
-
-## Plugin: Pattern Matcher Plugin
+### Plugin: Pattern Matcher Plugin
 
 **Purpose**: Match current alerts against known exploit patterns from Exploits-class-library.
 
 **Input**: Exploits-class-library directory structure
 
-### Library Structure
-
+**Library Structure**:
 ```
 Exploits-class-library/
 ├── card-index.csv                    # All cards with metadata
@@ -29,7 +21,7 @@ Exploits-class-library/
     └── ... (56 total pattern cards)
 ```
 
-### Pattern Matching Algorithm
+**Pattern Matching Algorithm**:
 
 ```javascript
 async function patternMatch(hypothesis, context, exploitsLibPath) {
@@ -60,7 +52,7 @@ async function patternMatch(hypothesis, context, exploitsLibPath) {
 }
 ```
 
-### Match Scoring Factors
+**Match Scoring Factors**:
 
 | Factor | Weight | Trackator Mapping |
 |--------|--------|-------------------|
@@ -70,9 +62,7 @@ async function patternMatch(hypothesis, context, exploitsLibPath) {
 | Severity alignment | 10% | `alert.severity` ↔ historical loss |
 | Prerequisite satisfaction | 10% | `context.entryPoints` ↔ `pattern.prerequisites` |
 
----
-
-## v2.0 ENHANCED: Additional Scoring Factors (Factors 6-9)
+### v2.0 ENHANCED: Additional Scoring Factors (Factors 6-9)
 
 When Trackator's enhanced analysis phases are available, the Pattern Matcher applies **4 additional scoring factors** via `calculateMatchScore_v2()` (see `plugins/pattern-matcher.md`):
 
@@ -85,19 +75,15 @@ When Trackator's enhanced analysis phases are available, the Pattern Matcher app
 
 **Maximum possible score with v2.0 bonuses**: 1.0 (base) + 0.35 (bonuses) = **1.35 (capped at 1.0)**
 
-### Key v2.0 Scoring Functions
-
+**Key v2.0 scoring functions**:
 - `checkStorageAlignment(alert, pattern, storage)` → Returns 0-1 storage alignment score
 - `checkCouplingSignal(alert, pattern, coupling)` → Returns 0-1 coupling signal score  
 - `checkSyncRisk(alert, pattern, sync)` → Returns 0-1 sync risk score
 - `checkPreClassification(alert, evidence)` → Returns {class, criteriaMet} for adjustment
 
----
+### Example: Reentrancy Pattern Match
 
-## Example: Reentrancy Pattern Match
-
-### Trackator Alert
-
+**Trackator Alert**:
 ```json
 {
   "id": "ALERT_1",
@@ -110,12 +96,10 @@ When Trackator's enhanced analysis phases are available, the Pattern Matcher app
 
 **Matching Exploit Card**: `reentrancy-state-update-after-external-call.md`
 
-### Detection Heuristic from Card
-
+**Detection Heuristic from Card**:
 > A function performs `.call{value: x}("")`, `.transfer()`, ERC20 transfer to externally-supplied address, and ONLY AFTER writes to balance/debt/share storage. Function lacks `nonReentrant` modifier.
 
-### Match Result
-
+**Match Result**:
 ```javascript
 {
     patternSlug: 'reentrancy-state-update-after-external-call',
@@ -132,30 +116,62 @@ When Trackator's enhanced analysis phases are available, the Pattern Matcher app
 }
 ```
 
----
-
-## Plugin: Reachability Check (BLOCK GATE #1)
+### Plugin: Reachability Check (BLOCK GATE #1)
 
 **Purpose**: Verify if matched pattern is actually reachable by attacker.
 
 **IMPORTANT**: This is a **BLOCK GATE**, not kill gate!
 
-> 📄 **Full implementation**: See [`references/code-examples.md#reachability-check`](../references/code-examples.md#reachability-check) for complete `reachabilityCheck()` function (~46 lines)
+```javascript
+function reachabilityCheck(hypothesis, patternMatch, context) {
+    const preconditions = patternMatch.preconditionChain;
+    const satisfied = [];
+    const unsatisfied = [];
+    const unknown = [];
+    
+    for (const precondition of preconditions) {
+        const result = checkPrecondition(precondition, context);
+        
+        if (result.satisfied) {
+            satisfied.push(precondition);
+        } else if (result.unsatisfied === false) {
+            unsatisfied.push(precondition);  // Proven unreachable
+        } else {
+            unknown.push(precondition);  // Needs further testing
+        }
+    }
+    
+    // BLOCK GATE LOGIC: Don't kill, just grade
+    if (unsatisfied.length > 0 && unknown.length === 0) {
+        return {
+            verdict: 'dead',
+            reason: `Unsatisfied preconditions: ${unsatisfied.join(', ')}`,
+            satisfiedPreconditions: satisfied,
+            unsatisfiedPreconditions: unsatisfied
+        };
+    }
+    
+    if (satisfied.length === preconditions.length) {
+        return {
+            verdict: 'confirmed_pattern',
+            reason: 'All preconditions satisfied',
+            satisfiedPreconditions: satisfied,
+            confidence: 'high'
+        };
+    }
+    
+    // Some unknowns → save for PoC
+    return {
+        verdict: unknown.length > satisfied.length ? 'lead' : 'probable',
+        reason: `${satisfied.length}/${preconditions.length} satisfied, ${unknown.length} need testing`,
+        satisfiedPreconditions: satisfied,
+        unknownPreconditions: unknown,
+        saveForPoC: true  // BLOCK GATE: Save, don't kill!
+    };
+}
+```
 
-### Reachability Check Logic Summary
-
-The reachability check evaluates each precondition in the matched pattern's precondition chain:
-
-| Verdict | Condition | Action |
-|---------|-----------|--------|
-| `dead` | All unsatisfied preconditions proven false | Block hypothesis (proven unreachable) |
-| `confirmed_pattern` | ALL preconditions satisfied | High confidence, proceed |
-| `probable` | More satisfied than unknown | Medium confidence, save for PoC |
-| `lead` | More unknown than satisfied | Low confidence lead, save for PoC |
-
-**Key Principle**: Unknown preconditions trigger `saveForPoC: true` — hypotheses are saved, not killed!
-
-### Reachability Checks Using Trackator Data
+**Reachability Checks Using Trackator Data**:
 
 | Precondition Type | Trackator Fields to Check |
 |-------------------|----------------------------|
@@ -165,11 +181,7 @@ The reachability check evaluates each precondition in the matched pattern's prec
 | Public entry point | `entryPoints[].access === 'anyone'` |
 | Value at risk | `assetsAtRisk[]` includes target asset |
 
----
-
-## Phase 2 Output
-
-After Phase 2 completes, each hypothesis is updated:
+### Phase 2 Output
 
 ```javascript
 hypothesis.status = 'MATCHED';  // or DEAD if proven unreachable
@@ -181,34 +193,102 @@ hypothesis.reachabilityResult = {
 };
 ```
 
-### Output Status Flow
+### Plugin: Attack Chain Composer (NEW - v2.0 Upgrade)
 
-```mermaid
-flowchart LR
-    A[Phase 1: Hypotheses] --> B{Pattern Match?}
-    B -->|No Match| C[status: UNMATCHED]
-    B -->|Match Found| D{Reachability Check}
-    D -->|All Satisfied| E[status: MATCHED<br/>verdict: confirmed_pattern]
-    D -->|Partial| F[status: MATCHED<br/>verdict: probable/lead<br/>saveForPoC: true]
-    D -->|Proven Dead| G[status: DEAD<br/>verdict: dead]
-    C --> H[To Phase 3]
-    E --> H
-    F --> H
-    G --> I[Archived]
+**Purpose**: Compose individual pattern matches into coherent multi-step attack chains with **mandatory Execution Path Gate** validation.
+
+**Phase**: 2b (Pattern Matching → Chain Composition)
+
+**Core Philosophy**: *"A fast false positive wastes everyone's time. A slow true positive saves the protocol."*
+
+**Input**: Pattern Matcher output (individual matches)
+
+**Output**: Composed attack chains (only those passing Execution Path Gate escalate to Phase 3)
+
+**Key Files**:
+- Plugin spec: `plugins/attack-chain-composer.md`
+- Templates: `Exploits-class-library/attack-chain-templates.json`
+- Field map: `Exploits-class-library/exploit-trackator-field-map.json`
+
+**What It Does**:
+
+1. **Collects viable patterns** from Pattern Matcher (score ≥ 0.6)
+2. **Finds chainable pairs** where pattern A's output enables pattern B's precondition
+3. **Builds attack chains** (2-5 steps) with full execution tracing
+4. **Runs Execution Path Gate** (4 mandatory checks before escalation)
+5. **Classifies chains** against known archetypes from historical incidents
+
+**The Execution Path Gate (MANDATORY)**:
+
+Before ANY chain can escalate to Phase 3, ALL 4 gates must pass:
+
+| Gate | Check | Failure Means |
+|------|-------|---------------|
+| **Precondition Trace** | Every precondition has verified execution path | Can't prove how attacker reaches vulnerability |
+| **State Change Verification** | All state changes tracked or manually verified | Untracked state = unverified claim |
+| **Attacker Control** | Attacker-controlled inputs identified and traceable | No clear attack vector |
+| **No Conflicting Assumptions** | No internal contradictions in chain logic | Chain is self-inconsistent |
+
+```javascript
+// Gate result structure
+{
+    canEscalate: true/false,       // ALL gates must pass
+    maxAllowedStatus: 'PROBABLE' | 'LEAD',  // Status ceiling if blocked
+    gateResults: [...],           // Individual gate results
+    blockedBy: [...]              // Names of failing gates (empty if all pass)
+}
+```
+
+**Known Chain Archetypes** (from `attack-chain-templates.json`):
+
+| Archetype | Steps | Execution | Historical Loss Range |
+|-----------|-------|-----------|---------------------|
+| Flash Loan Price Manipulation | 3 | Single TX | $50K - $5M |
+| Reentrancy Drain | 3 | Single TX | $100K - $150M |
+| Access Control Takeover | 3 | 1-3 TX | $50K - $150M |
+| Oracle/Governance Manipulation | 3 | Multi-TX (hours) | $500K - $150M |
+| Cross-Contract Coupling | 3 | 1-2 TX (close timing) | $10K - $5M |
+
+**Chain Composition Algorithm**:
+
+```
+Pattern Matches → Find Chainable Pairs → Build Chains → Trace Execution → Run Gate → Output Validated Chains
+```
+
+See `plugins/attack-chain-composer.md` for complete algorithm specification.
+
+**Integration Point**:
+
+```
+Phase 2 Pipeline (Enhanced):
+┌──────────────────┐     ┌──────────────────────┐     ┌──────────────────┐
+│ Pattern Matcher   │────▶│ Attack Chain         │────▶│ Execution Path   │
+│ (finds matches)   │     │ Composer (composes)  │     │ Gate (validates) │
+└──────────────────┘     └──────────────────────┘     └────────┬─────────┘
+                                                                  │
+                                                    Only PASSING chains ▼
+                                                         Phase 3: Hacker
+```
+
+### Phase 2 Output (Enhanced)
+
+```javascript
+hypothesis.status = 'MATCHED';  // or DEAD if proven unreachable
+hypothesis.patternMatches = [/* array of matches */];
+hypothesis.reachabilityResult = {
+    verdict: 'confirmed_pattern' | 'probable' | 'lead' | 'dead',
+    preconditions: {/* satisfied/unsatisfied/unknown */},
+    saveForPoC: boolean
+};
+// NEW: Attack chain composition results
+hypothesis.attackChains = [/* array of composed chains from attack-chain-composer.md */];
+hypothesis.chainCompositionResult = {
+    totalChainsComposed: N,
+    chainsPassingGate: M,  // Only these escalate to Phase 3
+    chainsBlockedByGate: K,  // Saved for analysis, not escalating
+    topChainArchetype: string
+};
 ```
 
 ---
 
-## Cross-References
-
-| Reference | Description |
-|-----------|-------------|
-| [`plugins/pattern-matcher.md`](../plugins/pattern-matcher.md) | Detailed plugin documentation |
-| [`references/code-examples.md`](../references/code-examples.md) | Full code implementations |
-| [`Exploits-class-library/`](../Exploits-class-library/) | 56 historical exploit pattern cards |
-| Phase 1 | Input: Hypotheses from Hypothesis Generator |
-| Phase 3 | Output consumers: Attack Path Construction |
-
----
-
-*Last extracted from original SKILL.md (lines 655-851)*

@@ -1,0 +1,2318 @@
+{
+  "timestamp": "2026-08-06T04:14:42.354Z",
+  "functionDependencyMatrix": {
+    "functions": [
+      {
+        "id": "SampleLendingProtocol.constructor",
+        "contract": "SampleLendingProtocol",
+        "name": "constructor",
+        "signature": "SampleLendingProtocol.constructor",
+        "visibility": "default",
+        "accessControl": "restricted",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "SampleLendingProtocol.deposit",
+        "contract": "SampleLendingProtocol",
+        "name": "deposit",
+        "signature": "SampleLendingProtocol.deposit",
+        "visibility": "external",
+        "accessControl": "restricted",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "SampleLendingProtocol.borrow",
+        "contract": "SampleLendingProtocol",
+        "name": "borrow",
+        "signature": "SampleLendingProtocol.borrow",
+        "visibility": "external",
+        "accessControl": "restricted",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "SampleLendingProtocol.repay",
+        "contract": "SampleLendingProtocol",
+        "name": "repay",
+        "signature": "SampleLendingProtocol.repay",
+        "visibility": "external",
+        "accessControl": "restricted",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "SampleLendingProtocol.liquidate",
+        "contract": "SampleLendingProtocol",
+        "name": "liquidate",
+        "signature": "SampleLendingProtocol.liquidate",
+        "visibility": "external",
+        "accessControl": "restricted",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "SampleLendingProtocol.withdraw",
+        "contract": "SampleLendingProtocol",
+        "name": "withdraw",
+        "signature": "SampleLendingProtocol.withdraw",
+        "visibility": "external",
+        "accessControl": "restricted",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "SampleLendingProtocol.setOracle",
+        "contract": "SampleLendingProtocol",
+        "name": "setOracle",
+        "signature": "SampleLendingProtocol.setOracle",
+        "visibility": "external",
+        "accessControl": "admin-only",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "SampleLendingProtocol.setCollateralFactor",
+        "contract": "SampleLendingProtocol",
+        "name": "setCollateralFactor",
+        "signature": "SampleLendingProtocol.setCollateralFactor",
+        "visibility": "external",
+        "accessControl": "admin-only",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "SampleLendingProtocol.pause",
+        "contract": "SampleLendingProtocol",
+        "name": "pause",
+        "signature": "SampleLendingProtocol.pause",
+        "visibility": "external",
+        "accessControl": "public",
+        "isPermissionless": true,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "SampleLendingProtocol.unpause",
+        "contract": "SampleLendingProtocol",
+        "name": "unpause",
+        "signature": "SampleLendingProtocol.unpause",
+        "visibility": "external",
+        "accessControl": "public",
+        "isPermissionless": true,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "SampleLendingProtocol.emergencyWithdraw",
+        "contract": "SampleLendingProtocol",
+        "name": "emergencyWithdraw",
+        "signature": "SampleLendingProtocol.emergencyWithdraw",
+        "visibility": "external",
+        "accessControl": "admin-only",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "SampleLendingProtocol.transferOwnership",
+        "contract": "SampleLendingProtocol",
+        "name": "transferOwnership",
+        "signature": "SampleLendingProtocol.transferOwnership",
+        "visibility": "external",
+        "accessControl": "admin-only",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "SampleLendingProtocol.calculateHealthFactor",
+        "contract": "SampleLendingProtocol",
+        "name": "calculateHealthFactor",
+        "signature": "SampleLendingProtocol.calculateHealthFactor",
+        "visibility": "public",
+        "accessControl": "public",
+        "isPermissionless": true,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "SampleLendingProtocol.calculateHealthFactorWithCollateral",
+        "contract": "SampleLendingProtocol",
+        "name": "calculateHealthFactorWithCollateral",
+        "signature": "SampleLendingProtocol.calculateHealthFactorWithCollateral",
+        "visibility": "public",
+        "accessControl": "public",
+        "isPermissionless": true,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "SampleLendingProtocol.getUserPosition",
+        "contract": "SampleLendingProtocol",
+        "name": "getUserPosition",
+        "signature": "SampleLendingProtocol.getUserPosition",
+        "visibility": "external",
+        "accessControl": "public",
+        "isPermissionless": true,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "IOracle.getPrice",
+        "contract": "IOracle",
+        "name": "getPrice",
+        "signature": "IOracle.getPrice",
+        "visibility": "external",
+        "accessControl": "public",
+        "isPermissionless": true,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "IOracle.getTWAP",
+        "contract": "IOracle",
+        "name": "getTWAP",
+        "signature": "IOracle.getTWAP",
+        "visibility": "external",
+        "accessControl": "public",
+        "isPermissionless": true,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "OracleWrapper.constructor",
+        "contract": "OracleWrapper",
+        "name": "constructor",
+        "signature": "OracleWrapper.constructor",
+        "visibility": "default",
+        "accessControl": "public",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "OracleWrapper.getPrice",
+        "contract": "OracleWrapper",
+        "name": "getPrice",
+        "signature": "OracleWrapper.getPrice",
+        "visibility": "public",
+        "accessControl": "public",
+        "isPermissionless": true,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "OracleWrapper.getTWAP",
+        "contract": "OracleWrapper",
+        "name": "getTWAP",
+        "signature": "OracleWrapper.getTWAP",
+        "visibility": "public",
+        "accessControl": "public",
+        "isPermissionless": true,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "OracleWrapper.isPriceFresh",
+        "contract": "OracleWrapper",
+        "name": "isPriceFresh",
+        "signature": "OracleWrapper.isPriceFresh",
+        "visibility": "public",
+        "accessControl": "public",
+        "isPermissionless": true,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "OracleWrapper.getDeviation",
+        "contract": "OracleWrapper",
+        "name": "getDeviation",
+        "signature": "OracleWrapper.getDeviation",
+        "visibility": "public",
+        "accessControl": "public",
+        "isPermissionless": true,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "OracleWrapper.getDeviationBps",
+        "contract": "OracleWrapper",
+        "name": "getDeviationBps",
+        "signature": "OracleWrapper.getDeviationBps",
+        "visibility": "public",
+        "accessControl": "public",
+        "isPermissionless": true,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "OracleWrapper.updatePrice",
+        "contract": "OracleWrapper",
+        "name": "updatePrice",
+        "signature": "OracleWrapper.updatePrice",
+        "visibility": "external",
+        "accessControl": "public",
+        "isPermissionless": true,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "OracleWrapper.transferAdmin",
+        "contract": "OracleWrapper",
+        "name": "transferAdmin",
+        "signature": "OracleWrapper.transferAdmin",
+        "visibility": "external",
+        "accessControl": "restricted",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "FeeCollector.constructor",
+        "contract": "FeeCollector",
+        "name": "constructor",
+        "signature": "FeeCollector.constructor",
+        "visibility": "default",
+        "accessControl": "restricted",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "FeeCollector.setProtocol",
+        "contract": "FeeCollector",
+        "name": "setProtocol",
+        "signature": "FeeCollector.setProtocol",
+        "visibility": "external",
+        "accessControl": "restricted",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "FeeCollector.collectFees",
+        "contract": "FeeCollector",
+        "name": "collectFees",
+        "signature": "FeeCollector.collectFees",
+        "visibility": "external",
+        "accessControl": "restricted",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "FeeCollector.withdrawFees",
+        "contract": "FeeCollector",
+        "name": "withdrawFees",
+        "signature": "FeeCollector.withdrawFees",
+        "visibility": "external",
+        "accessControl": "restricted",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "FeeCollector.emergencyWithdraw",
+        "contract": "FeeCollector",
+        "name": "emergencyWithdraw",
+        "signature": "FeeCollector.emergencyWithdraw",
+        "visibility": "external",
+        "accessControl": "restricted",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "FeeCollector.updateTreasury",
+        "contract": "FeeCollector",
+        "name": "updateTreasury",
+        "signature": "FeeCollector.updateTreasury",
+        "visibility": "external",
+        "accessControl": "restricted",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      },
+      {
+        "id": "FeeCollector.transferAdmin",
+        "contract": "FeeCollector",
+        "name": "transferAdmin",
+        "signature": "FeeCollector.transferAdmin",
+        "visibility": "external",
+        "accessControl": "restricted",
+        "isPermissionless": false,
+        "stateVariablesRead": [],
+        "stateVariablesWritten": [],
+        "inDegree": 0,
+        "outDegree": 0,
+        "couplingScore": 0,
+        "riskLevel": "safe"
+      }
+    ],
+    "dependencies": [],
+    "statistics": {
+      "totalFunctions": 32,
+      "totalDependencies": 0,
+      "averageDependenciesPerFunction": 0,
+      "maxInDegree": 0,
+      "maxOutDegree": 0,
+      "stronglyCoupledPairs": 0,
+      "crossContractDependencies": 0,
+      "cyclicDependencies": 0
+    },
+    "couplingClusters": []
+  },
+  "hiddenCouplings": {
+    "couplings": [
+      {
+        "id": "HC_1",
+        "type": "multi-contract-consistency",
+        "severity": "medium",
+        "source": {
+          "contract": "OracleWrapper"
+        },
+        "target": {
+          "contract": "FeeCollector"
+        },
+        "mechanism": "Multiple contracts appear to track related state",
+        "sharedState": [
+          "admin"
+        ],
+        "description": "OracleWrapper and FeeCollector both have variables: [admin]",
+        "exploitationScenario": "Desynchronization between contracts can lead to inconsistent state",
+        "recommendation": "Implement explicit synchronization or single-source-of-truth pattern",
+        "detectionConfidence": "possible"
+      }
+    ],
+    "summary": {
+      "totalHiddenCouplings": 1,
+      "criticalCount": 0,
+      "highCount": 0,
+      "byType": {
+        "multi-contract-consistency": 1
+      },
+      "mostAffectedContract": "OracleWrapper"
+    }
+  },
+  "invariantFunctionMap": {
+    "mappings": [
+      {
+        "invariantId": "INV_1",
+        "invariantCategory": "accounting",
+        "expression": "Σ balances == totalSupply",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_2",
+        "invariantCategory": "bounds",
+        "expression": "result >= 0 && result <= MAX_UINT256",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_3",
+        "invariantCategory": "accounting",
+        "expression": "collateral[token] * price[token] >= borrow[token] * liquidationThreshold",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_4",
+        "invariantCategory": "oracle",
+        "expression": "|spotPrice - twapPrice| / twapPrice < maxDeviation",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_5",
+        "invariantCategory": "bounds",
+        "expression": "ratePerBlock >= 0 && ratePerBlock <= maxRate",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_6",
+        "invariantCategory": "accounting",
+        "expression": "exchangeRate == cash + borrows - reserves / totalSupply",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_NB_TOTALSUPPLY",
+        "invariantCategory": "bounds",
+        "expression": "totalSupply >= 0 && totalSupply <= 1.1579e+77",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_NB_TOTALBORROWED",
+        "invariantCategory": "bounds",
+        "expression": "totalBorrowed >= 0 && totalBorrowed <= 1.1579e+77",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_NB_RESERVEBALANCE",
+        "invariantCategory": "bounds",
+        "expression": "reserveBalance >= 0 && reserveBalance <= 1.1579e+77",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_NB_COLLATERALFACTOR",
+        "invariantCategory": "bounds",
+        "expression": "collateralFactor >= 0 && collateralFactor <= 1.1579e+77",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_NB_LIQUIDATIONBONUS",
+        "invariantCategory": "bounds",
+        "expression": "liquidationBonus >= 0 && liquidationBonus <= 1.1579e+77",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_NB_INTERESTRATE",
+        "invariantCategory": "bounds",
+        "expression": "interestRate >= 0 && interestRate <= 1",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_NB_USERCOLLATERAL",
+        "invariantCategory": "bounds",
+        "expression": "userCollateral >= 0 && userCollateral <= 1.1579e+77",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_NB_USERDEBT",
+        "invariantCategory": "bounds",
+        "expression": "userDebt >= 0 && userDebt <= 1.1579e+77",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_NB_SPOTPRICE",
+        "invariantCategory": "bounds",
+        "expression": "spotPrice >= 0 && spotPrice <= 1000000000000",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_NB_TWAPPRICE",
+        "invariantCategory": "bounds",
+        "expression": "twapPrice >= 0 && twapPrice <= 1000000000000",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_NB_LASTUPDATETIME",
+        "invariantCategory": "bounds",
+        "expression": "lastUpdateTime >= 0 && lastUpdateTime <= 1.1579e+77",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_NB_TOTALFEESCOLLECTED",
+        "invariantCategory": "bounds",
+        "expression": "totalFeesCollected >= 0 && totalFeesCollected <= 1.1579e+77",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_NB_FEESBYTOKEN",
+        "invariantCategory": "bounds",
+        "expression": "feesByToken >= 0 && feesByToken <= 1.1579e+77",
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_TOTALSUPPLY",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_TOTALBORROWED",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_RESERVEBALANCE",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_ORACLE",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_COLLATERALFACTOR",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_LIQUIDATIONBONUS",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_INTERESTRATE",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_USERCOLLATERAL",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_USERDEBT",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_HASDEPOSITED",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_OWNER",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_GUARDIAN",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_PAUSED",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_COLLATERALTOKEN",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_BORROWTOKEN",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_FEECOLLECTOR",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_ADMIN",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_SPOTPRICE",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_TWAPPRICE",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_LASTUPDATETIME",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_PROTOCOL",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_TREASURY",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_TOTALFEESCOLLECTED",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      },
+      {
+        "invariantId": "INV_AUTH_FEESBYTOKEN",
+        "invariantCategory": "permission",
+        "expression": null,
+        "establishers": [],
+        "dependers": [],
+        "modifiers": [],
+        "potentialViolators": [],
+        "completeness": "unknown"
+      }
+    ],
+    "violationPaths": [],
+    "protectionGaps": []
+  },
+  "variableClassification": {
+    "classifications": [
+      {
+        "variableName": "totalSupply",
+        "contract": "SampleLendingProtocol",
+        "type": "uint256",
+        "primaryCategory": "accounting",
+        "secondaryCategories": [],
+        "securitySensitivity": "critical",
+        "integrityRequirement": "exact",
+        "classificationRationale": "Variable tracks fund/token quantities requiring conservation invariant",
+        "relatedInvariants": [
+          "INV_1",
+          "INV_6",
+          "INV_NB_TOTALSUPPLY",
+          "INV_AUTH_TOTALSUPPLY"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": []
+      },
+      {
+        "variableName": "totalBorrowed",
+        "contract": "SampleLendingProtocol",
+        "type": "uint256",
+        "primaryCategory": "accounting",
+        "secondaryCategories": [],
+        "securitySensitivity": "high",
+        "integrityRequirement": "exact",
+        "classificationRationale": "Variable tracks fund/token quantities requiring conservation invariant",
+        "relatedInvariants": [
+          "INV_NB_TOTALBORROWED",
+          "INV_AUTH_TOTALBORROWED"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": []
+      },
+      {
+        "variableName": "reserveBalance",
+        "contract": "SampleLendingProtocol",
+        "type": "uint256",
+        "primaryCategory": "accounting",
+        "secondaryCategories": [
+          "accounting"
+        ],
+        "securitySensitivity": "critical",
+        "integrityRequirement": "exact",
+        "classificationRationale": "Variable tracks fund/token quantities requiring conservation invariant",
+        "relatedInvariants": [
+          "INV_NB_RESERVEBALANCE",
+          "INV_AUTH_RESERVEBALANCE"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": []
+      },
+      {
+        "variableName": "oracle",
+        "contract": "SampleLendingProtocol",
+        "type": "OracleWrapper",
+        "primaryCategory": "pricing",
+        "secondaryCategories": [],
+        "securitySensitivity": "high",
+        "integrityRequirement": "bounded",
+        "classificationRationale": "Variable influences valuation affecting economic decisions",
+        "relatedInvariants": [
+          "INV_AUTH_ORACLE"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": []
+      },
+      {
+        "variableName": "collateralFactor",
+        "contract": "SampleLendingProtocol",
+        "type": "uint256",
+        "primaryCategory": "configuration",
+        "secondaryCategories": [],
+        "securitySensitivity": "medium",
+        "integrityRequirement": "eventual",
+        "classificationRationale": "Variable sets protocol parameters affecting system behavior",
+        "relatedInvariants": [
+          "INV_NB_COLLATERALFACTOR",
+          "INV_AUTH_COLLATERALFACTOR"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": []
+      },
+      {
+        "variableName": "liquidationBonus",
+        "contract": "SampleLendingProtocol",
+        "type": "uint256",
+        "primaryCategory": "unknown",
+        "secondaryCategories": [],
+        "securitySensitivity": "low",
+        "integrityRequirement": "eventual",
+        "classificationRationale": "Could not automatically determine variable purpose",
+        "relatedInvariants": [
+          "INV_NB_LIQUIDATIONBONUS",
+          "INV_AUTH_LIQUIDATIONBONUS"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": []
+      },
+      {
+        "variableName": "interestRate",
+        "contract": "SampleLendingProtocol",
+        "type": "uint256",
+        "primaryCategory": "pricing",
+        "secondaryCategories": [],
+        "securitySensitivity": "high",
+        "integrityRequirement": "bounded",
+        "classificationRationale": "Variable influences valuation affecting economic decisions",
+        "relatedInvariants": [
+          "INV_5",
+          "INV_NB_INTERESTRATE",
+          "INV_AUTH_INTERESTRATE"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": []
+      },
+      {
+        "variableName": "userCollateral",
+        "contract": "SampleLendingProtocol",
+        "type": "mapping(address => uint256)",
+        "primaryCategory": "unknown",
+        "secondaryCategories": [
+          "accounting"
+        ],
+        "securitySensitivity": "low",
+        "integrityRequirement": "eventual",
+        "classificationRationale": "Could not automatically determine variable purpose",
+        "relatedInvariants": [
+          "INV_NB_USERCOLLATERAL",
+          "INV_AUTH_USERCOLLATERAL"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": []
+      },
+      {
+        "variableName": "userDebt",
+        "contract": "SampleLendingProtocol",
+        "type": "mapping(address => uint256)",
+        "primaryCategory": "accounting",
+        "secondaryCategories": [
+          "accounting"
+        ],
+        "securitySensitivity": "critical",
+        "integrityRequirement": "exact",
+        "classificationRationale": "Variable tracks fund/token quantities requiring conservation invariant",
+        "relatedInvariants": [
+          "INV_NB_USERDEBT",
+          "INV_AUTH_USERDEBT"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": []
+      },
+      {
+        "variableName": "hasDeposited",
+        "contract": "SampleLendingProtocol",
+        "type": "mapping(address => bool)",
+        "primaryCategory": "unknown",
+        "secondaryCategories": [],
+        "securitySensitivity": "low",
+        "integrityRequirement": "eventual",
+        "classificationRationale": "Could not automatically determine variable purpose",
+        "relatedInvariants": [
+          "INV_AUTH_HASDEPOSITED"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": []
+      },
+      {
+        "variableName": "owner",
+        "contract": "SampleLendingProtocol",
+        "type": "address",
+        "primaryCategory": "authorization",
+        "secondaryCategories": [],
+        "securitySensitivity": "high",
+        "integrityRequirement": "exact",
+        "classificationRationale": "Variable controls access permissions affecting all secured operations",
+        "relatedInvariants": [
+          "INV_AUTH_OWNER"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": []
+      },
+      {
+        "variableName": "guardian",
+        "contract": "SampleLendingProtocol",
+        "type": "address",
+        "primaryCategory": "unknown",
+        "secondaryCategories": [],
+        "securitySensitivity": "low",
+        "integrityRequirement": "eventual",
+        "classificationRationale": "Could not automatically determine variable purpose",
+        "relatedInvariants": [
+          "INV_AUTH_GUARDIAN"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": []
+      },
+      {
+        "variableName": "paused",
+        "contract": "SampleLendingProtocol",
+        "type": "bool",
+        "primaryCategory": "flag",
+        "secondaryCategories": [],
+        "securitySensitivity": "low",
+        "integrityRequirement": "eventual",
+        "classificationRationale": "Variable indicates binary state conditions",
+        "relatedInvariants": [
+          "INV_AUTH_PAUSED"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": []
+      },
+      {
+        "variableName": "collateralToken",
+        "contract": "SampleLendingProtocol",
+        "type": "IERC20",
+        "primaryCategory": "unknown",
+        "secondaryCategories": [],
+        "securitySensitivity": "low",
+        "integrityRequirement": "eventual",
+        "classificationRationale": "Could not automatically determine variable purpose",
+        "relatedInvariants": [
+          "INV_AUTH_COLLATERALTOKEN"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": []
+      },
+      {
+        "variableName": "borrowToken",
+        "contract": "SampleLendingProtocol",
+        "type": "IERC20",
+        "primaryCategory": "unknown",
+        "secondaryCategories": [],
+        "securitySensitivity": "low",
+        "integrityRequirement": "eventual",
+        "classificationRationale": "Could not automatically determine variable purpose",
+        "relatedInvariants": [
+          "INV_AUTH_BORROWTOKEN"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": []
+      },
+      {
+        "variableName": "feeCollector",
+        "contract": "SampleLendingProtocol",
+        "type": "FeeCollector",
+        "primaryCategory": "configuration",
+        "secondaryCategories": [],
+        "securitySensitivity": "medium",
+        "integrityRequirement": "eventual",
+        "classificationRationale": "Variable sets protocol parameters affecting system behavior",
+        "relatedInvariants": [
+          "INV_AUTH_FEECOLLECTOR"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": []
+      },
+      {
+        "variableName": "admin",
+        "contract": "OracleWrapper",
+        "type": "address",
+        "primaryCategory": "authorization",
+        "secondaryCategories": [],
+        "securitySensitivity": "high",
+        "integrityRequirement": "exact",
+        "classificationRationale": "Variable controls access permissions affecting all secured operations",
+        "relatedInvariants": [
+          "INV_AUTH_ADMIN"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": [
+          {
+            "targetContract": "SampleLendingProtocol",
+            "impactType": "assumed-consistent",
+            "description": "SampleLendingProtocol may assume admin state from OracleWrapper"
+          }
+        ]
+      },
+      {
+        "variableName": "spotPrice",
+        "contract": "OracleWrapper",
+        "type": "uint256",
+        "primaryCategory": "pricing",
+        "secondaryCategories": [],
+        "securitySensitivity": "high",
+        "integrityRequirement": "bounded",
+        "classificationRationale": "Variable influences valuation affecting economic decisions",
+        "relatedInvariants": [
+          "INV_NB_SPOTPRICE",
+          "INV_AUTH_SPOTPRICE"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": [
+          {
+            "targetContract": "SampleLendingProtocol",
+            "impactType": "assumed-consistent",
+            "description": "SampleLendingProtocol may assume spotPrice state from OracleWrapper"
+          }
+        ]
+      },
+      {
+        "variableName": "twapPrice",
+        "contract": "OracleWrapper",
+        "type": "uint256",
+        "primaryCategory": "pricing",
+        "secondaryCategories": [],
+        "securitySensitivity": "high",
+        "integrityRequirement": "bounded",
+        "classificationRationale": "Variable influences valuation affecting economic decisions",
+        "relatedInvariants": [
+          "INV_NB_TWAPPRICE",
+          "INV_AUTH_TWAPPRICE"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": [
+          {
+            "targetContract": "SampleLendingProtocol",
+            "impactType": "assumed-consistent",
+            "description": "SampleLendingProtocol may assume twapPrice state from OracleWrapper"
+          }
+        ]
+      },
+      {
+        "variableName": "lastUpdateTime",
+        "contract": "OracleWrapper",
+        "type": "uint256",
+        "primaryCategory": "timestamp",
+        "secondaryCategories": [],
+        "securitySensitivity": "low",
+        "integrityRequirement": "monotonic",
+        "classificationRationale": "Variable records time for ordering/expiry logic",
+        "relatedInvariants": [
+          "INV_NB_LASTUPDATETIME",
+          "INV_AUTH_LASTUPDATETIME"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": [
+          {
+            "targetContract": "SampleLendingProtocol",
+            "impactType": "assumed-consistent",
+            "description": "SampleLendingProtocol may assume lastUpdateTime state from OracleWrapper"
+          }
+        ]
+      },
+      {
+        "variableName": "protocol",
+        "contract": "FeeCollector",
+        "type": "address",
+        "primaryCategory": "unknown",
+        "secondaryCategories": [],
+        "securitySensitivity": "low",
+        "integrityRequirement": "eventual",
+        "classificationRationale": "Could not automatically determine variable purpose",
+        "relatedInvariants": [
+          "INV_AUTH_PROTOCOL"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": [
+          {
+            "targetContract": "SampleLendingProtocol",
+            "impactType": "assumed-consistent",
+            "description": "SampleLendingProtocol may assume protocol state from FeeCollector"
+          }
+        ]
+      },
+      {
+        "variableName": "treasury",
+        "contract": "FeeCollector",
+        "type": "address",
+        "primaryCategory": "unknown",
+        "secondaryCategories": [],
+        "securitySensitivity": "low",
+        "integrityRequirement": "eventual",
+        "classificationRationale": "Could not automatically determine variable purpose",
+        "relatedInvariants": [
+          "INV_AUTH_TREASURY"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": [
+          {
+            "targetContract": "SampleLendingProtocol",
+            "impactType": "assumed-consistent",
+            "description": "SampleLendingProtocol may assume treasury state from FeeCollector"
+          }
+        ]
+      },
+      {
+        "variableName": "admin",
+        "contract": "FeeCollector",
+        "type": "address",
+        "primaryCategory": "authorization",
+        "secondaryCategories": [],
+        "securitySensitivity": "high",
+        "integrityRequirement": "exact",
+        "classificationRationale": "Variable controls access permissions affecting all secured operations",
+        "relatedInvariants": [
+          "INV_AUTH_ADMIN"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": [
+          {
+            "targetContract": "SampleLendingProtocol",
+            "impactType": "assumed-consistent",
+            "description": "SampleLendingProtocol may assume admin state from FeeCollector"
+          }
+        ]
+      },
+      {
+        "variableName": "totalFeesCollected",
+        "contract": "FeeCollector",
+        "type": "uint256",
+        "primaryCategory": "configuration",
+        "secondaryCategories": [],
+        "securitySensitivity": "medium",
+        "integrityRequirement": "eventual",
+        "classificationRationale": "Variable sets protocol parameters affecting system behavior",
+        "relatedInvariants": [
+          "INV_NB_TOTALFEESCOLLECTED",
+          "INV_AUTH_TOTALFEESCOLLECTED"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": [
+          {
+            "targetContract": "SampleLendingProtocol",
+            "impactType": "assumed-consistent",
+            "description": "SampleLendingProtocol may assume totalFeesCollected state from FeeCollector"
+          }
+        ]
+      },
+      {
+        "variableName": "feesByToken",
+        "contract": "FeeCollector",
+        "type": "mapping(address => uint256)",
+        "primaryCategory": "configuration",
+        "secondaryCategories": [
+          "accounting"
+        ],
+        "securitySensitivity": "medium",
+        "integrityRequirement": "eventual",
+        "classificationRationale": "Variable sets protocol parameters affecting system behavior",
+        "relatedInvariants": [
+          "INV_NB_FEESBYTOKEN",
+          "INV_AUTH_FEESBYTOKEN"
+        ],
+        "writerFunctions": [],
+        "readerFunctions": [],
+        "crossContractImpact": [
+          {
+            "targetContract": "SampleLendingProtocol",
+            "impactType": "assumed-consistent",
+            "description": "SampleLendingProtocol may assume feesByToken state from FeeCollector"
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "totalClassified": 25,
+      "criticalSensitivityCount": 3,
+      "byPrimaryCategory": {
+        "accounting": 4,
+        "pricing": 4,
+        "configuration": 4,
+        "unknown": 8,
+        "authorization": 3,
+        "flag": 1,
+        "timestamp": 1
+      },
+      "mostSensitiveVariable": "SampleLendingProtocol.userDebt",
+      "mostWidelyUsedVariable": ""
+    }
+  },
+  "topStateIntersections": {
+    "intersections": [],
+    "rankingMethodology": "Ranked by: risk score (variable sensitivity × participant count × permissionless access × coupling strength)",
+    "generatedAt": "2026-08-06T04:14:42.353Z"
+  },
+  "hiddenAssumptions": {
+    "assumptions": [
+      {
+        "id": "HA_1",
+        "assumption": "Oracle/data source provides accurate and manipulation-resistant prices",
+        "category": "oracle-accuracy",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "constructor"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.constructor"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+        "detectability": "hard",
+        "exploitability": "moderate",
+        "severity": "critical",
+        "recommendation": "Use TWAP oracles, implement circuit breakers, add sanity checks"
+      },
+      {
+        "id": "HA_2",
+        "assumption": "No reentrant call will occur during execution",
+        "category": "no-reentrancy",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "deposit",
+          "line": 113
+        },
+        "heldBy": [
+          "SampleLendingProtocol.deposit"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Reentrant call can double-spend/double-execute",
+        "detectability": "easy",
+        "exploitability": "trivial",
+        "severity": "critical",
+        "recommendation": "Implement CEI pattern or reentrancy guard"
+      },
+      {
+        "id": "HA_3",
+        "assumption": "Token contracts follow ERC20/721 specification exactly",
+        "category": "token-compliance",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "deposit"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.deposit"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Malicious token can block transfers, return false silently, or reenter",
+        "detectability": "moderate",
+        "exploitability": "easy",
+        "severity": "high",
+        "recommendation": "Check return values, use SafeERC20, handle false returns"
+      },
+      {
+        "id": "HA_4",
+        "assumption": "No reentrant call will occur during execution",
+        "category": "no-reentrancy",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "borrow",
+          "line": 131
+        },
+        "heldBy": [
+          "SampleLendingProtocol.borrow"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Reentrant call can double-spend/double-execute",
+        "detectability": "easy",
+        "exploitability": "trivial",
+        "severity": "critical",
+        "recommendation": "Implement CEI pattern or reentrancy guard"
+      },
+      {
+        "id": "HA_5",
+        "assumption": "Token contracts follow ERC20/721 specification exactly",
+        "category": "token-compliance",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "borrow"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.borrow"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Malicious token can block transfers, return false silently, or reenter",
+        "detectability": "moderate",
+        "exploitability": "easy",
+        "severity": "high",
+        "recommendation": "Check return values, use SafeERC20, handle false returns"
+      },
+      {
+        "id": "HA_6",
+        "assumption": "No reentrant call will occur during execution",
+        "category": "no-reentrancy",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "repay",
+          "line": 154
+        },
+        "heldBy": [
+          "SampleLendingProtocol.repay"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Reentrant call can double-spend/double-execute",
+        "detectability": "easy",
+        "exploitability": "trivial",
+        "severity": "critical",
+        "recommendation": "Implement CEI pattern or reentrancy guard"
+      },
+      {
+        "id": "HA_7",
+        "assumption": "Token contracts follow ERC20/721 specification exactly",
+        "category": "token-compliance",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "repay"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.repay"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Malicious token can block transfers, return false silently, or reenter",
+        "detectability": "moderate",
+        "exploitability": "easy",
+        "severity": "high",
+        "recommendation": "Check return values, use SafeERC20, handle false returns"
+      },
+      {
+        "id": "HA_8",
+        "assumption": "No reentrant call will occur during execution",
+        "category": "no-reentrancy",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "liquidate",
+          "line": 173
+        },
+        "heldBy": [
+          "SampleLendingProtocol.liquidate"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Reentrant call can double-spend/double-execute",
+        "detectability": "easy",
+        "exploitability": "trivial",
+        "severity": "critical",
+        "recommendation": "Implement CEI pattern or reentrancy guard"
+      },
+      {
+        "id": "HA_9",
+        "assumption": "Token contracts follow ERC20/721 specification exactly",
+        "category": "token-compliance",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "liquidate"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.liquidate"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Malicious token can block transfers, return false silently, or reenter",
+        "detectability": "moderate",
+        "exploitability": "easy",
+        "severity": "high",
+        "recommendation": "Check return values, use SafeERC20, handle false returns"
+      },
+      {
+        "id": "HA_10",
+        "assumption": "Oracle/data source provides accurate and manipulation-resistant prices",
+        "category": "oracle-accuracy",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "liquidate"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.liquidate"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+        "detectability": "hard",
+        "exploitability": "moderate",
+        "severity": "critical",
+        "recommendation": "Use TWAP oracles, implement circuit breakers, add sanity checks"
+      },
+      {
+        "id": "HA_11",
+        "assumption": "No reentrant call will occur during execution",
+        "category": "no-reentrancy",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "withdraw",
+          "line": 216
+        },
+        "heldBy": [
+          "SampleLendingProtocol.withdraw"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Reentrant call can double-spend/double-execute",
+        "detectability": "easy",
+        "exploitability": "trivial",
+        "severity": "critical",
+        "recommendation": "Implement CEI pattern or reentrancy guard"
+      },
+      {
+        "id": "HA_12",
+        "assumption": "Token contracts follow ERC20/721 specification exactly",
+        "category": "token-compliance",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "withdraw"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.withdraw"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Malicious token can block transfers, return false silently, or reenter",
+        "detectability": "moderate",
+        "exploitability": "easy",
+        "severity": "high",
+        "recommendation": "Check return values, use SafeERC20, handle false returns"
+      },
+      {
+        "id": "HA_13",
+        "assumption": "Oracle/data source provides accurate and manipulation-resistant prices",
+        "category": "oracle-accuracy",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "setOracle"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.setOracle"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+        "detectability": "hard",
+        "exploitability": "moderate",
+        "severity": "critical",
+        "recommendation": "Use TWAP oracles, implement circuit breakers, add sanity checks"
+      },
+      {
+        "id": "HA_14",
+        "assumption": "Caller acts in good faith within expected use cases",
+        "category": "caller-intent",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "pause"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.pause"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Adversarial caller exploits edge cases beyond intended parameters",
+        "detectability": "impossible",
+        "exploitability": "trivial",
+        "severity": "medium",
+        "recommendation": "Validate all inputs rigorously, check boundary conditions"
+      },
+      {
+        "id": "HA_15",
+        "assumption": "Caller acts in good faith within expected use cases",
+        "category": "caller-intent",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "unpause"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.unpause"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Adversarial caller exploits edge cases beyond intended parameters",
+        "detectability": "impossible",
+        "exploitability": "trivial",
+        "severity": "medium",
+        "recommendation": "Validate all inputs rigorously, check boundary conditions"
+      },
+      {
+        "id": "HA_16",
+        "assumption": "Token contracts follow ERC20/721 specification exactly",
+        "category": "token-compliance",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "emergencyWithdraw"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.emergencyWithdraw"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Malicious token can block transfers, return false silently, or reenter",
+        "detectability": "moderate",
+        "exploitability": "easy",
+        "severity": "high",
+        "recommendation": "Check return values, use SafeERC20, handle false returns"
+      },
+      {
+        "id": "HA_17",
+        "assumption": "Token contracts follow ERC20/721 specification exactly",
+        "category": "token-compliance",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "transferOwnership"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.transferOwnership"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Malicious token can block transfers, return false silently, or reenter",
+        "detectability": "moderate",
+        "exploitability": "easy",
+        "severity": "high",
+        "recommendation": "Check return values, use SafeERC20, handle false returns"
+      },
+      {
+        "id": "HA_18",
+        "assumption": "Oracle/data source provides accurate and manipulation-resistant prices",
+        "category": "oracle-accuracy",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "calculateHealthFactor"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.calculateHealthFactor"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+        "detectability": "hard",
+        "exploitability": "moderate",
+        "severity": "critical",
+        "recommendation": "Use TWAP oracles, implement circuit breakers, add sanity checks"
+      },
+      {
+        "id": "HA_19",
+        "assumption": "Caller acts in good faith within expected use cases",
+        "category": "caller-intent",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "calculateHealthFactor"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.calculateHealthFactor"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Adversarial caller exploits edge cases beyond intended parameters",
+        "detectability": "impossible",
+        "exploitability": "trivial",
+        "severity": "medium",
+        "recommendation": "Validate all inputs rigorously, check boundary conditions"
+      },
+      {
+        "id": "HA_20",
+        "assumption": "Oracle/data source provides accurate and manipulation-resistant prices",
+        "category": "oracle-accuracy",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "calculateHealthFactorWithCollateral"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.calculateHealthFactorWithCollateral"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+        "detectability": "hard",
+        "exploitability": "moderate",
+        "severity": "critical",
+        "recommendation": "Use TWAP oracles, implement circuit breakers, add sanity checks"
+      },
+      {
+        "id": "HA_21",
+        "assumption": "Caller acts in good faith within expected use cases",
+        "category": "caller-intent",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "calculateHealthFactorWithCollateral"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.calculateHealthFactorWithCollateral"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Adversarial caller exploits edge cases beyond intended parameters",
+        "detectability": "impossible",
+        "exploitability": "trivial",
+        "severity": "medium",
+        "recommendation": "Validate all inputs rigorously, check boundary conditions"
+      },
+      {
+        "id": "HA_22",
+        "assumption": "Caller acts in good faith within expected use cases",
+        "category": "caller-intent",
+        "location": {
+          "contract": "SampleLendingProtocol",
+          "function": "getUserPosition"
+        },
+        "heldBy": [
+          "SampleLendingProtocol.getUserPosition"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Adversarial caller exploits edge cases beyond intended parameters",
+        "detectability": "impossible",
+        "exploitability": "trivial",
+        "severity": "medium",
+        "recommendation": "Validate all inputs rigorously, check boundary conditions"
+      },
+      {
+        "id": "HA_23",
+        "assumption": "Caller acts in good faith within expected use cases",
+        "category": "caller-intent",
+        "location": {
+          "contract": "IOracle",
+          "function": "getPrice"
+        },
+        "heldBy": [
+          "IOracle.getPrice"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Adversarial caller exploits edge cases beyond intended parameters",
+        "detectability": "impossible",
+        "exploitability": "trivial",
+        "severity": "medium",
+        "recommendation": "Validate all inputs rigorously, check boundary conditions"
+      },
+      {
+        "id": "HA_24",
+        "assumption": "Caller acts in good faith within expected use cases",
+        "category": "caller-intent",
+        "location": {
+          "contract": "IOracle",
+          "function": "getTWAP"
+        },
+        "heldBy": [
+          "IOracle.getTWAP"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Adversarial caller exploits edge cases beyond intended parameters",
+        "detectability": "impossible",
+        "exploitability": "trivial",
+        "severity": "medium",
+        "recommendation": "Validate all inputs rigorously, check boundary conditions"
+      },
+      {
+        "id": "HA_25",
+        "assumption": "Caller acts in good faith within expected use cases",
+        "category": "caller-intent",
+        "location": {
+          "contract": "OracleWrapper",
+          "function": "getPrice"
+        },
+        "heldBy": [
+          "OracleWrapper.getPrice"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Adversarial caller exploits edge cases beyond intended parameters",
+        "detectability": "impossible",
+        "exploitability": "trivial",
+        "severity": "medium",
+        "recommendation": "Validate all inputs rigorously, check boundary conditions"
+      },
+      {
+        "id": "HA_26",
+        "assumption": "Caller acts in good faith within expected use cases",
+        "category": "caller-intent",
+        "location": {
+          "contract": "OracleWrapper",
+          "function": "getTWAP"
+        },
+        "heldBy": [
+          "OracleWrapper.getTWAP"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Adversarial caller exploits edge cases beyond intended parameters",
+        "detectability": "impossible",
+        "exploitability": "trivial",
+        "severity": "medium",
+        "recommendation": "Validate all inputs rigorously, check boundary conditions"
+      },
+      {
+        "id": "HA_27",
+        "assumption": "Caller acts in good faith within expected use cases",
+        "category": "caller-intent",
+        "location": {
+          "contract": "OracleWrapper",
+          "function": "isPriceFresh"
+        },
+        "heldBy": [
+          "OracleWrapper.isPriceFresh"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Adversarial caller exploits edge cases beyond intended parameters",
+        "detectability": "impossible",
+        "exploitability": "trivial",
+        "severity": "medium",
+        "recommendation": "Validate all inputs rigorously, check boundary conditions"
+      },
+      {
+        "id": "HA_28",
+        "assumption": "Caller acts in good faith within expected use cases",
+        "category": "caller-intent",
+        "location": {
+          "contract": "OracleWrapper",
+          "function": "getDeviation"
+        },
+        "heldBy": [
+          "OracleWrapper.getDeviation"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Adversarial caller exploits edge cases beyond intended parameters",
+        "detectability": "impossible",
+        "exploitability": "trivial",
+        "severity": "medium",
+        "recommendation": "Validate all inputs rigorously, check boundary conditions"
+      },
+      {
+        "id": "HA_29",
+        "assumption": "Caller acts in good faith within expected use cases",
+        "category": "caller-intent",
+        "location": {
+          "contract": "OracleWrapper",
+          "function": "getDeviationBps"
+        },
+        "heldBy": [
+          "OracleWrapper.getDeviationBps"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Adversarial caller exploits edge cases beyond intended parameters",
+        "detectability": "impossible",
+        "exploitability": "trivial",
+        "severity": "medium",
+        "recommendation": "Validate all inputs rigorously, check boundary conditions"
+      },
+      {
+        "id": "HA_30",
+        "assumption": "Oracle/data source provides accurate and manipulation-resistant prices",
+        "category": "oracle-accuracy",
+        "location": {
+          "contract": "OracleWrapper",
+          "function": "updatePrice"
+        },
+        "heldBy": [
+          "OracleWrapper.updatePrice"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+        "detectability": "hard",
+        "exploitability": "moderate",
+        "severity": "critical",
+        "recommendation": "Use TWAP oracles, implement circuit breakers, add sanity checks"
+      },
+      {
+        "id": "HA_31",
+        "assumption": "Caller acts in good faith within expected use cases",
+        "category": "caller-intent",
+        "location": {
+          "contract": "OracleWrapper",
+          "function": "updatePrice"
+        },
+        "heldBy": [
+          "OracleWrapper.updatePrice"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Adversarial caller exploits edge cases beyond intended parameters",
+        "detectability": "impossible",
+        "exploitability": "trivial",
+        "severity": "medium",
+        "recommendation": "Validate all inputs rigorously, check boundary conditions"
+      },
+      {
+        "id": "HA_32",
+        "assumption": "Token contracts follow ERC20/721 specification exactly",
+        "category": "token-compliance",
+        "location": {
+          "contract": "FeeCollector",
+          "function": "collectFees"
+        },
+        "heldBy": [
+          "FeeCollector.collectFees"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Malicious token can block transfers, return false silently, or reenter",
+        "detectability": "moderate",
+        "exploitability": "easy",
+        "severity": "high",
+        "recommendation": "Check return values, use SafeERC20, handle false returns"
+      },
+      {
+        "id": "HA_33",
+        "assumption": "Token contracts follow ERC20/721 specification exactly",
+        "category": "token-compliance",
+        "location": {
+          "contract": "FeeCollector",
+          "function": "withdrawFees"
+        },
+        "heldBy": [
+          "FeeCollector.withdrawFees"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Malicious token can block transfers, return false silently, or reenter",
+        "detectability": "moderate",
+        "exploitability": "easy",
+        "severity": "high",
+        "recommendation": "Check return values, use SafeERC20, handle false returns"
+      },
+      {
+        "id": "HA_34",
+        "assumption": "Token contracts follow ERC20/721 specification exactly",
+        "category": "token-compliance",
+        "location": {
+          "contract": "FeeCollector",
+          "function": "emergencyWithdraw"
+        },
+        "heldBy": [
+          "FeeCollector.emergencyWithdraw"
+        ],
+        "validatedBy": [],
+        "ifWrong": "Malicious token can block transfers, return false silently, or reenter",
+        "detectability": "moderate",
+        "exploitability": "easy",
+        "severity": "high",
+        "recommendation": "Check return values, use SafeERC20, handle false returns"
+      }
+    ],
+    "summary": {
+      "totalAssumptions": 34,
+      "criticalAssumptions": 11,
+      "unvalidatedAssumptions": 34,
+      "byCategory": {
+        "oracle-accuracy": 6,
+        "no-reentrancy": 5,
+        "token-compliance": 10,
+        "caller-intent": 13
+      },
+      "mostAssumptionHeavyFunction": "SampleLendingProtocol.liquidate"
+    }
+  },
+  "criticalFindings": [
+    {
+      "id": "CF_1",
+      "type": "assumption",
+      "severity": "critical",
+      "title": "Critical hidden assumption: Oracle/data source provides accurate and manipulation-resistant prices",
+      "description": "constructor assumes: Oracle/data source provides accurate and manipulation-resistant prices",
+      "location": {
+        "contract": "SampleLendingProtocol",
+        "function": "constructor"
+      },
+      "evidence": [
+        "If wrong: Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+        "Exploitability: moderate",
+        "Detectability: hard"
+      ],
+      "impact": "Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+      "remediation": "Use TWAP oracles, implement circuit breakers, add sanity checks",
+      "priority": "immediate"
+    },
+    {
+      "id": "CF_2",
+      "type": "assumption",
+      "severity": "critical",
+      "title": "Critical hidden assumption: No reentrant call will occur during execution",
+      "description": "deposit assumes: No reentrant call will occur during execution",
+      "location": {
+        "contract": "SampleLendingProtocol",
+        "function": "deposit",
+        "line": 113
+      },
+      "evidence": [
+        "If wrong: Reentrant call can double-spend/double-execute",
+        "Exploitability: trivial",
+        "Detectability: easy"
+      ],
+      "impact": "Reentrant call can double-spend/double-execute",
+      "remediation": "Implement CEI pattern or reentrancy guard",
+      "priority": "immediate"
+    },
+    {
+      "id": "CF_3",
+      "type": "assumption",
+      "severity": "critical",
+      "title": "Critical hidden assumption: No reentrant call will occur during execution",
+      "description": "borrow assumes: No reentrant call will occur during execution",
+      "location": {
+        "contract": "SampleLendingProtocol",
+        "function": "borrow",
+        "line": 131
+      },
+      "evidence": [
+        "If wrong: Reentrant call can double-spend/double-execute",
+        "Exploitability: trivial",
+        "Detectability: easy"
+      ],
+      "impact": "Reentrant call can double-spend/double-execute",
+      "remediation": "Implement CEI pattern or reentrancy guard",
+      "priority": "immediate"
+    },
+    {
+      "id": "CF_4",
+      "type": "assumption",
+      "severity": "critical",
+      "title": "Critical hidden assumption: No reentrant call will occur during execution",
+      "description": "repay assumes: No reentrant call will occur during execution",
+      "location": {
+        "contract": "SampleLendingProtocol",
+        "function": "repay",
+        "line": 154
+      },
+      "evidence": [
+        "If wrong: Reentrant call can double-spend/double-execute",
+        "Exploitability: trivial",
+        "Detectability: easy"
+      ],
+      "impact": "Reentrant call can double-spend/double-execute",
+      "remediation": "Implement CEI pattern or reentrancy guard",
+      "priority": "immediate"
+    },
+    {
+      "id": "CF_5",
+      "type": "assumption",
+      "severity": "critical",
+      "title": "Critical hidden assumption: No reentrant call will occur during execution",
+      "description": "liquidate assumes: No reentrant call will occur during execution",
+      "location": {
+        "contract": "SampleLendingProtocol",
+        "function": "liquidate",
+        "line": 173
+      },
+      "evidence": [
+        "If wrong: Reentrant call can double-spend/double-execute",
+        "Exploitability: trivial",
+        "Detectability: easy"
+      ],
+      "impact": "Reentrant call can double-spend/double-execute",
+      "remediation": "Implement CEI pattern or reentrancy guard",
+      "priority": "immediate"
+    },
+    {
+      "id": "CF_6",
+      "type": "assumption",
+      "severity": "critical",
+      "title": "Critical hidden assumption: Oracle/data source provides accurate and manipulation-resistant prices",
+      "description": "liquidate assumes: Oracle/data source provides accurate and manipulation-resistant prices",
+      "location": {
+        "contract": "SampleLendingProtocol",
+        "function": "liquidate"
+      },
+      "evidence": [
+        "If wrong: Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+        "Exploitability: moderate",
+        "Detectability: hard"
+      ],
+      "impact": "Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+      "remediation": "Use TWAP oracles, implement circuit breakers, add sanity checks",
+      "priority": "immediate"
+    },
+    {
+      "id": "CF_7",
+      "type": "assumption",
+      "severity": "critical",
+      "title": "Critical hidden assumption: No reentrant call will occur during execution",
+      "description": "withdraw assumes: No reentrant call will occur during execution",
+      "location": {
+        "contract": "SampleLendingProtocol",
+        "function": "withdraw",
+        "line": 216
+      },
+      "evidence": [
+        "If wrong: Reentrant call can double-spend/double-execute",
+        "Exploitability: trivial",
+        "Detectability: easy"
+      ],
+      "impact": "Reentrant call can double-spend/double-execute",
+      "remediation": "Implement CEI pattern or reentrancy guard",
+      "priority": "immediate"
+    },
+    {
+      "id": "CF_8",
+      "type": "assumption",
+      "severity": "critical",
+      "title": "Critical hidden assumption: Oracle/data source provides accurate and manipulation-resistant prices",
+      "description": "setOracle assumes: Oracle/data source provides accurate and manipulation-resistant prices",
+      "location": {
+        "contract": "SampleLendingProtocol",
+        "function": "setOracle"
+      },
+      "evidence": [
+        "If wrong: Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+        "Exploitability: moderate",
+        "Detectability: hard"
+      ],
+      "impact": "Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+      "remediation": "Use TWAP oracles, implement circuit breakers, add sanity checks",
+      "priority": "immediate"
+    },
+    {
+      "id": "CF_9",
+      "type": "assumption",
+      "severity": "critical",
+      "title": "Critical hidden assumption: Oracle/data source provides accurate and manipulation-resistant prices",
+      "description": "calculateHealthFactor assumes: Oracle/data source provides accurate and manipulation-resistant prices",
+      "location": {
+        "contract": "SampleLendingProtocol",
+        "function": "calculateHealthFactor"
+      },
+      "evidence": [
+        "If wrong: Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+        "Exploitability: moderate",
+        "Detectability: hard"
+      ],
+      "impact": "Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+      "remediation": "Use TWAP oracles, implement circuit breakers, add sanity checks",
+      "priority": "immediate"
+    },
+    {
+      "id": "CF_10",
+      "type": "assumption",
+      "severity": "critical",
+      "title": "Critical hidden assumption: Oracle/data source provides accurate and manipulation-resistant prices",
+      "description": "calculateHealthFactorWithCollateral assumes: Oracle/data source provides accurate and manipulation-resistant prices",
+      "location": {
+        "contract": "SampleLendingProtocol",
+        "function": "calculateHealthFactorWithCollateral"
+      },
+      "evidence": [
+        "If wrong: Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+        "Exploitability: moderate",
+        "Detectability: hard"
+      ],
+      "impact": "Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+      "remediation": "Use TWAP oracles, implement circuit breakers, add sanity checks",
+      "priority": "immediate"
+    },
+    {
+      "id": "CF_11",
+      "type": "assumption",
+      "severity": "critical",
+      "title": "Critical hidden assumption: Oracle/data source provides accurate and manipulation-resistant prices",
+      "description": "updatePrice assumes: Oracle/data source provides accurate and manipulation-resistant prices",
+      "location": {
+        "contract": "OracleWrapper",
+        "function": "updatePrice"
+      },
+      "evidence": [
+        "If wrong: Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+        "Exploitability: moderate",
+        "Detectability: hard"
+      ],
+      "impact": "Manipulated oracle causes incorrect valuation, bad debt, unfair liquidations",
+      "remediation": "Use TWAP oracles, implement circuit breakers, add sanity checks",
+      "priority": "immediate"
+    }
+  ]
+}

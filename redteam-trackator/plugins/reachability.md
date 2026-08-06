@@ -1,6 +1,6 @@
 # Plugin: Reachability Plugin
 
-**Phase**: 2, 3, 4, 5 (Multiple checkpoints)
+**Phase**: 2, 3, 4 (Multiple checkpoints)
 **Purpose**: Verify if attack hypotheses are actually achievable by external attackers
 **Type**: **BLOCK GATE** plugin (saves for PoC, doesn't kill)
 
@@ -379,83 +379,7 @@ function validateExecutionTrace(trace, hypothesis) {
 }
 ```
 
-## Checkpoint 3: Fuzz Realism Verification (Phase 4)
-
-### Input
-- Fuzz campaign results
-- Violations found by Echidna/Medusa
-
-### Realism Assessment
-
-```javascript
-function assessFuzzRealism(violation, context) {
-    const assessment = {
-        isRealistic: false,
-        score: 0,  // 0-100
-        reasons: [],
-        keepForReview: true  // Default: save, don't kill
-    };
-    
-    // Check 1: Requires unrealistic state?
-    if (requiresUnrealisticState(violation, context)) {
-        assessment.reasons.push('Requires state unlikely on mainnet');
-        assessment.score -= 30;
-    } else {
-        assessment.score += 20;
-    }
-    
-    // Check 2: Requires trusted role action?
-    if (requiresTrustedRoleAction(violation)) {
-        assessment.isRealistic = false;
-        assessment.keepForReview = false;  // Operational error
-        assessment.reasons.push('Requires trusted role action - operational');
-        return assessment;
-    } else {
-        assessment.score += 20;
-    }
-    
-    // Check 3: Capital requirements feasible?
-    const capitalReq = estimateCapitalRequired(violation);
-    if (capitalReq > PROTOCOL_TVL * 0.1) {  // More than 10% of TVL
-        assessment.reasons.push(`High capital required: $${capitalReq}M`);
-        assessment.score -= 10;
-    } else {
-        assessment.score += 15;
-    }
-    
-    // Check 4: Sequence length feasible?
-    if (violation.sequenceLength > MAX_FEASIBLE_SEQUENCE) {
-        assessment.reasons.push(`Sequence too long: ${violation.sequenceLength} txs`);
-        assessment.score -= 15;
-    } else {
-        assessment.score += 15;
-    }
-    
-    // Check 5: Time sensitivity feasible?
-    if (violation.requiresSameBlock && !hasFlashLoanAccess(context)) {
-        assessment.reasons.push('Requires same-block execution without flash loan source');
-        assessment.score -= 10;
-    } else {
-        assessment.score += 10;
-    }
-    
-    // Determine realism
-    assessment.isRealistic = assessment.score >= 50;
-    
-    // Block gate
-    if (assessment.isRealistic) {
-        assessment.blockGateAction = 'proceed_to_fork';
-    } else if (assessment.keepForReview && assessment.score >= 30) {
-        assessment.blockGateAction = 'save_for_manual_review';
-    } else {
-        assessment.blockGateAction = 'discard';
-    }
-    
-    return assessment;
-}
-```
-
-## Checkpoint 4: Fork Test Evidence Validation (Phase 5)
+## Checkpoint 3: Fork Test Evidence Validation (Phase 4)
 
 ### Input
 - Fork test results from Hacker
@@ -614,25 +538,34 @@ function applyPreClassificationWeighting(verdict, hypothesis, context) {
         return verdict;  // No enhanced data - return unchanged
     }
     
-    const preClass = findPreClassificationForHypothesis(hypothesis.id, context.evidence.classificationRegistry);
+    // FIX (integration bug): findPreClassificationForHypothesis previously assumed the
+    // same broken camelCase/per-class-array shape as intended-behavior.md's
+    // findPreClassification — see that file's fix note. Real classificationRegistry is
+    // {entries: ClassifiedFinding[], statistics}, with entries[].classification using the
+    // 6-class kebab-case vocabulary (proven-property/potential-bug/reachable-bug/
+    // false-positive/by-design/insufficient-evidence). Reuse the corrected lookup from
+    // intended-behavior.md's findPreClassification() rather than a separate broken copy.
+    const preClass = findPreClassification(hypothesis.id, context.evidence.classificationRegistry);
     
     if (!preClass) {
         return verdict;  // No pre-classification for this finding
     }
     
-    // Adjust confidence based on pre-classification
+    // Adjust confidence based on pre-classification (mapped from the 6-class registry,
+    // not the FinalVerdict vocabulary used elsewhere — reachable-bug/potential-bug/
+    // false-positive/by-design/proven-property/insufficient-evidence)
     switch (preClass) {
-        case 'confirmed-vulnerability':
+        case 'reachable-bug':
             // Boost confidence - already validated by Evidence Validator
             verdict.confidence = Math.min((verdict.confidence || 50) + 15, 100);
-            verdict.preClassification = 'confirmed-vulnerability';
+            verdict.preClassification = 'reachable-bug';
             verdict.preClassificationBoost = +15;
             break;
             
-        case 'potential-vulnerability':
+        case 'potential-bug':
             // Modest boost - likely but needs confirmation
             verdict.confidence = Math.min((verdict.confidence || 50) + 5, 100);
-            verdict.preClassification = 'potential-vulnerability';
+            verdict.preClassification = 'potential-bug';
             verdict.preClassificationBoost = +5;
             break;
             
@@ -656,7 +589,7 @@ function applyPreClassificationWeighting(verdict, hypothesis, context) {
             break;
             
         default:
-            // informational or cannot-determine - no adjustment
+            // proven-property or insufficient-evidence - no adjustment
             verdict.preClassification = preClass;
             break;
     }
@@ -675,8 +608,13 @@ function applyPartialNineCriteria(verdict, hypothesis, context) {
         return verdict;
     }
     
-    // Look for existing reachability analysis from Evidence Validator
-    const existingAnalysis = context.evidence.reachabilityAnalysis.find(
+    // FIX (integration bug — CRASH RISK): reachabilityAnalysis is an object
+    // {paths, unreachableFindings, summary}, not an array. Calling .find() directly on
+    // it throws "reachabilityAnalysis.find is not a function". Must go through .paths.
+    // Also: proofRequirementsList (the 9-criteria checklist) now lives alongside
+    // reachabilityAnalysis on context.evidence — cross-reference it here too, since
+    // it's a much richer source of "criteria satisfied so far" than gasCostEstimate.
+    const existingAnalysis = context.evidence.reachabilityAnalysis.paths?.find(
         r => r.findingId === hypothesis.id
     );
     
@@ -686,18 +624,30 @@ function applyPartialNineCriteria(verdict, hypothesis, context) {
     
     // Extract criteria we can verify now vs. what needs later verification
     const criteriaNow = {
-        entry_accessible: existingAnalysis.prerequisites?.find(
-            p => p.condition === 'entry_accessible'
-        ),
-        gas_feasible: existingAnalysis.gasCostEstimate ? { satisfied: true } : null
+        entry_accessible: existingAnalysis.entryPoint
+            ? { satisfied: existingAnalysis.entryPoint.isPermissionless } : null,
+        gas_feasible: existingAnalysis.estimatedGasCost ? { satisfied: true } : null
     };
+
+    // Pull in the 9-criteria proof-requirements checklist if available (see
+    // ProofRequirements in trackator's evidence-validator.ts — now actually exported)
+    const proofReq = context.evidence.proofRequirementsList?.find(
+        p => p.findingId === hypothesis.id
+    );
+    if (proofReq) {
+        criteriaNow.proof_requirements_met = {
+            satisfied: proofReq.overallStatus === 'proven-reachable',
+            metRequirements: proofReq.metRequirements,
+            totalRequirements: proofReq.totalRequirements
+        };
+    }
     
     // Apply available criteria to current verdict
     const satisfiedCount = Object.values(criteriaNow).filter(c => c?.satisfied).length;
     
     if (satisfiedCount > 0) {
         verdict.nineCriteriaPartial = {
-            totalApplicable: Object.keys(criteriaNow).length,
+            totalApplicable: Object.values(criteriaNow).filter(c => c !== null).length,
             satisfied: satisfiedCount,
             criteria: criteriaNow,
             source: 'evidence-validator-reachability-analysis'
@@ -720,7 +670,14 @@ If a finding has been through the Disproof Engine before reaching reachability:
 
 ```javascript
 function applyDisproofAwareness(verdict, hypothesis, context) {
-    const disproofResult = context.evidence?.disproofEngine?.disproofEvidence?.find(
+    // FIX (integration bug): context.evidence.disproofEngine doesn't exist at all — real
+    // top-level key is disproofAnalysis: {disproofAttempts, results, summary}. Also the
+    // old code read entirely fictional fields (reasonSafe/guardCodeFound/isEffective) that
+    // don't exist on DisproofResult; real fields are {resultId, findingId,
+    // originalClassification, newClassification, disproofStrategy, disproofEvidence[],
+    // reasoning, confidence}. A "disproof succeeded" signal is newClassification landing
+    // on 'false-positive' or 'by-design' (vs. the original classification).
+    const disproofResult = context.evidence?.disproofAnalysis?.results?.find(
         d => d.findingId === hypothesis.id
     );
     
@@ -728,17 +685,19 @@ function applyDisproofAwareness(verdict, hypothesis, context) {
         return verdict;
     }
     
-    verdict.disproofStatus = disproofResult.reasonSafe || 'disproof-attempted';
+    verdict.disproofStatus = disproofResult.disproofStrategy || 'disproof-attempted';
     
-    // If disproof found guard code that's effective, reduce confidence
-    if (disproofResult.guardCodeFound && disproofResult.isEffective) {
+    const wasDisproven = disproofResult.newClassification === 'false-positive' ||
+        disproofResult.newClassification === 'by-design';
+
+    if (wasDisproven && disproofResult.confidence >= 60) {
         verdict.confidence = Math.max((verdict.confidence || 50) - 25, 5);
-        verdict.disproofImpact = 'guard-code-found-effective';
-        verdict.note = 'Disproof engine found effective guard code - vulnerability may be mitigated';
-    } else if (disproofResult.guardCodeFound) {
-        // Guard found but effectiveness uncertain
-        verdict.disproofImpact = 'guard-code-found-effectiveness-uncertain';
-        verdict.note = 'Guard code found but effectiveness needs manual review';
+        verdict.disproofImpact = 'disproof-effective';
+        verdict.note = `Disproof engine reclassified as ${disproofResult.newClassification} via ${disproofResult.disproofStrategy} (reasoning: ${disproofResult.reasoning})`;
+    } else if (wasDisproven) {
+        // Reclassified but with low confidence — flag for manual review, don't discard
+        verdict.disproofImpact = 'disproof-attempted-low-confidence';
+        verdict.note = `Disproof engine suggests ${disproofResult.newClassification} but confidence is only ${disproofResult.confidence} — needs manual review`;
     }
     
     return verdict;

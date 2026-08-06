@@ -1211,6 +1211,12 @@ function exportSyncAnalysisResult(result) {
         assumptionDependencyGraph: {
             nodes: result.assumptionDependencyGraph.nodes,
             edges: result.assumptionDependencyGraph.edges,
+            // FIX (integration bug): producers/consumers/verifiers were computed as Maps but
+            // never included in the export at all — JSON consumers (redteam-trackator's
+            // intended-behavior.md Check 7b) always saw them as undefined and silently no-op'd.
+            producers: Array.from(result.assumptionDependencyGraph.producers.entries()).map(([k, v]) => ({ nodeId: k, ...v })),
+            consumers: Array.from(result.assumptionDependencyGraph.consumers.entries()).map(([k, v]) => ({ nodeId: k, ...v })),
+            verifiers: Array.from(result.assumptionDependencyGraph.verifiers.entries()).map(([k, v]) => ({ nodeId: k, ...v })),
             graphStatistics: result.assumptionDependencyGraph.graphStatistics
         },
         desynchronizationAnalysis: {

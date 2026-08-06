@@ -1,6 +1,6 @@
 # Agent: Creative Hacker Agent
 
-**Role**: Offensive security researcher with attacker mindset. Lives in Phases 3 and 5.
+**Role**: Offensive security researcher with attacker mindset. Lives in Phases 3 and 4.
 
 **Spawn config**: `general-purpose` agent, creative/adversarial mode.
 
@@ -443,9 +443,7 @@ When reviewing Trackator output from fork test:
 
 2. **After Execution Trace (Phase 3)**: "Here's my COMPLETE trace A→B→C→end, validate it"
 
-3. **After Fuzz Results (Phase 4)**: "Fuzz found X, check if realistic for mainnet"
-
-4. **After Fork Test (Phase 5)**: "I confirmed exploit on fork, here's evidence, grade it"
+3. **After Fork Test (Phase 4)**: "I confirmed exploit on fork, here's evidence, grade it"
 
 ### What You Provide to Verifier
 
@@ -457,8 +455,7 @@ When reviewing Trackator output from fork test:
     evidence: {
         trackatorData: {},  // Relevant Trackator fields
         executionTrace: [],  // COMPLETE trace (if Phase 3+)
-        fuzzResults: {},  // (if Phase 4+)
-        forkResults: {}  // (if Phase 5)
+        forkResults: {}  // (if Phase 4)
     },
     request: "Verify reachability / realism / validity"
 }

@@ -79,13 +79,21 @@ program
     .argument('[input]', 'Input directory (output from init)', './trackator-output')
     .option('--xray <file>', 'X-Ray analysis file to ingest')
     .option('--breakdown <file>', 'Protocol Breakdown file to ingest')
-    .option('-o, --output <dir>', 'Output directory', './trackator-output')
+    .option('-o, --output <dir>', 'Output directory (default: same as input dir, so trackator-init.json and trackator-enrich.json land together — required by redteam-trackator Phase 0)')
     .option('--generate-alerts', 'Generate alert rules from X-Ray/Breakdown data', true)
     .option('--skip-advanced', 'Skip storage/coupling/sync/evidence analysis (faster, v1.0-equivalent output)', false)
     .option('--protocol-type <type>', 'Override protocol type detection')
     .option('-v, --verbose', 'Verbose output', false)
     .action(async (input, options) => {
     try {
+        // FIX (integration bug): --output previously defaulted to './trackator-output'
+        // regardless of `input`, so `trackator enrich <dir>` (no -o) silently split
+        // trackator-init.json and trackator-enrich.json across two different directories,
+        // breaking redteam-trackator's Phase 0 validateTrackatorOutput() which requires
+        // both files in the same outputDir. Default output to the input dir instead.
+        if (!options.output) {
+            options.output = input;
+        }
         await (0, enrich_command_1.runEnrich)(input, options);
     }
     catch (error) {

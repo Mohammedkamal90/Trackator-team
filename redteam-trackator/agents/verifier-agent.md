@@ -216,7 +216,7 @@ function verifyNineCriteria(finding, context) {
 
 > *"A surviving disproof attempt is stronger than unchallenged findings."*
 
-When fuzz findings have been through Disproof Engine (`finding.disproofResult`):
+When findings have been through Disproof Engine (`finding.disproofResult`) from Evidence Validator:
 
 ```javascript
 function analyzeDisproofResult(disproofResult, finding) {
@@ -421,7 +421,7 @@ function validateExecutionTrace(trace, hypothesis) {
     
     validation.conclusion = validation.isValid ? {
         verdict: trace.conclusion?.survives ? 'TRACE_VALIDATED' : 'TRACE_MITIGATED',
-        blockGateAction: trace.conclusion?.survives ? 'proceed_to_fuzz' : 'save_as_mitigated'
+        blockGateAction: trace.conclusion?.survives ? 'proceed_to_fork' : 'save_as_mitigated'
     } : {
         verdict: 'TRACE_INVALID',
         blockGateAction: 'return_to_hacker',
@@ -432,56 +432,7 @@ function validateExecutionTrace(trace, hypothesis) {
 }
 ```
 
-### Phase 4: Realism Verification (BLOCK GATE #3)
-
-**Input from Hacker**: Fuzz results
-
-**What you verify:**
-
-```javascript
-function verifyFuzzRealism(fuzzResult, context) {
-    const verification = {
-        fuzzId: fuzzResult.campaignId,
-        violations: [],
-        realisticViolations: [],
-        unrealisticViolations: []
-    };
-    
-    for (const violation of fuzzResult.violations) {
-        const realism = assessRealism(violation, context);
-        
-        if (realism.isRealistic) {
-            verification.realisticViolations.push({
-                ...violation,
-                realismScore: realism.score,
-                notes: realism.notes
-            });
-        } else {
-            verification.unrealisticViolations.push({
-                ...violation,
-                reason: realism.reason,
-                keepForReview: realism.keepForReview  // Still save some!
-            });
-        }
-    }
-    
-    // BLOCK GATE: Don't kill unrealistic ones, just downgrade
-    verification.blockGateAction = verification.realisticViolations.length > 0 
-        ? 'proceed_to_fork' 
-        : 'save_for_manual_review';
-    
-    verification.summary = {
-        totalViolations: fuzzResult.violations.length,
-        realistic: verification.realisticViolations.length,
-        unrealistic: verification.unrealisticViolations.length,
-        recommendation: verification.blockGateAction
-    };
-    
-    return verification;
-}
-```
-
-### Phase 5: Fork Evidence Validation (BLOCK GATE #4)
+### Phase 4: Fork Evidence Validation (BLOCK GATE #3)
 
 **Input from Hacker**: Fork test results with Trackator visualization
 
@@ -592,8 +543,7 @@ function validateForkEvidence(forkResult, hypothesis) {
 
 1. **Phase 2 Output**: Pattern match + initial reachability
 2. **Phase 3 Output**: Creative hypotheses + execution traces
-3. **Phase 4 Output**: Fuzz campaign results
-4. **Phase 5 Output**: Fork test iterations + best result
+3. **Phase 4 Output**: Fork test iterations + best result
 
 ### What You Send Back
 
@@ -634,7 +584,7 @@ function validateForkEvidence(forkResult, hypothesis) {
 | `proceed_to_next_phase` | Validated, continue pipeline | Move to next phase |
 | `return_to_hacker` | Issues found, needs more work | Hacker fixes and resubmits |
 | `save_for_poc` | Can't validate now, try later | Add to PoC queue |
-| `save_for_fork` | Needs fork testing to resolve | Queue for Phase 5 |
+| `save_for_fork` | Needs fork testing to resolve | Queue for Phase 4 |
 | `save_for_manual_review` | Interesting but needs human | Appendix in report |
 | `discard` | Proven impossible or operational | Remove from consideration |
 | `report_now` | Confirmed finding | Include in final report |
@@ -683,14 +633,10 @@ function calculateFinalConfidence(finding) {
     if (finding.executionTrace?.validated === true) score += 20;
     else if (finding.executionTrace?.completed === true) score += 10;
     
-    // Fuzz validation (+15 max)
-    if (finding.fuzzValidated?.realistic === true) score += 15;
-    else if (finding.fuzzValidated?.anyViolation === true) score += 5;
-    
-    // Fork success (+35 max)
-    if (finding.forkResult?.verdict === 'CONFIRMED') score += 35;
-    else if (finding.forkResult?.verdict === 'PROBABLE') score += 20;
-    else if (finding.forkResult?.attempted === true) score += 5;
+    // Fork success (+50 max, ENHANCED: includes former fuzz weight)
+    if (finding.forkResult?.verdict === 'CONFIRMED') score += 50;
+    else if (finding.forkResult?.verdict === 'PROBABLE') score += 30;
+    else if (finding.forkResult?.attempted === true) score += 10;
     
     // Economic feasibility (+10 max, never negative)
     if (finding.economicAssessment?.feasible === true) score += 10;

@@ -1,0 +1,3190 @@
+{
+  "runId": "run_1785989513508_tjnink",
+  "command": "init",
+  "timestamp": "2026-08-06T04:11:53.508Z",
+  "duration": 1728,
+  "contracts": [
+    {
+      "name": "SampleLendingProtocol",
+      "sourcePath": "/media/glitch/Glitch/Audit-Agents/trackator/examples/sample-lending-protocol/SampleLendingProtocol.sol",
+      "abstract": false,
+      "inherited": [
+        "ReentrancyGuard"
+      ],
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "@openzeppelin/contracts/security/ReentrancyGuard.sol",
+        "./OracleWrapper.sol",
+        "./FeeCollector.sol"
+      ],
+      "stateVariables": [
+        {
+          "name": "totalSupply",
+          "type": "uint256",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 0,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "totalBorrowed",
+          "type": "uint256",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 1,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "reserveBalance",
+          "type": "uint256",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 2,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "oracle",
+          "type": "OracleWrapper",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 3,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "collateralFactor",
+          "type": "uint256",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 4,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "liquidationBonus",
+          "type": "uint256",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 5,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "interestRate",
+          "type": "uint256",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 6,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "userCollateral",
+          "type": "mapping(address => uint256)",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 7,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "userDebt",
+          "type": "mapping(address => uint256)",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 8,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "hasDeposited",
+          "type": "mapping(address => bool)",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 9,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "owner",
+          "type": "address",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 10,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "guardian",
+          "type": "address",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 11,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "paused",
+          "type": "bool",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 12,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "collateralToken",
+          "type": "IERC20",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 13,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "borrowToken",
+          "type": "IERC20",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 14,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "feeCollector",
+          "type": "FeeCollector",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 15,
+          "overridden": false,
+          "initialized": false
+        }
+      ],
+      "functions": [
+        {
+          "name": "constructor",
+          "kind": "function",
+          "visibility": "default",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [],
+          "body": {
+            "statements": 11,
+            "hasRequire": true,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "IERC20",
+            "OracleWrapper",
+            "FeeCollector"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 83,
+          "lineEnd": 105,
+          "complexity": 1
+        },
+        {
+          "name": "deposit",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "whenNotPaused",
+            "nonReentrant"
+          ],
+          "body": {
+            "statements": 6,
+            "hasRequire": true,
+            "hasRevert": false,
+            "hasExternalCall": true,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "violated"
+          },
+          "calls": [
+            "safeTransferFrom",
+            "address",
+            "Deposit"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 113,
+          "lineEnd": 125,
+          "complexity": 1
+        },
+        {
+          "name": "borrow",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "whenNotPaused",
+            "nonReentrant"
+          ],
+          "body": {
+            "statements": 9,
+            "hasRequire": true,
+            "hasRevert": false,
+            "hasExternalCall": true,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "violated"
+          },
+          "calls": [
+            "calculateHealthFactor",
+            "safeTransfer",
+            "Borrow"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 131,
+          "lineEnd": 148,
+          "complexity": 1
+        },
+        {
+          "name": "repay",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "whenNotPaused",
+            "nonReentrant"
+          ],
+          "body": {
+            "statements": 6,
+            "hasRequire": true,
+            "hasRevert": false,
+            "hasExternalCall": true,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "violated"
+          },
+          "calls": [
+            "safeTransferFrom",
+            "address",
+            "Repay"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 154,
+          "lineEnd": 166,
+          "complexity": 1
+        },
+        {
+          "name": "liquidate",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "whenNotPaused",
+            "nonReentrant"
+          ],
+          "body": {
+            "statements": 20,
+            "hasRequire": true,
+            "hasRevert": false,
+            "hasExternalCall": true,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "violated"
+          },
+          "calls": [
+            "calculateHealthFactor",
+            "getPrice",
+            "safeTransferFrom",
+            "address",
+            "safeTransfer",
+            "Liquidation"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 173,
+          "lineEnd": 210,
+          "complexity": 2
+        },
+        {
+          "name": "withdraw",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "whenNotPaused",
+            "nonReentrant"
+          ],
+          "body": {
+            "statements": 9,
+            "hasRequire": true,
+            "hasRevert": false,
+            "hasExternalCall": true,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "violated"
+          },
+          "calls": [
+            "calculateHealthFactorWithCollateral",
+            "safeTransfer",
+            "Withdrawal"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 216,
+          "lineEnd": 233,
+          "complexity": 1
+        },
+        {
+          "name": "setOracle",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "onlyOwner"
+          ],
+          "body": {
+            "statements": 1,
+            "hasRequire": false,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "OracleWrapper"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 241,
+          "lineEnd": 243,
+          "complexity": 1
+        },
+        {
+          "name": "setCollateralFactor",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "onlyOwner"
+          ],
+          "body": {
+            "statements": 2,
+            "hasRequire": true,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 248,
+          "lineEnd": 251,
+          "complexity": 1
+        },
+        {
+          "name": "pause",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "onlyGuardian"
+          ],
+          "body": {
+            "statements": 2,
+            "hasRequire": false,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "PauseChanged"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 256,
+          "lineEnd": 259,
+          "complexity": 1
+        },
+        {
+          "name": "unpause",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "onlyGuardian"
+          ],
+          "body": {
+            "statements": 2,
+            "hasRequire": false,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "PauseChanged"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 264,
+          "lineEnd": 267,
+          "complexity": 1
+        },
+        {
+          "name": "emergencyWithdraw",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "onlyOwner"
+          ],
+          "body": {
+            "statements": 1,
+            "hasRequire": false,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "safeTransfer",
+            "IERC20"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 273,
+          "lineEnd": 275,
+          "complexity": 1
+        },
+        {
+          "name": "transferOwnership",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "onlyOwner"
+          ],
+          "body": {
+            "statements": 3,
+            "hasRequire": true,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "address",
+            "OwnershipTransferred"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 280,
+          "lineEnd": 284,
+          "complexity": 1
+        },
+        {
+          "name": "calculateHealthFactor",
+          "kind": "function",
+          "visibility": "public",
+          "stateMutability": "view",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [],
+          "body": {
+            "statements": 8,
+            "hasRequire": false,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "type",
+            "getPrice"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 294,
+          "lineEnd": 304,
+          "complexity": 3
+        },
+        {
+          "name": "calculateHealthFactorWithCollateral",
+          "kind": "function",
+          "visibility": "public",
+          "stateMutability": "view",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [],
+          "body": {
+            "statements": 8,
+            "hasRequire": false,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "type",
+            "getPrice"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 309,
+          "lineEnd": 323,
+          "complexity": 3
+        },
+        {
+          "name": "getUserPosition",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "view",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [],
+          "body": {
+            "statements": 4,
+            "hasRequire": false,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "calculateHealthFactor"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 328,
+          "lineEnd": 338,
+          "complexity": 2
+        }
+      ],
+      "events": [
+        {
+          "name": "Deposit",
+          "parameters": [],
+          "anonymous": false,
+          "emittedBy": [],
+          "lineDeclared": 50
+        },
+        {
+          "name": "Borrow",
+          "parameters": [],
+          "anonymous": false,
+          "emittedBy": [],
+          "lineDeclared": 51
+        },
+        {
+          "name": "Repay",
+          "parameters": [],
+          "anonymous": false,
+          "emittedBy": [],
+          "lineDeclared": 52
+        },
+        {
+          "name": "Liquidation",
+          "parameters": [],
+          "anonymous": false,
+          "emittedBy": [],
+          "lineDeclared": 53
+        },
+        {
+          "name": "Withdrawal",
+          "parameters": [],
+          "anonymous": false,
+          "emittedBy": [],
+          "lineDeclared": 59
+        },
+        {
+          "name": "PriceUpdate",
+          "parameters": [],
+          "anonymous": false,
+          "emittedBy": [],
+          "lineDeclared": 60
+        },
+        {
+          "name": "PauseChanged",
+          "parameters": [],
+          "anonymous": false,
+          "emittedBy": [],
+          "lineDeclared": 61
+        },
+        {
+          "name": "OwnershipTransferred",
+          "parameters": [],
+          "anonymous": false,
+          "emittedBy": [],
+          "lineDeclared": 62
+        }
+      ],
+      "modifiers": [
+        {
+          "name": "onlyOwner",
+          "parameters": [],
+          "appliedTo": [],
+          "lineDeclared": 66
+        },
+        {
+          "name": "onlyGuardian",
+          "parameters": [],
+          "appliedTo": [],
+          "lineDeclared": 71
+        },
+        {
+          "name": "whenNotPaused",
+          "parameters": [],
+          "appliedTo": [],
+          "lineDeclared": 76
+        }
+      ],
+      "structs": [],
+      "enums": [],
+      "errors": [],
+      "usingFor": [
+        {
+          "type": "IERC20",
+          "library": [
+            "*"
+          ]
+        }
+      ],
+      "lineCount": 326
+    },
+    {
+      "name": "IOracle",
+      "sourcePath": "/media/glitch/Glitch/Audit-Agents/trackator/examples/sample-lending-protocol/OracleWrapper.sol",
+      "abstract": false,
+      "inherited": [],
+      "imports": [],
+      "stateVariables": [],
+      "functions": [
+        {
+          "name": "getPrice",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "view",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [],
+          "body": {
+            "statements": 0,
+            "hasRequire": false,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 10,
+          "lineEnd": 10,
+          "complexity": 1
+        },
+        {
+          "name": "getTWAP",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "view",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [],
+          "body": {
+            "statements": 0,
+            "hasRequire": false,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 11,
+          "lineEnd": 11,
+          "complexity": 1
+        }
+      ],
+      "events": [],
+      "modifiers": [],
+      "structs": [],
+      "enums": [],
+      "errors": [],
+      "usingFor": [],
+      "lineCount": 4
+    },
+    {
+      "name": "OracleWrapper",
+      "sourcePath": "/media/glitch/Glitch/Audit-Agents/trackator/examples/sample-lending-protocol/OracleWrapper.sol",
+      "abstract": false,
+      "inherited": [],
+      "imports": [],
+      "stateVariables": [
+        {
+          "name": "admin",
+          "type": "address",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 0,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "spotPrice",
+          "type": "uint256",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 1,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "twapPrice",
+          "type": "uint256",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 2,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "lastUpdateTime",
+          "type": "uint256",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 3,
+          "overridden": false,
+          "initialized": false
+        }
+      ],
+      "functions": [
+        {
+          "name": "constructor",
+          "kind": "function",
+          "visibility": "default",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [],
+          "body": {
+            "statements": 4,
+            "hasRequire": false,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 30,
+          "lineEnd": 35,
+          "complexity": 1
+        },
+        {
+          "name": "getPrice",
+          "kind": "function",
+          "visibility": "public",
+          "stateMutability": "view",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [],
+          "body": {
+            "statements": 1,
+            "hasRequire": false,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 41,
+          "lineEnd": 43,
+          "complexity": 1
+        },
+        {
+          "name": "getTWAP",
+          "kind": "function",
+          "visibility": "public",
+          "stateMutability": "view",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [],
+          "body": {
+            "statements": 1,
+            "hasRequire": false,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 48,
+          "lineEnd": 50,
+          "complexity": 1
+        },
+        {
+          "name": "isPriceFresh",
+          "kind": "function",
+          "visibility": "public",
+          "stateMutability": "view",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [],
+          "body": {
+            "statements": 1,
+            "hasRequire": false,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 55,
+          "lineEnd": 57,
+          "complexity": 1
+        },
+        {
+          "name": "getDeviation",
+          "kind": "function",
+          "visibility": "public",
+          "stateMutability": "view",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [],
+          "body": {
+            "statements": 3,
+            "hasRequire": false,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 62,
+          "lineEnd": 65,
+          "complexity": 2
+        },
+        {
+          "name": "getDeviationBps",
+          "kind": "function",
+          "visibility": "public",
+          "stateMutability": "view",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [],
+          "body": {
+            "statements": 4,
+            "hasRequire": false,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 70,
+          "lineEnd": 75,
+          "complexity": 2
+        },
+        {
+          "name": "updatePrice",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "onlyAdmin"
+          ],
+          "body": {
+            "statements": 5,
+            "hasRequire": false,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "PriceUpdated"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 83,
+          "lineEnd": 91,
+          "complexity": 1
+        },
+        {
+          "name": "transferAdmin",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "onlyAdmin"
+          ],
+          "body": {
+            "statements": 4,
+            "hasRequire": true,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "address",
+            "AdminChanged"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 96,
+          "lineEnd": 101,
+          "complexity": 1
+        }
+      ],
+      "events": [
+        {
+          "name": "PriceUpdated",
+          "parameters": [],
+          "anonymous": false,
+          "emittedBy": [],
+          "lineDeclared": 21
+        },
+        {
+          "name": "AdminChanged",
+          "parameters": [],
+          "anonymous": false,
+          "emittedBy": [],
+          "lineDeclared": 22
+        }
+      ],
+      "modifiers": [
+        {
+          "name": "onlyAdmin",
+          "parameters": [],
+          "appliedTo": [],
+          "lineDeclared": 25
+        }
+      ],
+      "structs": [],
+      "enums": [],
+      "errors": [],
+      "usingFor": [],
+      "lineCount": 89
+    },
+    {
+      "name": "FeeCollector",
+      "sourcePath": "/media/glitch/Glitch/Audit-Agents/trackator/examples/sample-lending-protocol/FeeCollector.sol",
+      "abstract": false,
+      "inherited": [
+        "ReentrancyGuard"
+      ],
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "@openzeppelin/contracts/security/ReentrancyGuard.sol"
+      ],
+      "stateVariables": [
+        {
+          "name": "protocol",
+          "type": "address",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 0,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "treasury",
+          "type": "address",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 1,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "admin",
+          "type": "address",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 2,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "totalFeesCollected",
+          "type": "uint256",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 3,
+          "overridden": false,
+          "initialized": false
+        },
+        {
+          "name": "feesByToken",
+          "type": "mapping(address => uint256)",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "slot": 4,
+          "overridden": false,
+          "initialized": false
+        }
+      ],
+      "functions": [
+        {
+          "name": "constructor",
+          "kind": "function",
+          "visibility": "default",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [],
+          "body": {
+            "statements": 3,
+            "hasRequire": true,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "address"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 39,
+          "lineEnd": 43,
+          "complexity": 1
+        },
+        {
+          "name": "setProtocol",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [],
+          "body": {
+            "statements": 3,
+            "hasRequire": true,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "address"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 48,
+          "lineEnd": 53,
+          "complexity": 1
+        },
+        {
+          "name": "collectFees",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "onlyProtocol",
+            "nonReentrant"
+          ],
+          "body": {
+            "statements": 5,
+            "hasRequire": true,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "safeTransferFrom",
+            "IERC20",
+            "address",
+            "FeeCollected"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 58,
+          "lineEnd": 69,
+          "complexity": 1
+        },
+        {
+          "name": "withdrawFees",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "onlyAdmin",
+            "nonReentrant"
+          ],
+          "body": {
+            "statements": 6,
+            "hasRequire": true,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "safeTransfer",
+            "IERC20",
+            "FeesWithdrawn"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 74,
+          "lineEnd": 86,
+          "complexity": 1
+        },
+        {
+          "name": "emergencyWithdraw",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "onlyAdmin"
+          ],
+          "body": {
+            "statements": 2,
+            "hasRequire": true,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "address",
+            "safeTransfer",
+            "IERC20"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 92,
+          "lineEnd": 95,
+          "complexity": 1
+        },
+        {
+          "name": "updateTreasury",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "onlyAdmin"
+          ],
+          "body": {
+            "statements": 4,
+            "hasRequire": true,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "address",
+            "TreasuryUpdated"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 99,
+          "lineEnd": 104,
+          "complexity": 1
+        },
+        {
+          "name": "transferAdmin",
+          "kind": "function",
+          "visibility": "external",
+          "stateMutability": "nonpayable",
+          "virtual": false,
+          "override": false,
+          "parameters": [],
+          "returnParameters": [],
+          "modifiers": [
+            "onlyAdmin"
+          ],
+          "body": {
+            "statements": 4,
+            "hasRequire": true,
+            "hasRevert": false,
+            "hasExternalCall": false,
+            "hasLoop": false,
+            "hasTransfer": false,
+            "hasDelegateCall": false,
+            "ceiPattern": "not-applicable"
+          },
+          "calls": [
+            "address",
+            "AdminChanged"
+          ],
+          "eventsEmitted": [],
+          "stateVariablesRead": [],
+          "stateVariablesWritten": [],
+          "lineStart": 106,
+          "lineEnd": 111,
+          "complexity": 1
+        }
+      ],
+      "events": [
+        {
+          "name": "FeeCollected",
+          "parameters": [],
+          "anonymous": false,
+          "emittedBy": [],
+          "lineDeclared": 23
+        },
+        {
+          "name": "FeesWithdrawn",
+          "parameters": [],
+          "anonymous": false,
+          "emittedBy": [],
+          "lineDeclared": 24
+        },
+        {
+          "name": "TreasuryUpdated",
+          "parameters": [],
+          "anonymous": false,
+          "emittedBy": [],
+          "lineDeclared": 25
+        },
+        {
+          "name": "AdminChanged",
+          "parameters": [],
+          "anonymous": false,
+          "emittedBy": [],
+          "lineDeclared": 26
+        }
+      ],
+      "modifiers": [
+        {
+          "name": "onlyProtocol",
+          "parameters": [],
+          "appliedTo": [],
+          "lineDeclared": 29
+        },
+        {
+          "name": "onlyAdmin",
+          "parameters": [],
+          "appliedTo": [],
+          "lineDeclared": 34
+        }
+      ],
+      "structs": [],
+      "enums": [],
+      "errors": [],
+      "usingFor": [
+        {
+          "type": "IERC20",
+          "library": [
+            "*"
+          ]
+        }
+      ],
+      "lineCount": 101
+    }
+  ],
+  "callGraph": [
+    {
+      "contract": "SampleLendingProtocol",
+      "function": "constructor",
+      "calls": [
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "constructor"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "IERC20"
+          },
+          "type": "internal"
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "constructor"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "OracleWrapper"
+          },
+          "type": "internal"
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "constructor"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "FeeCollector"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [],
+      "visibility": "default",
+      "isExternal": false,
+      "isEntry": false
+    },
+    {
+      "contract": "SampleLendingProtocol",
+      "function": "deposit",
+      "calls": [
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "deposit"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "safeTransferFrom"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [
+              {
+                "token": "unknown",
+                "direction": "send",
+                "amountExpr": "unknown"
+              }
+            ],
+            "amountSource": "unknown"
+          }
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "deposit"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "address"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [],
+            "amountSource": "unknown"
+          }
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "deposit"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "Deposit"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [],
+            "amountSource": "unknown"
+          }
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "SampleLendingProtocol",
+      "function": "borrow",
+      "calls": [
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "borrow"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "calculateHealthFactor"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [],
+            "amountSource": "unknown"
+          }
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "borrow"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "safeTransfer"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [
+              {
+                "token": "unknown",
+                "direction": "send",
+                "amountExpr": "unknown"
+              }
+            ],
+            "amountSource": "unknown"
+          }
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "borrow"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "Borrow"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [],
+            "amountSource": "unknown"
+          }
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "SampleLendingProtocol",
+      "function": "repay",
+      "calls": [
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "repay"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "safeTransferFrom"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [
+              {
+                "token": "unknown",
+                "direction": "send",
+                "amountExpr": "unknown"
+              }
+            ],
+            "amountSource": "unknown"
+          }
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "repay"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "address"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [],
+            "amountSource": "unknown"
+          }
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "repay"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "Repay"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [],
+            "amountSource": "unknown"
+          }
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "SampleLendingProtocol",
+      "function": "liquidate",
+      "calls": [
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "liquidate"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "calculateHealthFactor"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [],
+            "amountSource": "unknown"
+          }
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "liquidate"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "getPrice"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [],
+            "amountSource": "unknown"
+          }
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "liquidate"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "safeTransferFrom"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [
+              {
+                "token": "unknown",
+                "direction": "send",
+                "amountExpr": "unknown"
+              }
+            ],
+            "amountSource": "unknown"
+          }
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "liquidate"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "address"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [],
+            "amountSource": "unknown"
+          }
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "liquidate"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "safeTransfer"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [
+              {
+                "token": "unknown",
+                "direction": "send",
+                "amountExpr": "unknown"
+              }
+            ],
+            "amountSource": "unknown"
+          }
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "liquidate"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "Liquidation"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [],
+            "amountSource": "unknown"
+          }
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "SampleLendingProtocol",
+      "function": "withdraw",
+      "calls": [
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "withdraw"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "calculateHealthFactorWithCollateral"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [],
+            "amountSource": "unknown"
+          }
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "withdraw"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "safeTransfer"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [
+              {
+                "token": "unknown",
+                "direction": "send",
+                "amountExpr": "unknown"
+              }
+            ],
+            "amountSource": "unknown"
+          }
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "withdraw"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "Withdrawal"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [],
+            "amountSource": "unknown"
+          }
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "SampleLendingProtocol",
+      "function": "setOracle",
+      "calls": [
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "setOracle"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "OracleWrapper"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "SampleLendingProtocol",
+      "function": "setCollateralFactor",
+      "calls": [],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "SampleLendingProtocol",
+      "function": "pause",
+      "calls": [
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "pause"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "PauseChanged"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "SampleLendingProtocol",
+      "function": "unpause",
+      "calls": [
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "unpause"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "PauseChanged"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "SampleLendingProtocol",
+      "function": "emergencyWithdraw",
+      "calls": [
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "emergencyWithdraw"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "safeTransfer"
+          },
+          "type": "internal"
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "emergencyWithdraw"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "IERC20"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "SampleLendingProtocol",
+      "function": "transferOwnership",
+      "calls": [
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "transferOwnership"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "address"
+          },
+          "type": "internal"
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "transferOwnership"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "OwnershipTransferred"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "SampleLendingProtocol",
+      "function": "calculateHealthFactor",
+      "calls": [
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "calculateHealthFactor"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "type"
+          },
+          "type": "internal"
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "calculateHealthFactor"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "getPrice"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "borrow"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "calculateHealthFactor"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [],
+            "amountSource": "unknown"
+          }
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "liquidate"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "calculateHealthFactor"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [],
+            "amountSource": "unknown"
+          }
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "getUserPosition"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "calculateHealthFactor"
+          },
+          "type": "internal"
+        }
+      ],
+      "visibility": "public",
+      "isExternal": true,
+      "isEntry": false
+    },
+    {
+      "contract": "SampleLendingProtocol",
+      "function": "calculateHealthFactorWithCollateral",
+      "calls": [
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "calculateHealthFactorWithCollateral"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "type"
+          },
+          "type": "internal"
+        },
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "calculateHealthFactorWithCollateral"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "getPrice"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "withdraw"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "calculateHealthFactorWithCollateral"
+          },
+          "type": "internal",
+          "valueFlow": {
+            "ethSent": false,
+            "tokenTransfers": [],
+            "amountSource": "unknown"
+          }
+        }
+      ],
+      "visibility": "public",
+      "isExternal": true,
+      "isEntry": false
+    },
+    {
+      "contract": "SampleLendingProtocol",
+      "function": "getUserPosition",
+      "calls": [
+        {
+          "from": {
+            "contract": "SampleLendingProtocol",
+            "function": "getUserPosition"
+          },
+          "to": {
+            "contract": "SampleLendingProtocol",
+            "function": "calculateHealthFactor"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": false
+    },
+    {
+      "contract": "IOracle",
+      "function": "getPrice",
+      "calls": [],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": false
+    },
+    {
+      "contract": "IOracle",
+      "function": "getTWAP",
+      "calls": [],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": false
+    },
+    {
+      "contract": "OracleWrapper",
+      "function": "constructor",
+      "calls": [],
+      "calledBy": [],
+      "visibility": "default",
+      "isExternal": false,
+      "isEntry": false
+    },
+    {
+      "contract": "OracleWrapper",
+      "function": "getPrice",
+      "calls": [],
+      "calledBy": [],
+      "visibility": "public",
+      "isExternal": true,
+      "isEntry": false
+    },
+    {
+      "contract": "OracleWrapper",
+      "function": "getTWAP",
+      "calls": [],
+      "calledBy": [],
+      "visibility": "public",
+      "isExternal": true,
+      "isEntry": false
+    },
+    {
+      "contract": "OracleWrapper",
+      "function": "isPriceFresh",
+      "calls": [],
+      "calledBy": [],
+      "visibility": "public",
+      "isExternal": true,
+      "isEntry": false
+    },
+    {
+      "contract": "OracleWrapper",
+      "function": "getDeviation",
+      "calls": [],
+      "calledBy": [],
+      "visibility": "public",
+      "isExternal": true,
+      "isEntry": false
+    },
+    {
+      "contract": "OracleWrapper",
+      "function": "getDeviationBps",
+      "calls": [],
+      "calledBy": [],
+      "visibility": "public",
+      "isExternal": true,
+      "isEntry": false
+    },
+    {
+      "contract": "OracleWrapper",
+      "function": "updatePrice",
+      "calls": [
+        {
+          "from": {
+            "contract": "OracleWrapper",
+            "function": "updatePrice"
+          },
+          "to": {
+            "contract": "OracleWrapper",
+            "function": "PriceUpdated"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "OracleWrapper",
+      "function": "transferAdmin",
+      "calls": [
+        {
+          "from": {
+            "contract": "OracleWrapper",
+            "function": "transferAdmin"
+          },
+          "to": {
+            "contract": "OracleWrapper",
+            "function": "address"
+          },
+          "type": "internal"
+        },
+        {
+          "from": {
+            "contract": "OracleWrapper",
+            "function": "transferAdmin"
+          },
+          "to": {
+            "contract": "OracleWrapper",
+            "function": "AdminChanged"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "FeeCollector",
+      "function": "constructor",
+      "calls": [
+        {
+          "from": {
+            "contract": "FeeCollector",
+            "function": "constructor"
+          },
+          "to": {
+            "contract": "FeeCollector",
+            "function": "address"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [],
+      "visibility": "default",
+      "isExternal": false,
+      "isEntry": false
+    },
+    {
+      "contract": "FeeCollector",
+      "function": "setProtocol",
+      "calls": [
+        {
+          "from": {
+            "contract": "FeeCollector",
+            "function": "setProtocol"
+          },
+          "to": {
+            "contract": "FeeCollector",
+            "function": "address"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "FeeCollector",
+      "function": "collectFees",
+      "calls": [
+        {
+          "from": {
+            "contract": "FeeCollector",
+            "function": "collectFees"
+          },
+          "to": {
+            "contract": "FeeCollector",
+            "function": "safeTransferFrom"
+          },
+          "type": "internal"
+        },
+        {
+          "from": {
+            "contract": "FeeCollector",
+            "function": "collectFees"
+          },
+          "to": {
+            "contract": "FeeCollector",
+            "function": "IERC20"
+          },
+          "type": "internal"
+        },
+        {
+          "from": {
+            "contract": "FeeCollector",
+            "function": "collectFees"
+          },
+          "to": {
+            "contract": "FeeCollector",
+            "function": "address"
+          },
+          "type": "internal"
+        },
+        {
+          "from": {
+            "contract": "FeeCollector",
+            "function": "collectFees"
+          },
+          "to": {
+            "contract": "FeeCollector",
+            "function": "FeeCollected"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "FeeCollector",
+      "function": "withdrawFees",
+      "calls": [
+        {
+          "from": {
+            "contract": "FeeCollector",
+            "function": "withdrawFees"
+          },
+          "to": {
+            "contract": "FeeCollector",
+            "function": "safeTransfer"
+          },
+          "type": "internal"
+        },
+        {
+          "from": {
+            "contract": "FeeCollector",
+            "function": "withdrawFees"
+          },
+          "to": {
+            "contract": "FeeCollector",
+            "function": "IERC20"
+          },
+          "type": "internal"
+        },
+        {
+          "from": {
+            "contract": "FeeCollector",
+            "function": "withdrawFees"
+          },
+          "to": {
+            "contract": "FeeCollector",
+            "function": "FeesWithdrawn"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "FeeCollector",
+      "function": "emergencyWithdraw",
+      "calls": [
+        {
+          "from": {
+            "contract": "FeeCollector",
+            "function": "emergencyWithdraw"
+          },
+          "to": {
+            "contract": "FeeCollector",
+            "function": "address"
+          },
+          "type": "internal"
+        },
+        {
+          "from": {
+            "contract": "FeeCollector",
+            "function": "emergencyWithdraw"
+          },
+          "to": {
+            "contract": "FeeCollector",
+            "function": "safeTransfer"
+          },
+          "type": "internal"
+        },
+        {
+          "from": {
+            "contract": "FeeCollector",
+            "function": "emergencyWithdraw"
+          },
+          "to": {
+            "contract": "FeeCollector",
+            "function": "IERC20"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "FeeCollector",
+      "function": "updateTreasury",
+      "calls": [
+        {
+          "from": {
+            "contract": "FeeCollector",
+            "function": "updateTreasury"
+          },
+          "to": {
+            "contract": "FeeCollector",
+            "function": "address"
+          },
+          "type": "internal"
+        },
+        {
+          "from": {
+            "contract": "FeeCollector",
+            "function": "updateTreasury"
+          },
+          "to": {
+            "contract": "FeeCollector",
+            "function": "TreasuryUpdated"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    },
+    {
+      "contract": "FeeCollector",
+      "function": "transferAdmin",
+      "calls": [
+        {
+          "from": {
+            "contract": "FeeCollector",
+            "function": "transferAdmin"
+          },
+          "to": {
+            "contract": "FeeCollector",
+            "function": "address"
+          },
+          "type": "internal"
+        },
+        {
+          "from": {
+            "contract": "FeeCollector",
+            "function": "transferAdmin"
+          },
+          "to": {
+            "contract": "FeeCollector",
+            "function": "AdminChanged"
+          },
+          "type": "internal"
+        }
+      ],
+      "calledBy": [],
+      "visibility": "external",
+      "isExternal": true,
+      "isEntry": true
+    }
+  ],
+  "mermaidDiagrams": [
+    {
+      "type": "flowchart",
+      "title": "Protocol Overview",
+      "code": "graph TB\n  \"SampleLendingProtocol\"[\"SampleLendingProtocol\\n15 functions\\n16 state vars\\n8 events\\n3 modifiers\"]\n  \"IOracle\"[\"IOracle\\n2 functions\\n0 state vars\\n0 events\\n0 modifiers\"]\n  \"OracleWrapper\"[\"OracleWrapper\\n8 functions\\n4 state vars\\n2 events\\n1 modifiers\"]\n  \"FeeCollector\"[\"FeeCollector\\n7 functions\\n5 state vars\\n4 events\\n2 modifiers\"]\n\n  %% Inheritance\n  \"ReentrancyGuard\" --> \"SampleLendingProtocol\"\n  \"ReentrancyGuard\" --> \"FeeCollector\"\n\n  %% Styling\n  style \"SampleLendingProtocol\" fill:#fff3e0,stroke:#333\n  style \"IOracle\" fill:#e1f5fe,stroke:#333\n  style \"OracleWrapper\" fill:#e1f5fe,stroke:#333\n  style \"FeeCollector\" fill:#e1f5fe,stroke:#333",
+      "description": "High-level view of all contracts in the protocol"
+    },
+    {
+      "type": "classDiagram",
+      "title": "Class Diagram",
+      "code": "classDiagram\nclass SampleLendingProtocol <|-- ReentrancyGuard\n  SampleLendingProtocol+P totalSupply : uint256\n  SampleLendingProtocol+P totalBorrowed : uint256\n  SampleLendingProtocol+P reserveBalance : uint256\n  SampleLendingProtocol+P oracle : OracleWrapper\n  SampleLendingProtocol+P collateralFactor : uint256\n  SampleLendingProtocol+P liquidationBonus : uint256\n  SampleLendingProtocol+P interestRate : uint256\n  SampleLendingProtocol+P userCollateral : mapping(address => uint256)\n  SampleLendingProtocol+P userDebt : mapping(address => uint256)\n  SampleLendingProtocol+P hasDeposited : mapping(address => bool)\n  SampleLendingProtocol+P owner : address\n  SampleLendingProtocol+P guardian : address\n  SampleLendingProtocol+P paused : bool\n  SampleLendingProtocol+P collateralToken : IERC20\n  SampleLendingProtocol+P borrowToken : IERC20\n  SampleLendingProtocol+P feeCollector : FeeCollector\n  SampleLendingProtocolDconstructor()\n  SampleLendingProtocolEdeposit()\n  SampleLendingProtocolEborrow()\n  SampleLendingProtocolErepay()\n  SampleLendingProtocolEliquidate()\n  SampleLendingProtocolEwithdraw()\n  SampleLendingProtocolEsetOracle()\n  SampleLendingProtocolEsetCollateralFactor()\n  SampleLendingProtocolEpause()\n  SampleLendingProtocolEunpause()\n  SampleLendingProtocolEemergencyWithdraw()\n  SampleLendingProtocolEtransferOwnership()\n  SampleLendingProtocolPcalculateHealthFactor() <<view>>\n  SampleLendingProtocolPcalculateHealthFactorWithCollateral() <<view>>\n  SampleLendingProtocolEgetUserPosition() <<view>>\n  SampleLendingProtocol..>Deposit : \n  SampleLendingProtocol..>Borrow : \n  SampleLendingProtocol..>Repay : \n  SampleLendingProtocol..>Liquidation : \n  SampleLendingProtocol..>Withdrawal : \n  SampleLendingProtocol..>PriceUpdate : \n  SampleLendingProtocol..>PauseChanged : \n  SampleLendingProtocol..>OwnershipTransferred : \n\nclass IOracle\n  IOracleEgetPrice() <<view>>\n  IOracleEgetTWAP() <<view>>\n\nclass OracleWrapper\n  OracleWrapper+P admin : address\n  OracleWrapper+P spotPrice : uint256\n  OracleWrapper+P twapPrice : uint256\n  OracleWrapper+P lastUpdateTime : uint256\n  OracleWrapperDconstructor()\n  OracleWrapperPgetPrice() <<view>>\n  OracleWrapperPgetTWAP() <<view>>\n  OracleWrapperPisPriceFresh() <<view>>\n  OracleWrapperPgetDeviation() <<view>>\n  OracleWrapperPgetDeviationBps() <<view>>\n  OracleWrapperEupdatePrice()\n  OracleWrapperEtransferAdmin()\n  OracleWrapper..>PriceUpdated : \n  OracleWrapper..>AdminChanged : \n\nclass FeeCollector <|-- ReentrancyGuard\n  FeeCollector+P protocol : address\n  FeeCollector+P treasury : address\n  FeeCollector+P admin : address\n  FeeCollector+P totalFeesCollected : uint256\n  FeeCollector+P feesByToken : mapping(address => uint256)\n  FeeCollectorDconstructor()\n  FeeCollectorEsetProtocol()\n  FeeCollectorEcollectFees()\n  FeeCollectorEwithdrawFees()\n  FeeCollectorEemergencyWithdraw()\n  FeeCollectorEupdateTreasury()\n  FeeCollectorEtransferAdmin()\n  FeeCollector..>FeeCollected : \n  FeeCollector..>FeesWithdrawn : \n  FeeCollector..>TreasuryUpdated : \n  FeeCollector..>AdminChanged : \n",
+      "description": "Class inheritance and relationships"
+    },
+    {
+      "type": "flowchart",
+      "title": "Inheritance Graph",
+      "code": "graph TD\n  \"ReentrancyGuard\" --> \"SampleLendingProtocol\"\n  \"ReentrancyGuard\" --> \"FeeCollector\"",
+      "description": "Contract inheritance hierarchy"
+    },
+    {
+      "type": "classDiagram",
+      "title": "SampleLendingProtocol - Detailed Structure",
+      "code": "classDiagram\nclass SampleLendingProtocol {\n  <<State Variables>>\n    +totalSupply : uint256\n    +totalBorrowed : uint256\n    +reserveBalance : uint256\n    +oracle : OracleWrapper\n    +collateralFactor : uint256\n    +liquidationBonus : uint256\n    +interestRate : uint256\n    +userCollateral : mapping(address => uint256)\n    +userDebt : mapping(address => uint256)\n    +hasDeposited : mapping(address => bool)\n    +owner : address\n    +guardian : address\n    +paused : bool\n    +collateralToken : IERC20\n    +borrowToken : IERC20\n    +feeCollector : FeeCollector\n  --\n  <<Functions>>\n    ?constructor() \n    *deposit() \n    *borrow() \n    *repay() \n    *liquidate() \n    *withdraw() \n    *setOracle() \n    *setCollateralFactor() \n    *pause() \n    *unpause() \n    *emergencyWithdraw() \n    *transferOwnership() \n    +calculateHealthFactor() [VIEW]\n    +calculateHealthFactorWithCollateral() [VIEW]\n    *getUserPosition() [VIEW]\n}\nSampleLendingProtocol..>Deposit : \nSampleLendingProtocol..>Borrow : \nSampleLendingProtocol..>Repay : \nSampleLendingProtocol..>Liquidation : \nSampleLendingProtocol..>Withdrawal : \nSampleLendingProtocol..>PriceUpdate : \nSampleLendingProtocol..>PauseChanged : \nSampleLendingProtocol..>OwnershipTransferred : ",
+      "description": "Complete structure of contract including state variables and functions"
+    },
+    {
+      "type": "sequenceDiagram",
+      "title": "SampleLendingProtocol - Event Flow",
+      "code": "sequenceDiagram\n  participant Caller\n  participant SampleLendingProtocol\n  participant EventLog\n  Caller->>SampleLendingProtocol: trigger action\nSampleLendingProtocol-->EventLog: Deposit\n  Note right of EventLog: \n  Caller->>SampleLendingProtocol: trigger action\nSampleLendingProtocol-->EventLog: Borrow\n  Note right of EventLog: \n  Caller->>SampleLendingProtocol: trigger action\nSampleLendingProtocol-->EventLog: Repay\n  Note right of EventLog: \n  Caller->>SampleLendingProtocol: trigger action\nSampleLendingProtocol-->EventLog: Liquidation\n  Note right of EventLog: \n  Caller->>SampleLendingProtocol: trigger action\nSampleLendingProtocol-->EventLog: Withdrawal\n  Note right of EventLog: ",
+      "description": "Events emitted by the contract"
+    },
+    {
+      "type": "classDiagram",
+      "title": "IOracle - Detailed Structure",
+      "code": "classDiagram\nclass IOracle {\n  <<State Variables>>\n  --\n  <<Functions>>\n    *getPrice() [VIEW]\n    *getTWAP() [VIEW]\n}",
+      "description": "Complete structure of contract including state variables and functions"
+    },
+    {
+      "type": "sequenceDiagram",
+      "title": "IOracle - Event Flow",
+      "code": "sequenceDiagram\n  participant Caller\n  participant IOracle\n  participant EventLog",
+      "description": "Events emitted by the contract"
+    },
+    {
+      "type": "classDiagram",
+      "title": "OracleWrapper - Detailed Structure",
+      "code": "classDiagram\nclass OracleWrapper {\n  <<State Variables>>\n    +admin : address\n    +spotPrice : uint256\n    +twapPrice : uint256\n    +lastUpdateTime : uint256\n  --\n  <<Functions>>\n    ?constructor() \n    +getPrice() [VIEW]\n    +getTWAP() [VIEW]\n    +isPriceFresh() [VIEW]\n    +getDeviation() [VIEW]\n    +getDeviationBps() [VIEW]\n    *updatePrice() \n    *transferAdmin() \n}\nOracleWrapper..>PriceUpdated : \nOracleWrapper..>AdminChanged : ",
+      "description": "Complete structure of contract including state variables and functions"
+    },
+    {
+      "type": "sequenceDiagram",
+      "title": "OracleWrapper - Event Flow",
+      "code": "sequenceDiagram\n  participant Caller\n  participant OracleWrapper\n  participant EventLog\n  Caller->>OracleWrapper: trigger action\nOracleWrapper-->EventLog: PriceUpdated\n  Note right of EventLog: \n  Caller->>OracleWrapper: trigger action\nOracleWrapper-->EventLog: AdminChanged\n  Note right of EventLog: ",
+      "description": "Events emitted by the contract"
+    },
+    {
+      "type": "classDiagram",
+      "title": "FeeCollector - Detailed Structure",
+      "code": "classDiagram\nclass FeeCollector {\n  <<State Variables>>\n    +protocol : address\n    +treasury : address\n    +admin : address\n    +totalFeesCollected : uint256\n    +feesByToken : mapping(address => uint256)\n  --\n  <<Functions>>\n    ?constructor() \n    *setProtocol() \n    *collectFees() \n    *withdrawFees() \n    *emergencyWithdraw() \n    *updateTreasury() \n    *transferAdmin() \n}\nFeeCollector..>FeeCollected : \nFeeCollector..>FeesWithdrawn : \nFeeCollector..>TreasuryUpdated : \nFeeCollector..>AdminChanged : ",
+      "description": "Complete structure of contract including state variables and functions"
+    },
+    {
+      "type": "sequenceDiagram",
+      "title": "FeeCollector - Event Flow",
+      "code": "sequenceDiagram\n  participant Caller\n  participant FeeCollector\n  participant EventLog\n  Caller->>FeeCollector: trigger action\nFeeCollector-->EventLog: FeeCollected\n  Note right of EventLog: \n  Caller->>FeeCollector: trigger action\nFeeCollector-->EventLog: FeesWithdrawn\n  Note right of EventLog: \n  Caller->>FeeCollector: trigger action\nFeeCollector-->EventLog: TreasuryUpdated\n  Note right of EventLog: \n  Caller->>FeeCollector: trigger action\nFeeCollector-->EventLog: AdminChanged\n  Note right of EventLog: ",
+      "description": "Events emitted by the contract"
+    },
+    {
+      "type": "flowchart",
+      "title": "SampleLendingProtocol - Storage Layout",
+      "code": "graph LR\n  subgraph Storage Layout[SampleLendingProtocol]\n    Slot 0[\"Slot 0\"] -- 0 --> totalSupply[\"totalSupply\\n(value)\\n32 bytes\"]\n    Slot 1[\"Slot 1\"] -- 0 --> totalBorrowed[\"totalBorrowed\\n(value)\\n32 bytes\"]\n    Slot 2[\"Slot 2\"] -- 0 --> reserveBalance[\"reserveBalance\\n(value)\\n32 bytes\"]\n    Slot 3[\"Slot 3\"] -- 0 --> oracle[\"oracle\\n(value)\\n32 bytes\"]\n    Slot 4[\"Slot 4\"] -- 0 --> collateralFactor[\"collateralFactor\\n(value)\\n32 bytes\"]\n    Slot 5[\"Slot 5\"] -- 0 --> liquidationBonus[\"liquidationBonus\\n(value)\\n32 bytes\"]\n    Slot 6[\"Slot 6\"] -- 0 --> interestRate[\"interestRate\\n(value)\\n32 bytes\"]\n    Slot 7[\"Slot 7\"] -- 0 --> userCollateral[\"userCollateral\\n(mapping)\\n32 bytes\"]\n    Slot 8[\"Slot 8\"] -- 0 --> userDebt[\"userDebt\\n(mapping)\\n32 bytes\"]\n    Slot 9[\"Slot 9\"] -- 0 --> hasDeposited[\"hasDeposited\\n(mapping)\\n32 bytes\"]\n    Slot 10[\"Slot 10\"] -- 0 --> owner[\"owner\\n(value)\\n20 bytes\"]\n    %% Packed with: hasDeposited\n    Slot 11[\"Slot 11\"] -- 0 --> guardian[\"guardian\\n(value)\\n20 bytes\"]\n    Slot 11[\"Slot 11\"] -- 20 --> paused[\"paused\\n(value)\\n1 bytes\"]\n    %% Packed with: guardian\n    Slot 12[\"Slot 12\"] -- 0 --> collateralToken[\"collateralToken\\n(value)\\n32 bytes\"]\n    Slot 13[\"Slot 13\"] -- 0 --> borrowToken[\"borrowToken\\n(value)\\n32 bytes\"]\n    Slot 14[\"Slot 14\"] -- 0 --> feeCollector[\"feeCollector\\n(value)\\n32 bytes\"]\n  subgraph Mappings[Mappings]\n    M7[\"userCollateral\\n(mapping(address => uint256))\"]\n    M8[\"userDebt\\n(mapping(address => uint256))\"]\n    M9[\"hasDeposited\\n(mapping(address => bool))\"]\n  end\n  end\n\n  %% Packing Issues\n    style \"Slot 10\" fill:#ff6b6b\n    style \"Slot 11\" fill:#ff6b6b",
+      "description": "Storage slot assignments and variable packing"
+    },
+    {
+      "type": "stateDiagram",
+      "title": "SampleLendingProtocol - State Transitions",
+      "code": "stateDiagram-v2\n  [*] --> Idle",
+      "description": "Major state changes triggered by function calls"
+    },
+    {
+      "type": "flowchart",
+      "title": "IOracle - Storage Layout",
+      "code": "graph LR\n  subgraph Storage Layout[IOracle]\n  end",
+      "description": "Storage slot assignments and variable packing"
+    },
+    {
+      "type": "stateDiagram",
+      "title": "IOracle - State Transitions",
+      "code": "stateDiagram-v2\n  [*] --> Idle",
+      "description": "Major state changes triggered by function calls"
+    },
+    {
+      "type": "flowchart",
+      "title": "OracleWrapper - Storage Layout",
+      "code": "graph LR\n  subgraph Storage Layout[OracleWrapper]\n    Slot 0[\"Slot 0\"] -- 0 --> admin[\"admin\\n(value)\\n20 bytes\"]\n    Slot 1[\"Slot 1\"] -- 0 --> spotPrice[\"spotPrice\\n(value)\\n32 bytes\"]\n    Slot 2[\"Slot 2\"] -- 0 --> twapPrice[\"twapPrice\\n(value)\\n32 bytes\"]\n    Slot 3[\"Slot 3\"] -- 0 --> lastUpdateTime[\"lastUpdateTime\\n(value)\\n32 bytes\"]\n  end\n\n  %% Packing Issues\n    style \"Slot 0\" fill:#ff6b6b",
+      "description": "Storage slot assignments and variable packing"
+    },
+    {
+      "type": "stateDiagram",
+      "title": "OracleWrapper - State Transitions",
+      "code": "stateDiagram-v2\n  [*] --> Idle",
+      "description": "Major state changes triggered by function calls"
+    },
+    {
+      "type": "flowchart",
+      "title": "FeeCollector - Storage Layout",
+      "code": "graph LR\n  subgraph Storage Layout[FeeCollector]\n    Slot 0[\"Slot 0\"] -- 0 --> protocol[\"protocol\\n(value)\\n20 bytes\"]\n    Slot 1[\"Slot 1\"] -- 0 --> treasury[\"treasury\\n(value)\\n20 bytes\"]\n    Slot 2[\"Slot 2\"] -- 0 --> admin[\"admin\\n(value)\\n20 bytes\"]\n    Slot 3[\"Slot 3\"] -- 0 --> totalFeesCollected[\"totalFeesCollected\\n(value)\\n32 bytes\"]\n    Slot 3[\"Slot 3\"] -- 32 --> feesByToken[\"feesByToken\\n(mapping)\\n32 bytes\"]\n  subgraph Mappings[Mappings]\n    M3[\"feesByToken\\n(mapping(address => uint256))\"]\n  end\n  end\n\n  %% Packing Issues\n    style \"Slot 0\" fill:#ff6b6b\n    style \"Slot 1\" fill:#ff6b6b\n    style \"Slot 2\" fill:#ff6b6b",
+      "description": "Storage slot assignments and variable packing"
+    },
+    {
+      "type": "stateDiagram",
+      "title": "FeeCollector - State Transitions",
+      "code": "stateDiagram-v2\n  [*] --> Idle",
+      "description": "Major state changes triggered by function calls"
+    },
+    {
+      "type": "sequenceDiagram",
+      "title": "Execution Flow: deposit()",
+      "code": "sequenceDiagram\n",
+      "description": "Call sequence when invoking deposit"
+    },
+    {
+      "type": "sequenceDiagram",
+      "title": "Execution Flow: borrow()",
+      "code": "sequenceDiagram\n\n  Note over SampleLendingProtocol->>SampleLendingProtocol: calculateHealthFactor\n  SampleLendingProtocol-->>SampleLendingProtocol: return",
+      "description": "Call sequence when invoking borrow"
+    },
+    {
+      "type": "sequenceDiagram",
+      "title": "Execution Flow: repay()",
+      "code": "sequenceDiagram\n",
+      "description": "Call sequence when invoking repay"
+    },
+    {
+      "type": "sequenceDiagram",
+      "title": "Execution Flow: liquidate()",
+      "code": "sequenceDiagram\n\n  Note over SampleLendingProtocol->>SampleLendingProtocol: calculateHealthFactor\n  SampleLendingProtocol-->>SampleLendingProtocol: return",
+      "description": "Call sequence when invoking liquidate"
+    },
+    {
+      "type": "sequenceDiagram",
+      "title": "Execution Flow: withdraw()",
+      "code": "sequenceDiagram\n\n  Note over SampleLendingProtocol->>SampleLendingProtocol: calculateHealthFactorWithCollateral\n  SampleLendingProtocol-->>SampleLendingProtocol: return",
+      "description": "Call sequence when invoking withdraw"
+    },
+    {
+      "type": "sequenceDiagram",
+      "title": "Execution Flow: updatePrice()",
+      "code": "sequenceDiagram\n",
+      "description": "Call sequence when invoking updatePrice"
+    },
+    {
+      "type": "sequenceDiagram",
+      "title": "Execution Flow: transferAdmin()",
+      "code": "sequenceDiagram\n",
+      "description": "Call sequence when invoking transferAdmin"
+    },
+    {
+      "type": "sequenceDiagram",
+      "title": "Execution Flow: setProtocol()",
+      "code": "sequenceDiagram\n",
+      "description": "Call sequence when invoking setProtocol"
+    },
+    {
+      "type": "sequenceDiagram",
+      "title": "Execution Flow: collectFees()",
+      "code": "sequenceDiagram\n",
+      "description": "Call sequence when invoking collectFees"
+    },
+    {
+      "type": "sequenceDiagram",
+      "title": "Execution Flow: withdrawFees()",
+      "code": "sequenceDiagram\n",
+      "description": "Call sequence when invoking withdrawFees"
+    },
+    {
+      "type": "sequenceDiagram",
+      "title": "Execution Flow: emergencyWithdraw()",
+      "code": "sequenceDiagram\n",
+      "description": "Call sequence when invoking emergencyWithdraw"
+    },
+    {
+      "type": "sequenceDiagram",
+      "title": "Execution Flow: updateTreasury()",
+      "code": "sequenceDiagram\n",
+      "description": "Call sequence when invoking updateTreasury"
+    },
+    {
+      "type": "flowchart",
+      "title": "SampleLendingProtocol - Risk Heatmap",
+      "code": "graph TB\n  subgraph Risk Assessment[SampleLendingProtocol]\n    deposit[\"deposit\\nScore: 30\\ncei violation\"]\n    style deposit fill:#ffa726\n    borrow[\"borrow\\nScore: 30\\ncei violation\"]\n    style borrow fill:#ffa726\n    repay[\"repay\\nScore: 30\\ncei violation\"]\n    style repay fill:#ffa726\n    liquidate[\"liquidate\\nScore: 30\\ncei violation\"]\n    style liquidate fill:#ffa726\n    withdraw[\"withdraw\\nScore: 30\\ncei violation\"]\n    style withdraw fill:#ffa726\n    pause[\"pause\\nScore: 25\\nmissing access control\"]\n    style pause fill:#ffa726\n    unpause[\"unpause\\nScore: 25\\nmissing access control\"]\n    style unpause fill:#ffa726\n  end",
+      "description": "Functions colored by risk level"
+    },
+    {
+      "type": "flowchart",
+      "title": "SampleLendingProtocol - Access Control Map",
+      "code": "graph LR\n  subgraph restricted [RESTRICTED]\n    constructor\n    deposit\n    borrow\n    repay\n    liquidate\n    withdraw\n  end\n  style restricted fill:#c8e6c9\n  subgraph admin-only [ADMIN-ONLY]\n    setOracle\n    setCollateralFactor\n    emergencyWithdraw\n    transferOwnership\n  end\n  style admin-only fill:#eeeeee\n  subgraph public [PUBLIC]\n    pause\n    unpause\n    calculateHealthFactor\n    calculateHealthFactorWithCollateral\n    getUserPosition\n  end\n  style public fill:#ffcdd2",
+      "description": "Functions grouped by access control level"
+    },
+    {
+      "type": "flowchart",
+      "title": "IOracle - Risk Heatmap",
+      "code": "graph TB\n  subgraph Risk Assessment[IOracle]\n    NoHighRisk[\"No high-risk functions detected\"]\n    style NoHighRisk fill:#c8e6c9\n  end",
+      "description": "Functions colored by risk level"
+    },
+    {
+      "type": "flowchart",
+      "title": "IOracle - Access Control Map",
+      "code": "graph LR\n  subgraph public [PUBLIC]\n    getPrice\n    getTWAP\n  end\n  style public fill:#ffcdd2",
+      "description": "Functions grouped by access control level"
+    },
+    {
+      "type": "flowchart",
+      "title": "OracleWrapper - Risk Heatmap",
+      "code": "graph TB\n  subgraph Risk Assessment[OracleWrapper]\n    updatePrice[\"updatePrice\\nScore: 25\\nmissing access control\"]\n    style updatePrice fill:#ffa726\n  end",
+      "description": "Functions colored by risk level"
+    },
+    {
+      "type": "flowchart",
+      "title": "OracleWrapper - Access Control Map",
+      "code": "graph LR\n  subgraph public [PUBLIC]\n    constructor\n    getPrice\n    getTWAP\n    isPriceFresh\n    getDeviation\n    getDeviationBps\n    updatePrice\n  end\n  style public fill:#ffcdd2\n  subgraph restricted [RESTRICTED]\n    transferAdmin\n  end\n  style restricted fill:#c8e6c9",
+      "description": "Functions grouped by access control level"
+    },
+    {
+      "type": "flowchart",
+      "title": "FeeCollector - Risk Heatmap",
+      "code": "graph TB\n  subgraph Risk Assessment[FeeCollector]\n    NoHighRisk[\"No high-risk functions detected\"]\n    style NoHighRisk fill:#c8e6c9\n  end",
+      "description": "Functions colored by risk level"
+    },
+    {
+      "type": "flowchart",
+      "title": "FeeCollector - Access Control Map",
+      "code": "graph LR\n  subgraph restricted [RESTRICTED]\n    constructor\n    setProtocol\n    collectFees\n    withdrawFees\n    emergencyWithdraw\n    updateTreasury\n    transferAdmin\n  end\n  style restricted fill:#c8e6c9",
+      "description": "Functions grouped by access control level"
+    },
+    {
+      "type": "flowchart",
+      "title": "Value Flow Diagram",
+      "code": "graph LR\n  NoValueFlow[\"No significant value flows detected\"]\n  style NoValueFlow fill:#e1f5fe",
+      "description": "No asset movements detected in this protocol"
+    }
+  ],
+  "valueFlows": [],
+  "roleExtraction": {
+    "extractedAt": "2026-08-06T04:11:53.507Z",
+    "totalRoles": 10,
+    "trustedRoles": [
+      {
+        "id": "ROLE_OWNER_SampleLendingProtocol",
+        "name": "Owner",
+        "category": "trusted",
+        "addressSource": "owner (state variable)",
+        "addressType": "state-var",
+        "trustLevel": "HIGH",
+        "trustReasoning": "Ownership can be transferred - verify transfer protection exists",
+        "capabilities": [
+          {
+            "functionSignature": "setOracle()",
+            "contractName": "SampleLendingProtocol",
+            "category": "operational",
+            "impact": "low",
+            "description": "Update oracle price feed"
+          },
+          {
+            "functionSignature": "setCollateralFactor()",
+            "contractName": "SampleLendingProtocol",
+            "category": "operational",
+            "impact": "low",
+            "description": "Execute setCollateralFactor()"
+          },
+          {
+            "functionSignature": "emergencyWithdraw()",
+            "contractName": "SampleLendingProtocol",
+            "category": "emergency",
+            "impact": "critical",
+            "description": "Withdraw assets from the protocol"
+          },
+          {
+            "functionSignature": "transferOwnership()",
+            "contractName": "SampleLendingProtocol",
+            "category": "admin",
+            "impact": "high",
+            "description": "Transfer tokens/assets"
+          }
+        ],
+        "constraints": [
+          "Emergency actions may require additional safeguards",
+          "Consider adding timelock for critical operations"
+        ],
+        "sourceContract": "SampleLendingProtocol",
+        "modifierName": "onlyOwner",
+        "relatedFunctions": [
+          "setOracle()",
+          "setCollateralFactor()",
+          "emergencyWithdraw()",
+          "transferOwnership()"
+        ],
+        "riskIfCompromised": "Owner can execute 1 critical functions: emergencyWithdraw(). Full protocol compromise possible.",
+        "isSinglePointOfFailure": true
+      },
+      {
+        "id": "ROLE_GUARDIAN_SampleLendingProtocol",
+        "name": "Guardian",
+        "category": "trusted",
+        "trustLevel": "HIGH",
+        "trustReasoning": "Guardian role with 2 specific capabilities",
+        "capabilities": [
+          {
+            "functionSignature": "pause()",
+            "contractName": "SampleLendingProtocol",
+            "category": "emergency",
+            "impact": "critical",
+            "description": "Pause protocol operations"
+          },
+          {
+            "functionSignature": "unpause()",
+            "contractName": "SampleLendingProtocol",
+            "category": "emergency",
+            "impact": "critical",
+            "description": "Pause protocol operations"
+          }
+        ],
+        "constraints": [
+          "Emergency actions may require additional safeguards",
+          "Consider adding timelock for critical operations"
+        ],
+        "sourceContract": "SampleLendingProtocol",
+        "relatedFunctions": [
+          "pause()",
+          "unpause()"
+        ],
+        "riskIfCompromised": "Guardian can manipulate 2 functions",
+        "isSinglePointOfFailure": false
+      },
+      {
+        "id": "ROLE_OWNER_OracleWrapper",
+        "name": "Owner",
+        "category": "trusted",
+        "addressType": "unknown",
+        "trustLevel": "CRITICAL",
+        "trustReasoning": "Single admin with full control over critical functions",
+        "capabilities": [],
+        "constraints": [],
+        "sourceContract": "OracleWrapper",
+        "modifierName": "onlyOwner",
+        "relatedFunctions": [],
+        "riskIfCompromised": "Owner has administrative control over 0 functions. Verify ownership transfer protections.",
+        "isSinglePointOfFailure": true
+      },
+      {
+        "id": "ROLE_ADMIN_OracleWrapper",
+        "name": "Admin",
+        "category": "trusted",
+        "addressSource": "admin (state variable)",
+        "addressType": "state-var",
+        "trustLevel": "HIGH",
+        "trustReasoning": "Admin role with significant but not complete control",
+        "capabilities": [
+          {
+            "functionSignature": "updatePrice()",
+            "contractName": "OracleWrapper",
+            "category": "operational",
+            "impact": "low",
+            "description": "Execute updatePrice()"
+          },
+          {
+            "functionSignature": "transferAdmin()",
+            "contractName": "OracleWrapper",
+            "category": "financial",
+            "impact": "high",
+            "description": "Transfer tokens/assets"
+          }
+        ],
+        "constraints": [],
+        "sourceContract": "OracleWrapper",
+        "modifierName": "onlyAdmin",
+        "relatedFunctions": [
+          "updatePrice()",
+          "transferAdmin()"
+        ],
+        "riskIfCompromised": "Admin can execute 2 privileged functions",
+        "isSinglePointOfFailure": false
+      },
+      {
+        "id": "ROLE_OWNER_FeeCollector",
+        "name": "Owner",
+        "category": "trusted",
+        "addressType": "unknown",
+        "trustLevel": "CRITICAL",
+        "trustReasoning": "Single admin with full control over critical functions",
+        "capabilities": [],
+        "constraints": [],
+        "sourceContract": "FeeCollector",
+        "modifierName": "onlyOwner",
+        "relatedFunctions": [],
+        "riskIfCompromised": "Owner has administrative control over 0 functions. Verify ownership transfer protections.",
+        "isSinglePointOfFailure": true
+      },
+      {
+        "id": "ROLE_ADMIN_FeeCollector",
+        "name": "Admin",
+        "category": "trusted",
+        "addressSource": "admin (state variable)",
+        "addressType": "state-var",
+        "trustLevel": "HIGH",
+        "trustReasoning": "Admin role with significant but not complete control",
+        "capabilities": [
+          {
+            "functionSignature": "withdrawFees()",
+            "contractName": "FeeCollector",
+            "category": "financial",
+            "impact": "high",
+            "description": "Withdraw assets from the protocol"
+          },
+          {
+            "functionSignature": "emergencyWithdraw()",
+            "contractName": "FeeCollector",
+            "category": "emergency",
+            "impact": "critical",
+            "description": "Withdraw assets from the protocol"
+          },
+          {
+            "functionSignature": "updateTreasury()",
+            "contractName": "FeeCollector",
+            "category": "operational",
+            "impact": "low",
+            "description": "Execute updateTreasury()"
+          },
+          {
+            "functionSignature": "transferAdmin()",
+            "contractName": "FeeCollector",
+            "category": "financial",
+            "impact": "high",
+            "description": "Transfer tokens/assets"
+          }
+        ],
+        "constraints": [
+          "Emergency actions may require additional safeguards",
+          "Consider adding timelock for critical operations"
+        ],
+        "sourceContract": "FeeCollector",
+        "modifierName": "onlyAdmin",
+        "relatedFunctions": [
+          "withdrawFees()",
+          "emergencyWithdraw()",
+          "updateTreasury()",
+          "transferAdmin()"
+        ],
+        "riskIfCompromised": "Admin can execute 4 privileged functions",
+        "isSinglePointOfFailure": false
+      }
+    ],
+    "nonTrustedRoles": [
+      {
+        "id": "ROLE_PUBLIC_USER_(GENERAL)",
+        "name": "User (General)",
+        "category": "non-trusted",
+        "addressSource": "msg.sender (any caller)",
+        "addressType": "msg-sender",
+        "trustLevel": "NONE",
+        "trustReasoning": "No authentication required - anyone can call these functions",
+        "capabilities": [
+          {
+            "functionSignature": "borrow()",
+            "contractName": "SampleLendingProtocol",
+            "category": "unknown",
+            "impact": "medium",
+            "description": "Borrow against collateral"
+          },
+          {
+            "functionSignature": "repay()",
+            "contractName": "SampleLendingProtocol",
+            "category": "unknown",
+            "impact": "medium",
+            "description": "Repay outstanding debt"
+          },
+          {
+            "functionSignature": "withdraw()",
+            "contractName": "SampleLendingProtocol",
+            "category": "financial",
+            "impact": "high",
+            "description": "Withdraw assets from the protocol"
+          }
+        ],
+        "constraints": [
+          "May require token approval",
+          "May require balance checks",
+          "Rate limits may apply"
+        ],
+        "sourceContract": "SampleLendingProtocol",
+        "relatedFunctions": [
+          "borrow()",
+          "repay()",
+          "withdraw()"
+        ],
+        "riskIfCompromised": "Public access to financial functions could enable exploitation: withdraw()",
+        "isSinglePointOfFailure": false
+      },
+      {
+        "id": "ROLE_PUBLIC_DEPOSITOR",
+        "name": "Depositor",
+        "category": "non-trusted",
+        "addressSource": "msg.sender (any caller)",
+        "addressType": "msg-sender",
+        "trustLevel": "NONE",
+        "trustReasoning": "No authentication required - anyone can call these functions",
+        "capabilities": [
+          {
+            "functionSignature": "deposit()",
+            "contractName": "SampleLendingProtocol",
+            "category": "financial",
+            "impact": "medium",
+            "description": "Deposit assets into the protocol"
+          }
+        ],
+        "constraints": [
+          "May require token approval",
+          "May require balance checks",
+          "Rate limits may apply"
+        ],
+        "sourceContract": "SampleLendingProtocol",
+        "relatedFunctions": [
+          "deposit()"
+        ],
+        "riskIfCompromised": "Public access to financial functions could enable exploitation: deposit()",
+        "isSinglePointOfFailure": false
+      },
+      {
+        "id": "ROLE_PUBLIC_LIQUIDATOR",
+        "name": "Liquidator",
+        "category": "non-trusted",
+        "addressSource": "msg.sender (any caller)",
+        "addressType": "msg-sender",
+        "trustLevel": "NONE",
+        "trustReasoning": "No authentication required - anyone can call these functions",
+        "capabilities": [
+          {
+            "functionSignature": "liquidate()",
+            "contractName": "SampleLendingProtocol",
+            "category": "unknown",
+            "impact": "medium",
+            "description": "Liquidate unhealthy positions"
+          }
+        ],
+        "constraints": [
+          "May require token approval",
+          "May require balance checks",
+          "Rate limits may apply"
+        ],
+        "sourceContract": "SampleLendingProtocol",
+        "relatedFunctions": [
+          "liquidate()"
+        ],
+        "riskIfCompromised": "Unrestricted access may enable DoS or unexpected state changes",
+        "isSinglePointOfFailure": false
+      },
+      {
+        "id": "ROLE_BORROWER",
+        "name": "Borrower",
+        "category": "non-trusted",
+        "addressSource": "msg.sender (authenticated via position)",
+        "addressType": "msg-sender",
+        "trustLevel": "LOW",
+        "trustReasoning": "Borrower can only interact with their own positions",
+        "capabilities": [
+          {
+            "functionSignature": "borrow()",
+            "contractName": "SampleLendingProtocol",
+            "category": "unknown",
+            "impact": "medium",
+            "description": "Borrow against collateral"
+          },
+          {
+            "functionSignature": "repay()",
+            "contractName": "SampleLendingProtocol",
+            "category": "unknown",
+            "impact": "medium",
+            "description": "Repay outstanding debt"
+          },
+          {
+            "functionSignature": "setCollateralFactor()",
+            "contractName": "SampleLendingProtocol",
+            "category": "operational",
+            "impact": "low",
+            "description": "Execute setCollateralFactor()"
+          },
+          {
+            "functionSignature": "calculateHealthFactorWithCollateral()",
+            "contractName": "SampleLendingProtocol",
+            "category": "unknown",
+            "impact": "low",
+            "description": "Execute calculateHealthFactorWithCollateral()"
+          }
+        ],
+        "constraints": [
+          "Must have collateral posted",
+          "Must maintain health factor",
+          "Subject to liquidation"
+        ],
+        "sourceContract": "SampleLendingProtocol",
+        "relatedFunctions": [
+          "borrow()",
+          "repay()",
+          "setCollateralFactor()",
+          "calculateHealthFactorWithCollateral()"
+        ],
+        "riskIfCompromised": "Borrower can default on loans causing bad debt",
+        "isSinglePointOfFailure": false
+      }
+    ],
+    "roleHierarchy": [
+      {
+        "fromRole": "Owner",
+        "toRole": "Admin",
+        "relationshipType": "can-escalate-to",
+        "mechanism": "Ownership implies administrative rights"
+      }
+    ],
+    "summary": {
+      "trustedCount": 6,
+      "nonTrustedCount": 4,
+      "highTrustCount": 6,
+      "singlePointsOfFailure": [
+        "Owner (SampleLendingProtocol)",
+        "Owner (OracleWrapper)",
+        "Owner (FeeCollector)"
+      ],
+      "publicFunctionCount": 6,
+      "hasTimelock": false,
+      "hasMultisig": false
+    }
+  }
+}

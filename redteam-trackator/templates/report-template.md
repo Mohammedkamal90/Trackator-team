@@ -1,9 +1,9 @@
 # Redteam-Trackator Report Template
 
-**Version**: 2.0.0
+**Version**: 2.1.0
 **Format**: Markdown (primary) + JSON (machine-readable supplement)
 **Compliance**: Uses canonical verdict states from SKILL.md Rule 4
-**v2.0 Enhancement**: Includes Trackator multi-phase evidence (Storage, Coupling, Sync, Evidence Validator)
+**v2.1 Enhancement**: Includes Trackator multi-phase evidence (Storage, Coupling, Sync, Evidence Validator). Fuzzing removed to separate skill.
 
 ---
 
@@ -15,8 +15,8 @@
 **Protocol:** {PROTOCOL_NAME}
 **Assessment Date:** {ISO_DATE_STRING}
 **Trackator Version:** {TRACKATOR_VERSION}
-**Assessor:** Redteam-Trackator v2.0.0 (Automated + Human-in-the-loop)
-**Pipeline Completion:** Phases 0-6 {FULLY_COMPLETE | PARTIAL (Phases X, Y skipped)}
+**Assessor:** Redteam-Trackator v2.1.0 (Automated + Human-in-the-loop)
+**Pipeline Completion:** Phases 0-5 {FULLY_COMPLETE | PARTIAL (Phases X, Y skipped)}
 
 ---
 
@@ -118,9 +118,8 @@ Phase 0: INGESTION → Trackator output parsed, {N} hypotheses generated
 Phase 1: INTENT FILTERING → {N} FPs discarded, {N} survived
 Phase 2: PATTERN MATCHING → {N} pattern matches found
 Phase 3: CREATIVE ATTACK → {N} novel attack ideas generated
-Phase 4: FUZZING → {N} fuzz campaigns run ({N} violations)
-Phase 5: FORK TESTING → {N} fork test sessions completed
-Phase 6: REPORTING → This document
+Phase 4: FORK TESTING → {N} fork test sessions completed
+Phase 5: REPORTING → This document
 ```
 
 ### Tools & Data Sources
@@ -130,8 +129,6 @@ Phase 6: REPORTING → This document
 | Trackator (Static Analysis) | {version} — Contract structure, invariants, alerts |
 | Exploits-class-library | {card_count} patterns — Historical exploit matching |
 | Foundry (Fork Testing) | {version} — Mainnet state validation |
-| Echidna/Medusa (Fuzzing) | {version} — State space exploration |
-| Fizz Skill | {version} — Property generation |
 
 ### Rules Applied
 
@@ -155,7 +152,7 @@ Phase 6: REPORTING → This document
 **CVSS Score (Estimate):** {X.X}  
 **Estimated Impact:** ${LOSS_USD_RANGE} (based on pattern matches and TVL)  
 **Discovery Phase:** {0-6}  
-**Discovery Method:** {Pattern Match / Creative Attack / Fuzz / Fork Test}
+**Discovery Method:** {Pattern Match / Creative Attack / Fork Test}
 
 ---
 
@@ -396,8 +393,7 @@ function fixed() external {
 |--------|-------|------------|
 | Operational Error (trusted role action) | {N} | {X}% |
 | Design Choice (intentional architecture) | {N} | {X}% |
-| Unreachable (proven by execution trace) | {N} | {X}% |
-| Unrealistic State (fuzz artifact) | {N} | {X}% |
+| Unreachable (proven by trace) | {N} | {X}% |
 | False Positive (intent filter caught it) | {N} | {X}% |
 
 ### Notable Discards (Learning Examples)
@@ -585,9 +581,8 @@ For each finding, confidence is calculated from multiple components:
 | Pattern Match Strength | 20% | {XX}% | Historical exploit similarity |
 | Code Coverage | 15% | {XX}% | How much attack surface is covered |
 | Trace Completeness | 20% | {XX}% | Full A→B→C→end trace completed |
-| Fuzz Validation | 15% | {XX}% | Echidna/Medusa reproduced issue |
-| Fork Test Result | 25% | {XX}% | Confirmed on mainnet fork |
-| Economic Feasibility | 5% | {XX}% | Profit exceeds cost (informative only) |
+| Fork Test Result | 50% | {XX}% | Confirmed on mainnet fork (ENHANCED weight) |
+| Economic Feasibility | 10% | {XX}% | Profit exceeds cost (informative only) |
 
 **Composite Confidence Score:** {XX}/100
 
@@ -683,8 +678,8 @@ For findings that underwent disproof analysis:
 | hypotheses-filtered.json | JSON | {path} | Phase 1 output |
 | pattern-matches.json | JSON | {path} | Phase 2 output |
 | creative-findings.json | JSON | {path} | Phase 3 output |
-| fuzz-results.json | JSON | {path} | Phase 4 output (if run) |
-| fork-test-results.json | JSON | {path} | Phase 5 output (if run) |
+| evidence-calibration.json | JSON | {path} | Phase 4 output (evidence) |
+| fork-test-results.json | JSON | {path} | Phase 4 output (fork test) |
 
 ### Input Data
 

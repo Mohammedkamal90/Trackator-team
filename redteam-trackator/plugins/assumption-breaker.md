@@ -730,7 +730,7 @@ const MINIMUM_SCORE_THRESHOLD = 35;  // Below this = probably not worth pursuing
 1. Each attack becomes a hypothesis
 2. Hypothesis MUST get full execution trace (Rule 1)
 3. Traced hypotheses go to Verifier via reachability BLOCK GATE
-4. High-scoring attacks prioritized for fuzz testing (Phase 4)
+4. High-scoring attacks prioritized for fork testing (Phase 4)
 
 ---
 

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Trackator Enrichment Report</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 2rem; background: #1a1a2e; color: #eee; }
+    h1 { color: #00d4ff; border-bottom: 2px solid #00d4ff; padding-bottom: 0.5rem; }
+    h2 { color: #ff6b6b; margin-top: 2rem; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th, td { border: 1px solid #444; padding: 0.75rem; text-align: left; }
+    th { background: #16213e; color: #00d4ff; }
+    tr:hover { background: #16213e; }
+    .critical { color: #ff6b6b; }
+    .high { color: #ffa726; }
+    .medium { color: #ffee58; }
+    .low { color: #69f0ae; }
+    .safe { color: #ffffff; }
+  </style>
+</head>
+<body>
+  <h1>Trackator Enrichment Report</h1>
+  <p><strong>Protocol Type:</strong> lending</p>
+  <p><strong>Generated:</strong> 2026-08-06T04:14:42.338Z</p>
+  <h2>Alert Rules</h2>
+  <table>
+    <tr><th>Name</th><th>Severity</th><th>Category</th><th>Condition</th><th>Mitigation</th></tr>
+    <tr>
+      <td>CEI Pattern Violation - Potential Reentrancy</td>
+      <td class="critical">critical</td>
+      <td>reentrancy</td>
+      <td>{"type":"pattern","field":"ceiPattern","operator":"eq","value":"violated"}</td>
+      <td>Reorder operations to perform all external calls after all state updates, or use</td>
+    </tr>
+    <tr>
+      <td>Missing Access Control on State-Changing Function</td>
+      <td class="critical">critical</td>
+      <td>access-control</td>
+      <td>{"type":"absence","field":"modifiers","operator":"not-contains","value":"onlyOwn</td>
+      <td>Add appropriate access control modifiers based on intended permissions.</td>
+    </tr>
+    <tr>
+      <td>DelegateCall Detected - Execution Context Forwarding</td>
+      <td class="critical">critical</td>
+      <td>access-control</td>
+      <td>{"type":"presence","field":"hasDelegateCall","operator":"eq","value":true}</td>
+      <td>Ensure delegatecall target is trusted, immutable, or governed by robust access c</td>
+    </tr>
+    <tr>
+      <td>Unbounded Loop - Potential DoS Risk</td>
+      <td class="medium">medium</td>
+      <td>denial-of-service</td>
+      <td>{"type":"presence","field":"hasLoop","operator":"eq","value":true}</td>
+      <td>Add iteration limits, use pagination, or move loop logic off-chain.</td>
+    </tr>
+    <tr>
+      <td>Oracle Price Deviation Exceeds Threshold</td>
+      <td class="critical">critical</td>
+      <td>oracle-manipulation</td>
+      <td>{"type":"threshold","field":"priceDeviationPercent","operator":"gte","value":5,"</td>
+      <td>Use TWAP oracles, implement circuit breakers, add flash loan detection.</td>
+    </tr>
+    <tr>
+      <td>Accounting Invariant Violation: Total supply accounting must balance...</td>
+      <td class="critical">critical</td>
+      <td>accounting</td>
+      <td>{"type":"custom","field":"Σ balances == totalSupply","operator":"not-contains","</td>
+      <td>Review transaction that caused accounting inconsistency. May indicate fund leaka</td>
+    </tr>
+    <tr>
+      <td>Accounting Invariant Violation: Collateral value must always cover borrowed amount...</td>
+      <td class="critical">critical</td>
+      <td>accounting</td>
+      <td>{"type":"custom","field":"collateral[token] * price[token] >= borrow[token] * li</td>
+      <td>Review transaction that caused accounting inconsistency. May indicate fund leaka</td>
+    </tr>
+    <tr>
+      <td>Accounting Invariant Violation: Exchange rate between underlying and cToken must b...</td>
+      <td class="critical">critical</td>
+      <td>accounting</td>
+      <td>{"type":"custom","field":"exchangeRate == cash + borrows - reserves / totalSuppl</td>
+      <td>Review transaction that caused accounting inconsistency. May indicate fund leaka</td>
+    </tr>
+    <tr>
+      <td>Flash Loan Attack Pattern: Flash Loan Attack</td>
+      <td class="high">high</td>
+      <td>flash-loan</td>
+      <td>{"type":"sequence","field":"balanceChanges","operator":"in-sequence","value":["l</td>
+      <td>Check for balance changes within single transaction</td>
+    </tr>
+    <tr>
+      <td>Anomalous Change in totalSupply</td>
+      <td class="medium">medium</td>
+      <td>unexpected-value</td>
+      <td>{"type":"threshold","field":"SampleLendingProtocol.totalSupply","operator":"gt",</td>
+      <td>Verify this change is legitimate. Check for manipulation or bugs.</td>
+    </tr>
+    <tr>
+      <td>Anomalous Change in totalBorrowed</td>
+      <td class="medium">medium</td>
+      <td>unexpected-value</td>
+      <td>{"type":"threshold","field":"SampleLendingProtocol.totalBorrowed","operator":"gt</td>
+      <td>Verify this change is legitimate. Check for manipulation or bugs.</td>
+    </tr>
+    <tr>
+      <td>Anomalous Change in reserveBalance</td>
+      <td class="medium">medium</td>
+      <td>unexpected-value</td>
+      <td>{"type":"threshold","field":"SampleLendingProtocol.reserveBalance","operator":"g</td>
+      <td>Verify this change is legitimate. Check for manipulation or bugs.</td>
+    </tr>
+    <tr>
+      <td>Anomalous Change in collateralFactor</td>
+      <td class="medium">medium</td>
+      <td>unexpected-value</td>
+      <td>{"type":"threshold","field":"SampleLendingProtocol.collateralFactor","operator":</td>
+      <td>Verify this change is legitimate. Check for manipulation or bugs.</td>
+    </tr>
+    <tr>
+      <td>Anomalous Change in liquidationBonus</td>
+      <td class="medium">medium</td>
+      <td>unexpected-value</td>
+      <td>{"type":"threshold","field":"SampleLendingProtocol.liquidationBonus","operator":</td>
+      <td>Verify this change is legitimate. Check for manipulation or bugs.</td>
+    </tr>
+    <tr>
+      <td>Anomalous Change in interestRate</td>
+      <td class="medium">medium</td>
+      <td>unexpected-value</td>
+      <td>{"type":"threshold","field":"SampleLendingProtocol.interestRate","operator":"gt"</td>
+      <td>Verify this change is legitimate. Check for manipulation or bugs.</td>
+    </tr>
+    <tr>
+      <td>Anomalous Change in userCollateral</td>
+      <td class="medium">medium</td>
+      <td>unexpected-value</td>
+      <td>{"type":"threshold","field":"SampleLendingProtocol.userCollateral","operator":"g</td>
+      <td>Verify this change is legitimate. Check for manipulation or bugs.</td>
+    </tr>
+    <tr>
+      <td>Anomalous Change in userDebt</td>
+      <td class="medium">medium</td>
+      <td>unexpected-value</td>
+      <td>{"type":"threshold","field":"SampleLendingProtocol.userDebt","operator":"gt","va</td>
+      <td>Verify this change is legitimate. Check for manipulation or bugs.</td>
+    </tr>
+    <tr>
+      <td>Anomalous Change in spotPrice</td>
+      <td class="medium">medium</td>
+      <td>unexpected-value</td>
+      <td>{"type":"threshold","field":"OracleWrapper.spotPrice","operator":"gt","value":5}</td>
+      <td>Verify this change is legitimate. Check for manipulation or bugs.</td>
+    </tr>
+    <tr>
+      <td>Anomalous Change in twapPrice</td>
+      <td class="medium">medium</td>
+      <td>unexpected-value</td>
+      <td>{"type":"threshold","field":"OracleWrapper.twapPrice","operator":"gt","value":5}</td>
+      <td>Verify this change is legitimate. Check for manipulation or bugs.</td>
+    </tr>
+    <tr>
+      <td>Anomalous Change in lastUpdateTime</td>
+      <td class="medium">medium</td>
+      <td>unexpected-value</td>
+      <td>{"type":"threshold","field":"OracleWrapper.lastUpdateTime","operator":"gt","valu</td>
+      <td>Verify this change is legitimate. Check for manipulation or bugs.</td>
+    </tr>
+    <tr>
+      <td>Anomalous Change in totalFeesCollected</td>
+      <td class="medium">medium</td>
+      <td>unexpected-value</td>
+      <td>{"type":"threshold","field":"FeeCollector.totalFeesCollected","operator":"gt","v</td>
+      <td>Verify this change is legitimate. Check for manipulation or bugs.</td>
+    </tr>
+    <tr>
+      <td>Anomalous Change in feesByToken</td>
+      <td class="medium">medium</td>
+      <td>unexpected-value</td>
+      <td>{"type":"threshold","field":"FeeCollector.feesByToken","operator":"gt","value":2</td>
+      <td>Verify this change is legitimate. Check for manipulation or bugs.</td>
+    </tr>
+    <tr>
+      <td>Unusual Gas Consumption Pattern</td>
+      <td class="low">low</td>
+      <td>gas-griefing</td>
+      <td>{"type":"threshold","field":"gasUsed","operator":"gte","value":0.9}</td>
+      <td>Monitor for repeated high-gas transactions from same address.</td>
+    </tr>
+    <tr>
+      <td>External Call Failed Silently</td>
+      <td class="medium">medium</td>
+      <td>external-call-failure</td>
+      <td>{"type":"presence","field":"failedExternalCall","operator":"eq","value":true}</td>
+      <td>Check return values of external calls and revert on failure.</td>
+    </tr>
+    <tr>
+      <td>Timestamp-Dependent Logic Detected</td>
+      <td class="low">low</td>
+      <td>timestamp-dependency</td>
+      <td>{"type":"presence","field":"usesBlockTimestamp","operator":"eq","value":true}</td>
+      <td>Avoid timestamp dependency for critical calculations or use wider time windows.</td>
+    </tr>
+  </table>
+  <h2>Invariants</h2>
+  <table>
+    <tr><th>ID</th><th>Category</th><th>Severity</th><th>Template</th></tr>
+    <tr>
+      <td>INV_1</td>
+      <td>accounting</td>
+      <td class="critical">critical</td>
+      <td>Total supply accounting must balance</td>
+    </tr>
+    <tr>
+      <td>INV_2</td>
+      <td>bounds</td>
+      <td class="critical">critical</td>
+      <td>No underflow or overflow in arithmetic operations</td>
+    </tr>
+    <tr>
+      <td>INV_3</td>
+      <td>accounting</td>
+      <td class="critical">critical</td>
+      <td>Collateral value must always cover borrowed amount</td>
+    </tr>
+    <tr>
+      <td>INV_4</td>
+      <td>oracle</td>
+      <td class="critical">critical</td>
+      <td>Oracle prices must be within acceptable bounds</td>
+    </tr>
+    <tr>
+      <td>INV_5</td>
+      <td>bounds</td>
+      <td class="high">high</td>
+      <td>Interest rates must remain within configured bounds</td>
+    </tr>
+    <tr>
+      <td>INV_6</td>
+      <td>accounting</td>
+      <td class="critical">critical</td>
+      <td>Exchange rate between underlying and cToken must be accurate</td>
+    </tr>
+    <tr>
+      <td>INV_NB_TOTALSUPPLY</td>
+      <td>bounds</td>
+      <td class="high">high</td>
+      <td>totalSupply must stay within expected range</td>
+    </tr>
+    <tr>
+      <td>INV_NB_TOTALBORROWED</td>
+      <td>bounds</td>
+      <td class="high">high</td>
+      <td>totalBorrowed must stay within expected range</td>
+    </tr>
+    <tr>
+      <td>INV_NB_RESERVEBALANCE</td>
+      <td>bounds</td>
+      <td class="high">high</td>
+      <td>reserveBalance must stay within expected range</td>
+    </tr>
+    <tr>
+      <td>INV_NB_COLLATERALFACTOR</td>
+      <td>bounds</td>
+      <td class="high">high</td>
+      <td>collateralFactor must stay within expected range</td>
+    </tr>
+    <tr>
+      <td>INV_NB_LIQUIDATIONBONUS</td>
+      <td>bounds</td>
+      <td class="high">high</td>
+      <td>liquidationBonus must stay within expected range</td>
+    </tr>
+    <tr>
+      <td>INV_NB_INTERESTRATE</td>
+      <td>bounds</td>
+      <td class="high">high</td>
+      <td>interestRate must stay within expected range</td>
+    </tr>
+    <tr>
+      <td>INV_NB_USERCOLLATERAL</td>
+      <td>bounds</td>
+      <td class="high">high</td>
+      <td>userCollateral must stay within expected range</td>
+    </tr>
+    <tr>
+      <td>INV_NB_USERDEBT</td>
+      <td>bounds</td>
+      <td class="high">high</td>
+      <td>userDebt must stay within expected range</td>
+    </tr>
+    <tr>
+      <td>INV_NB_SPOTPRICE</td>
+      <td>bounds</td>
+      <td class="high">high</td>
+      <td>spotPrice must stay within expected range</td>
+    </tr>
+    <tr>
+      <td>INV_NB_TWAPPRICE</td>
+      <td>bounds</td>
+      <td class="high">high</td>
+      <td>twapPrice must stay within expected range</td>
+    </tr>
+    <tr>
+      <td>INV_NB_LASTUPDATETIME</td>
+      <td>bounds</td>
+      <td class="high">high</td>
+      <td>lastUpdateTime must stay within expected range</td>
+    </tr>
+    <tr>
+      <td>INV_NB_TOTALFEESCOLLECTED</td>
+      <td>bounds</td>
+      <td class="high">high</td>
+      <td>totalFeesCollected must stay within expected range</td>
+    </tr>
+    <tr>
+      <td>INV_NB_FEESBYTOKEN</td>
+      <td>bounds</td>
+      <td class="high">high</td>
+      <td>feesByToken must stay within expected range</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_TOTALSUPPLY</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>totalSupply must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_TOTALBORROWED</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>totalBorrowed must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_RESERVEBALANCE</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>reserveBalance must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_ORACLE</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>oracle must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_COLLATERALFACTOR</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>collateralFactor must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_LIQUIDATIONBONUS</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>liquidationBonus must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_INTERESTRATE</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>interestRate must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_USERCOLLATERAL</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>userCollateral must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_USERDEBT</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>userDebt must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_HASDEPOSITED</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>hasDeposited must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_OWNER</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>owner must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_GUARDIAN</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>guardian must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_PAUSED</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>paused must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_COLLATERALTOKEN</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>collateralToken must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_BORROWTOKEN</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>borrowToken must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_FEECOLLECTOR</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>feeCollector must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_ADMIN</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>admin must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_SPOTPRICE</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>spotPrice must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_TWAPPRICE</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>twapPrice must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_LASTUPDATETIME</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>lastUpdateTime must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_PROTOCOL</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>protocol must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_TREASURY</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>treasury must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_TOTALFEESCOLLECTED</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>totalFeesCollected must only be modified by authorized functions</td>
+    </tr>
+    <tr>
+      <td>INV_AUTH_FEESBYTOKEN</td>
+      <td>permission</td>
+      <td class="medium">medium</td>
+      <td>feesByToken must only be modified by authorized functions</td>
+    </tr>
+  </table>
+  <h2>Attack Vectors</h2>
+  <table>
+    <tr><th>Name</th><th>Category</th><th>Likelihood</th><th>Severity</th><th>Impact</th></tr>
+    <tr>
+      <td>Reentrancy Attack</td>
+      <td>logic-error</td>
+      <td>likely</td>
+      <td class="critical">critical</td>
+      <td>Drain contract funds, corrupt state</td>
+    </tr>
+    <tr>
+      <td>Access Control Bypass</td>
+      <td>access-control</td>
+      <td>possible</td>
+      <td class="critical">critical</td>
+      <td>Unauthorized state changes, fund theft</td>
+    </tr>
+    <tr>
+      <td>Oracle Price Manipulation</td>
+      <td>oracle-manipulation</td>
+      <td>likely</td>
+      <td class="critical">critical</td>
+      <td>Incorrect pricing, stolen funds via liquidations/swaps</td>
+    </tr>
+    <tr>
+      <td>Flash Loan Attack</td>
+      <td>flash-loan</td>
+      <td>possible</td>
+      <td class="high">high</td>
+      <td>Manipulate protocol state for profit</td>
+    </tr>
+    <tr>
+      <td>Improper Liquidation</td>
+      <td>liquidation</td>
+      <td>possible</td>
+      <td class="critical">critical</td>
+      <td>User funds lost through unjustified liquidation</td>
+    </tr>
+    <tr>
+      <td>Interest Rate Manipulation</td>
+      <td>logic-error</td>
+      <td>unlikely</td>
+      <td class="medium">medium</td>
+      <td>Manipulated interest rates, economic attack</td>
+    </tr>
+  </table>
+  <h2>Trust Assumptions</h2>
+  <table>
+    <tr><th>Category</th><th>Assumption</th><th>If Violated</th><th>Confidence</th></tr>
+    <tr>
+      <td>oracle</td>
+      <td>Oracle prices reflect true market values</td>
+      <td>Incorrect liquidations, manipulated swaps, unfair exchanges</td>
+      <td style="color: #ffa726">medium</td>
+    </tr>
+    <tr>
+      <td>external-contract</td>
+      <td>Integrated external contracts behave as specified</td>
+      <td>Loss of funds through unexpected behavior</td>
+      <td style="color: #ffa726">medium</td>
+    </tr>
+    <tr>
+      <td>governance</td>
+      <td>Governance processes are not captured by malicious actors</td>
+      <td>Unauthorized parameter changes, fund drains</td>
+      <td style="color: #ffa726">medium</td>
+    </tr>
+    <tr>
+      <td>price-feed</td>
+      <td>Price feeds cannot be manipulated within a single transaction/block</td>
+      <td>Cheap collateral borrowed against, bad debt accumulation</td>
+      <td style="color: #ff6b6b">low</td>
+    </tr>
+  </table>
+</body>
+</html>

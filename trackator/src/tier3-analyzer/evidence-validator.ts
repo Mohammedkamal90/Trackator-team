@@ -42,6 +42,12 @@ export interface EvidenceValidationResult {
   reachabilityAnalysis: ReachabilityAnalysisReport;
   disproofAnalysis: DisproofReport;
   confidenceAssessments: ConfidenceAssessment[];
+  // FIX (integration bug): this was computed internally (Step 5 of validateEvidence,
+  // fed into generateFinalVerdict) but never surfaced on the returned object or exported
+  // to trackator-evidence.json — the touted "9-criteria reachability proof" was silently
+  // discarded on every run. redteam-trackator's phase-4-fork-testing.md Step 5 reads
+  // `context.evidence.proofRequirementsList` and always no-op'd as a result.
+  proofRequirementsList: ProofRequirements[];
   finalVerdict: FinalVerdictTable;
   summary: ValidationSummary;
 }
@@ -619,6 +625,7 @@ export function validateEvidence(
     reachabilityAnalysis,
     disproofAnalysis,
     confidenceAssessments,
+    proofRequirementsList,
     finalVerdict,
     summary
   };
@@ -2366,7 +2373,7 @@ function generateFinalVerdict(
   reachability: ReachabilityAnalysisReport,
   disproof: DisproofReport,
   confidence: ConfidenceAssessment[],
-  proofReqs: ProofRequirement[],
+  proofReqs: ProofRequirements[],
   verbose: boolean = false
 ): FinalVerdictTable {
   const verdicts: VerdictEntry[] = [];
@@ -2537,8 +2544,15 @@ function generateProofRequirements(
   findings: ClassifiedFinding[],
   reachability: ReachabilityAnalysisReport,
   verbose: boolean = false
-): ProofRequirement[] {
-  const requirements: ProofRequirement[] = [];
+): ProofRequirements[] {
+  // FIX (integration bug): this previously returned a flat, ungrouped ProofRequirement[]
+  // (all findings' individual checks mixed into one array, no findingId set on most items),
+  // which matched neither the declared `ProofRequirements` type (grouped per finding with
+  // metRequirements/totalRequirements/overallStatus) nor what redteam-trackator's
+  // phase-4-fork-testing.md expects (`proofRequirementsList.find(r => r.findingId === ...)`
+  // then reads r.metRequirements/r.totalRequirements/r.overallStatus/r.requirements[]).
+  // Now returns one ProofRequirements object per finding, as declared.
+  const result: ProofRequirements[] = [];
 
   for (const finding of findings) {
     const path = reachability.paths.find(p => p.findingId === finding.findingId);
@@ -2580,10 +2594,22 @@ function generateProofRequirements(
       ...(stateSatisfied ? {} : { evidence: { itemId: `REQ3_EVID_${finding.findingId}`, itemType: 'state-prerequisite' as any, description: path.reachabilityReason, strength: 'strong' as any, isSupporting: true } })
     });
 
-    // Req 4: No validation blocks the path
+    // Req 4: Required storage values can occur (previously missing entirely — see FIX note above)
+    const storageSatisfied = path.crossContractPrereqs.every(p => p.canBeSatisfied);
+    reqs.push({
+      reqId: `REQ4_${finding.findingId}_storage`,
+      requirement: 'Required storage/cross-contract state values can occur',
+      category: 'storage-prerequisites',
+      status: path.crossContractPrereqs.length > 0
+        ? (storageSatisfied ? 'met' : 'partial')
+        : 'unknown',
+      explanation: path.crossContractPrereqs.length > 0
+        ? `Cross-contract storage prereqs: [${path.crossContractPrereqs.map(p => `${p.targetContract}: ${p.requiredState}`).join(', ')}]`
+        : 'No specific cross-contract storage prerequisites identified'
+    });
     const hasBlocking = finding.blockingEvidence.length > 0;
     reqs.push({
-      reqId: `REQ4_${finding.findingId}_validation`,
+      reqId: `REQ5_${finding.findingId}_validation`,
       requirement: 'No validation blocks the exploitation path',
       category: 'no-validation-blocks',
       status: hasBlocking ? 'not-met' : 'met',
@@ -2593,18 +2619,18 @@ function generateProofRequirements(
       ...(hasBlocking ? {} : {})
     });
 
-    // Req 5: No invariant prevents exploitation
+    // Req 6: No invariant prevents exploitation
     reqs.push({
-      reqId: `REQ5_${finding.findingId}_invariant`,
+      reqId: `REQ6_${finding.findingId}_invariant`,
       requirement: 'No protocol invariant prevents this exploitation',
       category: 'no-invariant-prevents',
       status: 'unknown',  // Would need deeper invariant analysis
       explanation: 'Invariant prevention analysis requires separate comprehensive check'
     });
 
-    // Req 6: No reconciliation restores before impact
+    // Req 7: No reconciliation restores before impact
     reqs.push({
-      reqId: `REQ6_${finding.findingId}_reconci`,
+      reqId: `REQ7_${finding.findingId}_reconci`,
       requirement: 'No automatic/state reconciliation restores correctness before impact',
       category: 'no-reconciliation',
       status: path.callChain.some(s => s.action === 'external-call' && s.stepOrder > 1) ? 'not-met' : 'unknown',
@@ -2613,10 +2639,10 @@ function generateProofRequirements(
         : 'Reconciliation analysis requires deeper state tracking'
     });
 
-    // Req 7: Observable security impact exists
+    // Req 8: Observable security impact exists
     const hasObservableImpact = /loss|drain|steal|theft|extract|fund|bypass|exploit/i.test(finding.description);
     reqs.push({
-      reqId: 'REQ7_' + finding.findingId + '_impact',
+      reqId: 'REQ8_' + finding.findingId + '_impact',
       requirement: 'Observable security impact exists (fund loss, unauthorized access, etc.)',
       category: 'observable-impact',
       status: hasObservableImpact ? 'met' : 'partial',
@@ -2625,43 +2651,44 @@ function generateProofRequirements(
         : 'Impact may be informational or preventive'
     });
 
-    // Req 8: Realistic PoC can be constructed
+    // Req 9: Realistic PoC can be constructed
     const pocFeasible = path.exploitationComplexity !== 'impossible' && 
                          path.exploitationComplexity !== 'difficult';
     reqs.push({
-      reqId: 'REQ8_' + finding.findingId + '_poc',
+      reqId: 'REQ9_' + finding.findingId + '_poc',
       requirement: 'Realistic Proof-of-Concept can be constructed',
       category: 'poc-constructible',
       status: pocFeasible ? 'met' : 'not-met',
       explanation: 'Exploitation complexity assessed as ' + path.exploitationComplexity + (pocFeasible ? ' (feasible)' : ' (may be infeasible)')
     });
 
-    // Calculate overall status
+    // Tag each requirement with the finding it belongs to (consumer convenience —
+    // ProofRequirement.findingId was declared but never populated before this fix)
+    for (const r of reqs) r.findingId = finding.findingId;
+
+    // Calculate overall status — thresholds now out of 9 real criteria, not 8
     const metCount = reqs.filter(r => r.status === 'met').length;
     const totalCount = reqs.length;
     const overallStatus: ProofRequirements['overallStatus'] = 
-      metCount >= 7 ? 'proven-reachable' :
+      metCount >= 8 ? 'proven-reachable' :
       metCount >= 5 ? 'not-proven' :
       metCount >= 3 ? 'not-proven' : 'insufficient-evidence';
 
-    // Add to requirements with overall status
-    requirements.push(...reqs);
-
-    // Also create summary requirement
-    requirements.push({
-      reqId: 'REQ_OVERALL_' + finding.findingId,
-      requirement: 'All proof requirements satisfied for ReachableBug classification',
-      category: 'poc-constructible' as any,
-      status: overallStatus,
-      explanation: metCount + '/' + totalCount + ' requirements met. Status: ' + overallStatus
+    result.push({
+      findingId: finding.findingId,
+      requirements: reqs,
+      overallStatus,
+      metRequirements: metCount,
+      totalRequirements: totalCount,
+      missingRequirements: reqs.filter(r => r.status !== 'met')
     });
   }
 
   if (verbose) {
-    console.log('[EvidenceValidator] Generated proof requirements for ' + requirements.length + ' finding-category pairs');
+    console.log('[EvidenceValidator] Generated proof requirements for ' + result.length + ' findings (9 criteria each)');
   }
 
-  return requirements;
+  return result;
 }
 
 // ============================================================
@@ -2788,6 +2815,8 @@ export function exportValidationResult(result: EvidenceValidationResult): any {
       methodology: result.finalVerdict.methodology,
       summary: result.finalVerdict.summary
     },
+    // FIX (integration bug): was omitted from export entirely — see EvidenceValidationResult note.
+    proofRequirementsList: result.proofRequirementsList,
     summary: result.summary
   };
 }

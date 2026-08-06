@@ -184,9 +184,11 @@ async function runUnifiedAnalysis(options) {
             const phase1Findings = result.phase1?.highRiskFindings || [];
             const phase2Findings = result.phase2?.criticalFindings || [];
             const phase3Risks = result.phase3?.desynchronizationAnalysis.detectedRisks || [];
-            // Note: phase3 uses AssumptionNode[], but EvidenceValidationOptions expects HiddenAssumption[]
-            // These are structurally different - casting here to satisfy the interface
-            const phase3Assumptions = (result.phase3?.assumptionDependencyGraph.nodes || []);
+            // FIX (integration bug): previously sourced from phase3.assumptionDependencyGraph.nodes
+            // (AssumptionNode[] — no validatedBy/detectability/exploitability fields), cast `as any`,
+            // which crashed initialClassifyAssumption() on assumption.validatedBy.length every run.
+            // HiddenAssumption[] with the correct shape already exists on phase2's output — use that.
+            const phase3Assumptions = result.phase2?.hiddenAssumptions.assumptions || [];
             const phase4Opts = {
                 contracts,
                 functionRegistry,

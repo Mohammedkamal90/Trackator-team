@@ -1,31 +1,18 @@
-# Phase 1: INTENT FILTERING
+## Phase 1: INTENT FILTERING
 
-> **Part of**: [RedTeam Trackator SKILL.md](../SKILL.md) | **Phase**: 1 of 6
-> **Previous**: [Phase 0 - Ingestion](phase-0-ingestion.md) | **Next**: [Phase 2 - Pattern Matching](phase-2-pattern-matching.md)
-
----
-
-## Objective
-
+### Objective
 Kill false positives EARLY by comparing against intended behavior, design choices, and operational patterns.
 
----
-
-## Plugin: Intended Behavior Plugin
+### Plugin: Intended Behavior Plugin
 
 **Purpose**: Determine if an alert points at intentional design rather than bug.
 
-> 📖 **Full plugin documentation**: See [`plugins/intended-behavior.md`](../plugins/intended-behavior.md) for complete implementation details, edge cases, and examples.
+**Inputs**:
+- Hypothesis list from Phase 0
+- Trackator protocol context
+- Protocol documentation (if available)
 
-### Inputs
-
-| Input | Source | Description |
-|-------|--------|-------------|
-| Hypothesis list | Phase 0 output | List of hypotheses to evaluate |
-| Trackator protocol context | Protocol file | Full protocol structure with components, functions, trust assumptions |
-| Protocol documentation | External docs | Design docs, README, audits (if available) |
-
-### Logic
+**Logic**:
 
 ```javascript
 function intentFilter(hypothesis, context) {
@@ -64,7 +51,7 @@ function intentFilter(hypothesis, context) {
 }
 ```
 
-### Trackator Field Mappings for Intent Filter
+**Trackator Field Mappings for Intent Filter**:
 
 | Check | Trackator Fields Used |
 |-------|----------------------|
@@ -73,9 +60,7 @@ function intentFilter(hypothesis, context) {
 | Operational error | `functions[].modifiers[]` (contains onlyRole/onlyOwner) |
 | Exploitable design | `attackVectors[].prerequisite[]`, `entryPoints[].access` |
 
----
-
-## Intent Filter Decision Matrix
+### Intent Filter Decision Matrix
 
 | Alert Type | Has Access Control? | In Trust Assumptions? | Enables Attack Chain? | Verdict |
 |------------|---------------------|------------------------|----------------------|---------|
@@ -85,18 +70,7 @@ function intentFilter(hypothesis, context) {
 | Anomalous value change | Yes (admin) | Yes | No | `discard` (operational) |
 | Oracle deviation | N/A | Yes (low conf) | Yes | `keep` |
 
-### Verdict Explanations
-
-| Verdict | Meaning | Action |
-|---------|---------|--------|
-| `keep` | Genuine anomaly requiring investigation | Pass to Phase 2 |
-| `downgrade_to_info` | Known pattern, low risk | Log as informational, exclude from attack surface |
-| `discard` | False positive - working as designed | Remove from hypothesis list |
-| `keep_with_note` | Intended but potentially exploitable | Flag for deeper analysis in later phases |
-
----
-
-## Phase 1 Output
+### Phase 1 Output
 
 Update hypotheses with filter results:
 
@@ -109,67 +83,7 @@ hypothesis.intentFilterResult = {
 };
 ```
 
-### Flow Diagram
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    PHASE 1: INTENT FILTERING                    │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│   Phase 0 Hypotheses                                            │
-│         │                                                        │
-│         ▼                                                        │
-│   ┌─────────────┐                                               │
-│   │ Trust Assump.│──Yes──▶ Low conf + Attack? ──Yes──▶ KEEP     │
-│   │ Check       │                        │                      │
-│   └─────────────┘                        ├──No──▶ DOWNGRADE     │
-│         │ No                              │                      │
-│         ▼                                ▼                       │
-│   ┌─────────────┐     ┌──────────────────────────────┐          │
-│   │ Component   │──Yes──▶ Working as designed? ──Yes──▶ DISCARD  │
-│   │ Responsib.  │        │                              │          │
-│   └─────────────┘        ├──No──▶ Continue              │          │
-│         │ No             │                              │          │
-│         ▼                ▼                              │          │
-│   ┌─────────────┐     ┌──────────────────────────────┐ │          │
-│   │ Operational │──Yes──▶ Trusted role action? ──Yes──▶ DISCARD  │
-│   │ Error Check │        │                              │          │
-│   └─────────────┘        ├──No──▶ Continue              │          │
-│         │                │                              │          │
-│         ▼                ▼                              │          │
-│   ┌─────────────┐     ┌──────────────────────────────┐ │          │
-│   │ Exploitable │──Yes──▶ Design choice? ──Yes──▶ KEEP+NOTE      │
-│   │ Design      │        │                              │          │
-│   └─────────────┘        ├──No──▶ KEEP (genuine)        │          │
-│                          │                              │          │
-│                          ▼                              │          │
-│                   Surviving Hypotheses                  │          │
-│                   → Phase 2 Input                       │          │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Key Metrics to Track
-
-| Metric | Description | Target |
-|--------|-------------|--------|
-| Filter rate | % of hypotheses discarded as false positives | 40-60% |
-| Keep rate | % passing to Phase 2 | 40-60% |
-| Downgrade rate | % downgraded to info | 10-20% |
-| Keep-with-note rate | % flagged as exploitable design | 5-10% |
+Surviving hypotheses → Phase 2 input.
 
 ---
 
-## Cross-References
-
-| Reference | Link |
-|-----------|------|
-| Main SKILL.md | [`../SKILL.md`](../SKILL.md) |
-| Phase 0 - Ingestion | [`phase-0-ingestion.md`](phase-0-ingestion.md) |
-| Phase 2 - Pattern Matching | [`phase-2-pattern-matching.md`](phase-2-pattern-matching.md) |
-| Intended Behavior Plugin (full) | [`../plugins/intended-behavior.md`](../plugins/intended-behavior.md) |
-| Phase Summary | [`phase-summary.md`](phase-summary.md) |
-
----
-
-*This file is auto-extracted from RedTeam Trackator SKILL.md - Phase 1 of 6*

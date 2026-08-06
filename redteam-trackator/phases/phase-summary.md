@@ -1,118 +1,137 @@
-# Phase Summary Reference
+# Phase Summary (Quick Reference)
 
-> **Part of**: [RedTeam Trackator SKILL.md](../SKILL.md) | **Type**: Quick Reference (load first)
-> Load this file first (~10 sec) to understand pipeline state before diving into specific phases.
+> **Load this file first** for an overview of all phases. Then load individual phase files as needed.
 
-## Pipeline Flow
-
-```
-Phase 0 (Ingestion)
-    ↓ hypothesis-list.json
-Phase 1 (Intent Filtering)
-    ↓ filtered-hypotheses.json
-Phase 2 (Pattern Matching)
-    ↓ pattern-matches.json (with reachability scores)
-Phase 3 (Creative Attack)
-    ↓ creative-findings.json + execution-traces.json
-Phase 4 (Fuzzing) [optional]
-    ↓ fuzz-results.json
-Phase 5 (Fork Testing)
-    ↓ fork-test-results.json
-Phase 6 (Reporting)
-    ↓ redteam-trackator-report.md + .json
-```
-
-## Phase Signatures
-
-### Phase 0: INGESTION
-**Purpose**: Read all Trackator output files, validate structure, build initial hypothesis list from alerts.
-**Input**: `trackator-init.json`, `trackator-enrich.json`, optional `trackator-analyze.json` + v2.0 enhanced files
-**Output**: `hypotheses-initial.json`, `context-object.json`
-**Owner**: System (automated)
-**When to load**: Always — this is the entry point
-
-### Phase 1: INTENT FILTERING
-**Purpose**: Kill false positives early by distinguishing bugs from design choices and operational errors.
-**Input**: Hypothesis list from Phase 0, Trackator enrich data
-**Output**: `hypotheses-filtered.json` (only surviving hypotheses)
-**Owner**: System + Verifier (uses intended-behavior plugin)
-**When to load**: When you have alerts that need filtering
-
-### Phase 2: PATTERN MATCHING
-**Purpose**: Match surviving hypotheses against 56+ historical exploit patterns; assess reachability.
-**Input**: Filtered hypotheses, Exploits-class-library (optional), Trackator data
-**Output**: `pattern-matches.json` with scores and precondition chains
-**Owner**: Hacker (matching) → Verifier (reachability BLOCK GATE #1)
-**When to load**: When hypotheses survived Phase 1 filtering
-
-### Phase 3: CREATIVE ATTACK
-**Purpose**: Find NOVEL vulnerabilities via reverse engineering and assumption breaking. This is where Hacker LIVES.
-**Input**: Pattern matches from Phase 2, full Trackator context including v2.0 enhanced data
-**Output**: `creative-findings.json` with complete execution traces A→B→C→end
-**Owner**: Hacker (PRIMARY) → Verifier (trace validation BLOCK GATE #2)
-**When to load**: **Biggest phase (~400 lines)**. Load only when ready for creative analysis.
-**v2.0 enhanced data used**: Storage Dependency Analyzer, State Coupling Detector, Sync Analyzer
-
-### Phase 4: FUZZING [OPTIONAL]
-**Purpose**: Mechanically validate findings using Echidna/Medusa via Fizz skill; run Disproof Engine.
-**Input**: Creative findings with traces from Phase 3
-**Output**: `fuzz-results.json` with violation reports and disproof analysis
-**Owner**: Hacker (campaign) → Verifier (realism check BLOCK GATE #3)
-**When to load**: Optional — skip if Fizz skill unavailable or time-constrained
-
-### Phase 5: FORK TESTING
-**Purpose**: Confirm exploits on real mainnet state via Foundry fork. Highest evidence value.
-**Input**: Best findings from Phases 3-4, Fork RPC URL, block number
-**Output**: `fork-test-results.json` with TX hashes and Trackator visualization
-**Owner**: Hacker (iterates) → Verifier (evidence validation BLOCK GATE #4)
-**When to load**: When you have findings worth confirming on mainnet
-
-### Phase 6: REPORTING
-**Purpose**: Generate final assessment report with confidence scoring and evidence tables.
-**Input**: All artifacts from Phases 0-5
-**Output**: `redteam-trackator-report.md` + `redteam-trackator-report.json`
-**Owner**: System (automated generation)
-**When to load**: When all analysis phases complete
-
----
-
-## Quick Decision Tree
+## Pipeline Overview
 
 ```
-Starting assessment?
-→ Load SKILL.md + phase-summary.md + phase-0-ingestion.md
-
-Have hypotheses to filter?
-→ Load phase-1-intent-filtering.md
-
-Hypotheses survived filtering?
-→ Load phase-2-pattern-matching.md
-
-Have pattern matches?
-→ Load phase-3-creative-attack.md (biggest file)
-
-Need to confirm on mainnet?
-→ Load phase-5-fork-testing.md
-
-Ready to write report?
-→ Load phase-6-reporting.md
-
-Need data structure details?
-→ Load references/trackator-fields.md
-
-Need full code implementations?
-→ Load references/code-examples.md
+PHASE 0 → PHASE 1 → PHASE 2 → PHASE 3 → PHASE 4 → PHASE 5
+ Ingestion   Intent    Pattern    Creative    Fork       Report
+           Filter    Match      Attack      Test
 ```
 
----
+## Phase Overview (One-Line Each)
 
-## v2.0 Enhanced Data Availability
+| # | Phase | Input | Output | Owner | File |
+|---|-------|-------|--------|-------|------|
+| 0 | **Ingestion** | Trackator JSONs | hypothesis-list.json | System | `phase-0-ingestion.md` |
+| 1 | **Intent Filtering** | hypothesis-list | filtered-hypotheses | System + Verifier | `phase-1-intent-filtering.md` |
+| 2 | **Pattern Matching** | filtered-hypotheses | pattern-matches | Hacker → Verifier | `phase-2-pattern-matching.md` |
+| 3 | **Creative Attack** | pattern-matches | creative-findings + traces | Hacker → Verifier | `phase-3-creative-attack.md` |
+| 4 | **Fork Testing** | traced-hypotheses | fork-test-results | Hacker → Verifier | `phase-4-fork-testing.md` |
+| 5 | **Reporting** | all-results | final-report.md | System | `phase-5-reporting.md` |
 
-| Enhanced Data | Source File | Used In | Key Fields |
-|---------------|-------------|---------|------------|
-| Storage Dependency Analyzer | `trackator-storage.json` | P3 | variableWriters, valueBearingVariables, contendedVariables |
-| State Coupling Detector | `trackator-coupling.json` | P3 | functionDependencyMatrix, hiddenCouplings, invariantFunctionMap |
-| Sync Analyzer | `trackator-sync.json` | P3, P5 | assumptionDependencyGraph, criticalDesyncRisks |
-| Evidence Validator | `trackator-evidence.json` | P2, P4 | classificationRegistry, reachabilityAnalysis |
+## Key Concepts
 
-**Note**: If enhanced files missing, system operates in v1.0 mode (basic Trackator output only).
+### Block Gate Paradigm
+- **NOT kill gates** — findings are SAVED, not deleted
+- Options: `proceed_to_next_phase`, `return_to_hacker`, `save_for_poc`, `save_for_fork`, `discard`, `report_now`
+
+### Trust Boundaries
+- Trusted roles: Admin, Governance, Keeper, Oracle (within documented bounds)
+- These are NOT attack targets — focus on code flaws that work even when roles behave correctly
+
+### Execution Trace Requirement
+- Full A→B→C→end trace MANDATORY before escalating any hypothesis
+- No "signs of bug" without complete proof
+
+## Confidence Scoring (v2.1)
+
+| Component | Weight | Description |
+|-----------|--------|-------------|
+| Pattern Match | 20% | Historical exploit similarity |
+| Trace Complete | 20% | Full A→B→C→end trace completed |
+| Fork Success | 50% | Confirmed on mainnet fork (includes former fuzz weight) |
+| Economic Feasibility | 10% | Profit exceeds cost (informative only) |
+
+## Verdict Tiers
+
+| Tier | Score Range | Action |
+|------|-------------|--------|
+| CONFIRMED | ≥70% | Report now |
+| PROBABLE | ≥40% | Report with caveats |
+| LEAD | ≥20% | Appendix only |
+| DISCARDED | <20% | Remove from consideration |
+
+## Quick Phase Details
+
+### Phase 0: INGESTION (~320 lines)
+- Read Trackator output files
+- Extract enhanced fields (storage, coupling, sync, evidence)
+- Build initial hypothesis list from alerts
+- **Output**: Structured context object + hypothesis list
+
+### Phase 1: INTENT FILTERING (~90 lines)
+- Apply Intended Behavior Plugin
+- Distinguish bugs from design choices
+- **Decision**: `{keep | downgrade | discard}`
+
+### Phase 2: PATTERN MATCHING (~295 lines)
+- Match against historical exploit patterns
+- Attack Chain Composer (v2.0)
+- Reachability Check (BLOCK GATE #1)
+- Evidence Validation (6-class classification)
+- **Output**: Pattern matches with confidence scores
+
+### Phase 3: CREATIVE ATTACK (~1,360 lines)
+- Reverse Engineering Plugin
+- Assumption Breaker Plugin
+- State Coupling Analysis (v2.0)
+- Root Cause Hypothesizer (v2.2)
+- **MANDATORY**: Full execution trace
+- Reachability Check (BLOCK GATE #2)
+- **Output**: Creative findings with complete traces
+
+### Phase 4: FORK TESTING (~665 lines)
+- Evidence Calibration System (v2.1)
+- Smoke Fork Test
+- Deep Fork Testing with Iteration
+- Anti-Pattern Library
+- **Output**: Fork test results with TX hashes
+
+### Phase 5: REPORTING (~220 lines)
+- Generate comprehensive report
+- Include evidence tables, appendices
+- Classification distribution
+- **Output**: final-report.md + final-report.json
+
+## Plugin Index
+
+| Plugin | Phase | Purpose | File |
+|--------|-------|---------|------|
+| Intended Behavior | 1 | FP early filtering | `plugins/intended-behavior.md` |
+| Pattern Matcher | 2 | Historical exploit matching | `plugins/pattern-matcher.md` |
+| Attack Chain Composer | 2 | Chain composition + Gate | `plugins/attack-chain-composer.md` |
+| Evidence Validator | 2,4 | Six-class classification | Integrated into phases |
+| Reachability | 2,3,4 | Feasibility verification | `plugins/reachability.md` |
+| Reverse Engineering | 3 | Value flow tracing | `plugins/reverse-engineering.md` |
+| State Coupling Analysis | 3 | Coupling-based attacks | Integrated into phase 3 |
+| Root Cause Hypothesizer | 3 | Multi-layer causal analysis | `plugins/root-cause-hypothesizer.md` |
+| Assumption Breaker | 3 | Trust assumption testing | `plugins/assumption-breaker.md` |
+| Attacker Mindset Simulator | 3 | Attacker psychology | `plugins/attacker-mindset-simulator.md` |
+| Fork Test | 4 | Mainnet validation | `plugins/fork-test.md` |
+| Anti-Pattern Library | 4 | False positive elimination | `plugins/anti-pattern-library.md` |
+| Report Generator | 5 | Output formatting | `templates/report-template.md` |
+
+## Agent Index
+
+| Agent | Role | Primary Phases | File |
+|-------|------|----------------|------|
+| **Hacker Agent** | Offensive security researcher | 3, 4 | `agents/hacker-agent.md` |
+| **Verifier Agent** | Defensive skeptic | 2, 3, 4, 5 | `agents/verifier-agent.md` |
+
+## Reference Files
+
+| Reference | When to Use | File |
+|-----------|-------------|------|
+| Data Structures | Need field definitions | `references/trackator-fields.md` |
+| Evidence Calibration | Need classification logic | `references/evidence-calibration.md` |
+| Code Examples | Need full JS implementations | See individual phase files |
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 2.1.0 | 2026-08-06 | **REFACTOR**: Removed Fuzzing; Modular file structure; 5-phase pipeline |
+| 2.0.0 | 2026-07-30 | Trackator Enhanced Integration; Disproof Engine; 6-class classification |
+| 1.0.0 | 2026-07-26 | Initial release |

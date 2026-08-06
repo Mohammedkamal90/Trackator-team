@@ -1,0 +1,2903 @@
+{
+  "xray": {
+    "protocolType": "lending",
+    "threatModel": {
+      "assetsAtRisk": [
+        {
+          "type": "erc20",
+          "name": "totalSupply",
+          "location": "SampleLendingProtocol.totalSupply",
+          "liquiditySource": "state variable"
+        },
+        {
+          "type": "erc20",
+          "name": "totalBorrowed",
+          "location": "SampleLendingProtocol.totalBorrowed",
+          "liquiditySource": "state variable"
+        },
+        {
+          "type": "erc20",
+          "name": "reserveBalance",
+          "location": "SampleLendingProtocol.reserveBalance",
+          "liquiditySource": "state variable"
+        },
+        {
+          "type": "erc20",
+          "name": "collateralToken",
+          "location": "SampleLendingProtocol.collateralToken"
+        },
+        {
+          "type": "erc20",
+          "name": "borrowToken",
+          "location": "SampleLendingProtocol.borrowToken"
+        },
+        {
+          "type": "erc20",
+          "name": "totalFeesCollected",
+          "location": "FeeCollector.totalFeesCollected",
+          "liquiditySource": "state variable"
+        },
+        {
+          "type": "erc20",
+          "name": "feesByToken",
+          "location": "FeeCollector.feesByToken"
+        }
+      ],
+      "entryPoints": [
+        {
+          "name": "deposit",
+          "contract": "SampleLendingProtocol",
+          "access": "anyone",
+          "criticality": "critical",
+          "description": "External function: deposit()"
+        },
+        {
+          "name": "borrow",
+          "contract": "SampleLendingProtocol",
+          "access": "anyone",
+          "criticality": "critical",
+          "description": "External function: borrow()"
+        },
+        {
+          "name": "repay",
+          "contract": "SampleLendingProtocol",
+          "access": "anyone",
+          "criticality": "critical",
+          "description": "External function: repay()"
+        },
+        {
+          "name": "liquidate",
+          "contract": "SampleLendingProtocol",
+          "access": "anyone",
+          "criticality": "critical",
+          "description": "External function: liquidate()"
+        },
+        {
+          "name": "withdraw",
+          "contract": "SampleLendingProtocol",
+          "access": "anyone",
+          "criticality": "critical",
+          "description": "External function: withdraw()"
+        },
+        {
+          "name": "setOracle",
+          "contract": "SampleLendingProtocol",
+          "access": "owner-only",
+          "criticality": "low",
+          "description": "External function: setOracle()"
+        },
+        {
+          "name": "setCollateralFactor",
+          "contract": "SampleLendingProtocol",
+          "access": "owner-only",
+          "criticality": "low",
+          "description": "External function: setCollateralFactor()"
+        },
+        {
+          "name": "pause",
+          "contract": "SampleLendingProtocol",
+          "access": "anyone",
+          "criticality": "low",
+          "description": "External function: pause()"
+        },
+        {
+          "name": "unpause",
+          "contract": "SampleLendingProtocol",
+          "access": "anyone",
+          "criticality": "low",
+          "description": "External function: unpause()"
+        },
+        {
+          "name": "emergencyWithdraw",
+          "contract": "SampleLendingProtocol",
+          "access": "owner-only",
+          "criticality": "low",
+          "description": "External function: emergencyWithdraw()"
+        },
+        {
+          "name": "transferOwnership",
+          "contract": "SampleLendingProtocol",
+          "access": "owner-only",
+          "criticality": "medium",
+          "description": "External function: transferOwnership()"
+        },
+        {
+          "name": "updatePrice",
+          "contract": "OracleWrapper",
+          "access": "anyone",
+          "criticality": "low",
+          "description": "External function: updatePrice()"
+        },
+        {
+          "name": "transferAdmin",
+          "contract": "OracleWrapper",
+          "access": "anyone",
+          "criticality": "medium",
+          "description": "External function: transferAdmin()"
+        },
+        {
+          "name": "setProtocol",
+          "contract": "FeeCollector",
+          "access": "anyone",
+          "criticality": "low",
+          "description": "External function: setProtocol()"
+        },
+        {
+          "name": "collectFees",
+          "contract": "FeeCollector",
+          "access": "anyone",
+          "criticality": "low",
+          "description": "External function: collectFees()"
+        },
+        {
+          "name": "withdrawFees",
+          "contract": "FeeCollector",
+          "access": "anyone",
+          "criticality": "low",
+          "description": "External function: withdrawFees()"
+        },
+        {
+          "name": "emergencyWithdraw",
+          "contract": "FeeCollector",
+          "access": "anyone",
+          "criticality": "low",
+          "description": "External function: emergencyWithdraw()"
+        },
+        {
+          "name": "updateTreasury",
+          "contract": "FeeCollector",
+          "access": "anyone",
+          "criticality": "low",
+          "description": "External function: updateTreasury()"
+        },
+        {
+          "name": "transferAdmin",
+          "contract": "FeeCollector",
+          "access": "anyone",
+          "criticality": "medium",
+          "description": "External function: transferAdmin()"
+        }
+      ],
+      "privilegeBoundaries": [],
+      "keyActors": []
+    },
+    "invariants": [
+      {
+        "id": "INV_1",
+        "category": "accounting",
+        "protocolType": "lending",
+        "template": "Total supply accounting must balance",
+        "instance": "sum(user_balances) == total_supply",
+        "severity": "critical",
+        "checkable": true,
+        "expression": "Σ balances == totalSupply",
+        "relatedStateVars": [
+          "totalSupply",
+          "balances"
+        ],
+        "relatedFunctions": [
+          "mint",
+          "burn",
+          "transfer"
+        ]
+      },
+      {
+        "id": "INV_2",
+        "category": "bounds",
+        "protocolType": "lending",
+        "template": "No underflow or overflow in arithmetic operations",
+        "instance": "All arithmetic must use SafeMath or Solidity 0.8+",
+        "severity": "critical",
+        "checkable": true,
+        "expression": "result >= 0 && result <= MAX_UINT256",
+        "relatedStateVars": [],
+        "relatedFunctions": []
+      },
+      {
+        "id": "INV_3",
+        "category": "accounting",
+        "protocolType": "lending",
+        "template": "Collateral value must always cover borrowed amount",
+        "instance": "collateral_value >= borrow_amount * collateral_factor",
+        "severity": "critical",
+        "checkable": true,
+        "expression": "collateral[token] * price[token] >= borrow[token] * liquidationThreshold",
+        "relatedStateVars": [
+          "collateral",
+          "borrows"
+        ],
+        "relatedFunctions": [
+          "borrow",
+          "depositCollateral",
+          "liquidate"
+        ]
+      },
+      {
+        "id": "INV_4",
+        "category": "oracle",
+        "protocolType": "lending",
+        "template": "Oracle prices must be within acceptable bounds",
+        "instance": "price deviation < threshold (e.g., 5% from TWAP)",
+        "severity": "critical",
+        "checkable": true,
+        "expression": "|spotPrice - twapPrice| / twapPrice < maxDeviation",
+        "relatedStateVars": [
+          "oraclePrices"
+        ],
+        "relatedFunctions": [
+          "getPrice",
+          "liquidate"
+        ]
+      },
+      {
+        "id": "INV_5",
+        "category": "bounds",
+        "protocolType": "lending",
+        "template": "Interest rates must remain within configured bounds",
+        "instance": "0 <= interest_rate <= max_interest_rate",
+        "severity": "high",
+        "checkable": true,
+        "expression": "ratePerBlock >= 0 && ratePerBlock <= maxRate",
+        "relatedStateVars": [
+          "interestRate"
+        ],
+        "relatedFunctions": [
+          "accrueInterest"
+        ]
+      },
+      {
+        "id": "INV_6",
+        "category": "accounting",
+        "protocolType": "lending",
+        "template": "Exchange rate between underlying and cToken must be accurate",
+        "instance": "exchangeRate = totalUnderlying / totalSupply",
+        "severity": "critical",
+        "checkable": true,
+        "expression": "exchangeRate == cash + borrows - reserves / totalSupply",
+        "relatedStateVars": [
+          "totalBorrows",
+          "totalSupply",
+          "cash",
+          "reserves"
+        ],
+        "relatedFunctions": [
+          "exchangeRateCurrent",
+          "redeem",
+          "mint"
+        ]
+      }
+    ],
+    "trustAssumptions": [
+      {
+        "id": "TA_1",
+        "category": "oracle",
+        "assumption": "Oracle prices reflect true market values",
+        "ifViolated": "Incorrect liquidations, manipulated swaps, unfair exchanges",
+        "mitigation": "Use TWAP, multiple oracles, circuit breakers",
+        "confidence": "medium"
+      },
+      {
+        "id": "TA_2",
+        "category": "external-contract",
+        "assumption": "Integrated external contracts behave as specified",
+        "ifViolated": "Loss of funds through unexpected behavior",
+        "mitigation": "Upgradeability, pausability, regular audits",
+        "confidence": "medium"
+      },
+      {
+        "id": "TA_3",
+        "category": "governance",
+        "assumption": "Governance processes are not captured by malicious actors",
+        "ifViolated": "Unauthorized parameter changes, fund drains",
+        "mitigation": "Timelocks, multisig, proposal review",
+        "confidence": "medium"
+      },
+      {
+        "id": "TA_L1",
+        "category": "price-feed",
+        "assumption": "Price feeds cannot be manipulated within a single transaction/block",
+        "ifViolated": "Cheap collateral borrowed against, bad debt accumulation",
+        "mitigation": "TWAP oracles, flash loan detection",
+        "confidence": "low"
+      }
+    ],
+    "adversaryProfiles": [
+      {
+        "id": "ADV_EXT",
+        "type": "external",
+        "capabilities": [
+          "Call public functions",
+          "Submit transactions",
+          "Front-run transactions"
+        ],
+        "goals": [
+          "Extract value",
+          "Drain funds",
+          "Manipulate state"
+        ],
+        "constraints": [
+          "Must pay gas",
+          "Cannot directly modify storage",
+          "Subject to access control"
+        ],
+        "likelyAttacks": [
+          "Flash loan attacks",
+          "Oracle manipulation",
+          "Reentrancy"
+        ]
+      },
+      {
+        "id": "ADV_LIQ",
+        "type": "liquidator",
+        "capabilities": [
+          "Trigger liquidations",
+          "Observe collateral prices",
+          "Compete for rewards"
+        ],
+        "goals": [
+          "Maximize liquidation profits",
+          "Acquire cheap collateral"
+        ],
+        "constraints": [
+          "Must meet liquidation requirements",
+          "Gas costs affect profitability"
+        ],
+        "likelyAttacks": [
+          "Oracle manipulation before liquidation",
+          "Sandwich attacks on liquidation"
+        ]
+      },
+      {
+        "id": "ADV_ORACLE",
+        "type": "oracle-manipulator",
+        "capabilities": [
+          "Influence oracle prices temporarily",
+          "Create large trades"
+        ],
+        "goals": [
+          "Manipulate prices for profit",
+          "Trigger false liquidations"
+        ],
+        "constraints": [
+          "Capital requirements",
+          "Slippage costs",
+          "Time window limits"
+        ],
+        "likelyAttacks": [
+          "Flash loan price manipulation",
+          "TWAP distortion"
+        ]
+      }
+    ],
+    "attackVectors": [
+      {
+        "id": "AV_1",
+        "name": "Reentrancy Attack",
+        "category": "logic-error",
+        "prerequisite": [
+          "External call before state update",
+          "No reentrancy guard"
+        ],
+        "impact": "Drain contract funds, corrupt state",
+        "likelihood": "likely",
+        "severity": "critical",
+        "relatedInvariants": [
+          "INV_1"
+        ],
+        "detectionMethod": "Check CEI pattern compliance"
+      },
+      {
+        "id": "AV_2",
+        "name": "Access Control Bypass",
+        "category": "access-control",
+        "prerequisite": [
+          "Missing or weak access control",
+          "Function visibility issue"
+        ],
+        "impact": "Unauthorized state changes, fund theft",
+        "likelihood": "possible",
+        "severity": "critical",
+        "relatedInvariants": [],
+        "detectionMethod": "Check modifier coverage on sensitive functions"
+      },
+      {
+        "id": "AV_3",
+        "name": "Oracle Price Manipulation",
+        "category": "oracle-manipulation",
+        "prerequisite": [
+          "Single oracle source",
+          "Flash loan capability",
+          "Low liquidity"
+        ],
+        "impact": "Incorrect pricing, stolen funds via liquidations/swaps",
+        "likelihood": "likely",
+        "severity": "critical",
+        "relatedInvariants": [],
+        "detectionMethod": "Monitor price deviations from TWAP"
+      },
+      {
+        "id": "AV_4",
+        "name": "Flash Loan Attack",
+        "category": "flash-loan",
+        "prerequisite": [
+          "No flash loan detection",
+          "State dependencies across calls"
+        ],
+        "impact": "Manipulate protocol state for profit",
+        "likelihood": "possible",
+        "severity": "high",
+        "relatedInvariants": [],
+        "detectionMethod": "Check for balance changes within single transaction"
+      },
+      {
+        "id": "AV_5",
+        "name": "Improper Liquidation",
+        "category": "liquidation",
+        "prerequisite": [
+          "Incorrect health factor calculation",
+          "Oracle manipulation"
+        ],
+        "impact": "User funds lost through unjustified liquidation",
+        "likelihood": "possible",
+        "severity": "critical",
+        "relatedInvariants": [],
+        "detectionMethod": "Verify health factor calculations"
+      },
+      {
+        "id": "AV_6",
+        "name": "Interest Rate Manipulation",
+        "category": "logic-error",
+        "prerequisite": [
+          "Interest rate depends on utilization",
+          "Large position influence"
+        ],
+        "impact": "Manipulated interest rates, economic attack",
+        "likelihood": "unlikely",
+        "severity": "medium",
+        "relatedInvariants": [],
+        "detectionMethod": "Monitor rate changes relative to utilization"
+      }
+    ],
+    "generatedAt": "2026-08-06T04:14:42.324Z"
+  },
+  "breakdown": {
+    "components": [
+      {
+        "name": "SampleLendingProtocol",
+        "type": "core",
+        "responsibility": "Token accounting, Asset custody and transfers, Price discovery and oracle integration, Liquidation processing",
+        "dependencies": [
+          "IERC20",
+          "SafeERC20",
+          "ReentrancyGuard",
+          "OracleWrapper",
+          "FeeCollector"
+        ],
+        "stateOwned": [
+          "totalSupply",
+          "totalBorrowed",
+          "reserveBalance",
+          "oracle",
+          "collateralFactor",
+          "liquidationBonus",
+          "interestRate",
+          "userCollateral",
+          "userDebt",
+          "hasDeposited",
+          "owner",
+          "guardian",
+          "paused",
+          "collateralToken",
+          "borrowToken",
+          "feeCollector"
+        ],
+        "interfaces": [
+          {
+            "name": "deposit",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "whenNotPaused, nonReentrant",
+            "sideEffects": [
+              "Makes external calls"
+            ]
+          },
+          {
+            "name": "borrow",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "whenNotPaused, nonReentrant",
+            "sideEffects": [
+              "Makes external calls"
+            ]
+          },
+          {
+            "name": "repay",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "whenNotPaused, nonReentrant",
+            "sideEffects": [
+              "Makes external calls"
+            ]
+          },
+          {
+            "name": "liquidate",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "whenNotPaused, nonReentrant",
+            "sideEffects": [
+              "Makes external calls"
+            ]
+          },
+          {
+            "name": "withdraw",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "whenNotPaused, nonReentrant",
+            "sideEffects": [
+              "Makes external calls"
+            ]
+          },
+          {
+            "name": "setOracle",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "onlyOwner",
+            "sideEffects": []
+          },
+          {
+            "name": "setCollateralFactor",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "onlyOwner",
+            "sideEffects": []
+          },
+          {
+            "name": "pause",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "onlyGuardian",
+            "sideEffects": []
+          },
+          {
+            "name": "unpause",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "onlyGuardian",
+            "sideEffects": []
+          },
+          {
+            "name": "emergencyWithdraw",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "onlyOwner",
+            "sideEffects": []
+          },
+          {
+            "name": "transferOwnership",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "onlyOwner",
+            "sideEffects": []
+          },
+          {
+            "name": "calculateHealthFactor",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "None",
+            "sideEffects": []
+          },
+          {
+            "name": "calculateHealthFactorWithCollateral",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "None",
+            "sideEffects": []
+          },
+          {
+            "name": "getUserPosition",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "None",
+            "sideEffects": []
+          }
+        ],
+        "riskLevel": "critical"
+      },
+      {
+        "name": "IOracle",
+        "type": "peripheral",
+        "responsibility": "Price discovery and oracle integration",
+        "dependencies": [],
+        "stateOwned": [],
+        "interfaces": [
+          {
+            "name": "getPrice",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "None",
+            "sideEffects": []
+          },
+          {
+            "name": "getTWAP",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "None",
+            "sideEffects": []
+          }
+        ],
+        "riskLevel": "low"
+      },
+      {
+        "name": "OracleWrapper",
+        "type": "core",
+        "responsibility": "Asset custody and transfers, Price discovery and oracle integration",
+        "dependencies": [],
+        "stateOwned": [
+          "admin",
+          "spotPrice",
+          "twapPrice",
+          "lastUpdateTime"
+        ],
+        "interfaces": [
+          {
+            "name": "getPrice",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "None",
+            "sideEffects": []
+          },
+          {
+            "name": "getTWAP",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "None",
+            "sideEffects": []
+          },
+          {
+            "name": "isPriceFresh",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "None",
+            "sideEffects": []
+          },
+          {
+            "name": "getDeviation",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "None",
+            "sideEffects": []
+          },
+          {
+            "name": "getDeviationBps",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "None",
+            "sideEffects": []
+          },
+          {
+            "name": "updatePrice",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "onlyAdmin",
+            "sideEffects": []
+          },
+          {
+            "name": "transferAdmin",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "onlyAdmin",
+            "sideEffects": []
+          }
+        ],
+        "riskLevel": "low"
+      },
+      {
+        "name": "FeeCollector",
+        "type": "core",
+        "responsibility": "Token accounting, Asset custody and transfers",
+        "dependencies": [
+          "IERC20",
+          "SafeERC20",
+          "ReentrancyGuard"
+        ],
+        "stateOwned": [
+          "protocol",
+          "treasury",
+          "admin",
+          "totalFeesCollected",
+          "feesByToken"
+        ],
+        "interfaces": [
+          {
+            "name": "setProtocol",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "None",
+            "sideEffects": []
+          },
+          {
+            "name": "collectFees",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "onlyProtocol, nonReentrant",
+            "sideEffects": []
+          },
+          {
+            "name": "withdrawFees",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "onlyAdmin, nonReentrant",
+            "sideEffects": []
+          },
+          {
+            "name": "emergencyWithdraw",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "onlyAdmin",
+            "sideEffects": []
+          },
+          {
+            "name": "updateTreasury",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "onlyAdmin",
+            "sideEffects": []
+          },
+          {
+            "name": "transferAdmin",
+            "inputs": [],
+            "outputs": [],
+            "accessControl": "onlyAdmin",
+            "sideEffects": []
+          }
+        ],
+        "riskLevel": "low"
+      }
+    ],
+    "moneyFlows": [
+      {
+        "id": "MF_1",
+        "name": "Deposit via deposit()",
+        "trigger": "User calls SampleLendingProtocol.deposit()",
+        "steps": [
+          {
+            "order": 1,
+            "action": "Transfer tokens/ETH",
+            "from": "User",
+            "to": "SampleLendingProtocol",
+            "asset": "Input token",
+            "amount": "_amount"
+          },
+          {
+            "order": 2,
+            "action": "Update user balance/shares",
+            "from": "SampleLendingProtocol",
+            "to": "User",
+            "asset": "LP/staked tokens",
+            "amount": "_shares"
+          },
+          {
+            "order": 3,
+            "action": "Emit Deposit event",
+            "from": "SampleLendingProtocol",
+            "to": "Event Log",
+            "asset": "Event",
+            "amount": "-"
+          }
+        ],
+        "conditions": [
+          "Contract not paused",
+          "Amount > 0",
+          "Allowance sufficient (for ERC20)"
+        ],
+        "edgeCases": [
+          "Zero amount deposit",
+          "Max uint256 amount",
+          "Reentrant call"
+        ]
+      },
+      {
+        "id": "MF_2",
+        "name": "Borrow via borrow()",
+        "trigger": "User calls SampleLendingProtocol.borrow()",
+        "steps": [
+          {
+            "order": 1,
+            "action": "Check collateral sufficiency",
+            "from": "SampleLendingProtocol",
+            "to": "SampleLendingProtocol",
+            "asset": "Check",
+            "amount": "-"
+          },
+          {
+            "order": 2,
+            "action": "Transfer borrowed assets",
+            "from": "SampleLendingProtocol",
+            "to": "User",
+            "asset": "Borrowed token",
+            "amount": "_amount"
+          },
+          {
+            "order": 3,
+            "action": "Update borrow balance",
+            "from": "User",
+            "to": "SampleLendingProtocol",
+            "asset": "Debt",
+            "amount": "_amount"
+          },
+          {
+            "order": 4,
+            "action": "Emit Borrow event",
+            "from": "SampleLendingProtocol",
+            "to": "Event Log",
+            "asset": "Event",
+            "amount": "-"
+          }
+        ],
+        "conditions": [
+          "Sufficient collateral",
+          "Account healthy after borrow",
+          "Not paused"
+        ],
+        "edgeCases": [
+          "Borrow max",
+          "Borrow zero",
+          "Edge of liquidation"
+        ]
+      },
+      {
+        "id": "MF_3",
+        "name": "Liquidation via liquidate()",
+        "trigger": "Liquidator calls SampleLendingProtocol.liquidate()",
+        "steps": [
+          {
+            "order": 1,
+            "action": "Verify unhealthy position",
+            "from": "Liquidator",
+            "to": "SampleLendingProtocol",
+            "asset": "Check",
+            "amount": "-"
+          },
+          {
+            "order": 2,
+            "action": "Seize collateral",
+            "from": "Borrower/Vault",
+            "to": "Liquidator",
+            "asset": "Collateral",
+            "amount": "_collateral"
+          },
+          {
+            "order": 3,
+            "action": "Repay borrow",
+            "from": "Liquidator",
+            "to": "Protocol",
+            "asset": "Underlying",
+            "amount": "_repay"
+          },
+          {
+            "order": 4,
+            "action": "Pay liquidation reward",
+            "from": "Protocol",
+            "to": "Liquidator",
+            "asset": "Reward",
+            "amount": "_reward"
+          },
+          {
+            "order": 5,
+            "action": "Emit Liquidation event",
+            "from": "SampleLendingProtocol",
+            "to": "Event Log",
+            "asset": "Event",
+            "amount": "-"
+          }
+        ],
+        "conditions": [
+          "Position is below threshold",
+          "Close factor respected",
+          "Not paused"
+        ],
+        "edgeCases": [
+          "Self-liquidation",
+          "Partial liquidation",
+          "Oracle manipulation during"
+        ]
+      },
+      {
+        "id": "MF_4",
+        "name": "Withdrawal via withdraw()",
+        "trigger": "User calls SampleLendingProtocol.withdraw()",
+        "steps": [
+          {
+            "order": 1,
+            "action": "Burn/transfer shares",
+            "from": "User",
+            "to": "SampleLendingProtocol",
+            "asset": "LP/staked tokens",
+            "amount": "_shares"
+          },
+          {
+            "order": 2,
+            "action": "Transfer assets",
+            "from": "SampleLendingProtocol",
+            "to": "User",
+            "asset": "Underlying token",
+            "amount": "_amount"
+          },
+          {
+            "order": 3,
+            "action": "Emit Withdraw event",
+            "from": "SampleLendingProtocol",
+            "to": "Event Log",
+            "asset": "Event",
+            "amount": "-"
+          }
+        ],
+        "conditions": [
+          "User has sufficient balance/shares",
+          "Contract has enough liquidity"
+        ],
+        "edgeCases": [
+          "Withdraw full balance",
+          "Withdraw zero",
+          "Insufficient liquidity"
+        ]
+      },
+      {
+        "id": "MF_5",
+        "name": "Withdrawal via emergencyWithdraw()",
+        "trigger": "User calls SampleLendingProtocol.emergencyWithdraw()",
+        "steps": [
+          {
+            "order": 1,
+            "action": "Burn/transfer shares",
+            "from": "User",
+            "to": "SampleLendingProtocol",
+            "asset": "LP/staked tokens",
+            "amount": "_shares"
+          },
+          {
+            "order": 2,
+            "action": "Transfer assets",
+            "from": "SampleLendingProtocol",
+            "to": "User",
+            "asset": "Underlying token",
+            "amount": "_amount"
+          },
+          {
+            "order": 3,
+            "action": "Emit Withdraw event",
+            "from": "SampleLendingProtocol",
+            "to": "Event Log",
+            "asset": "Event",
+            "amount": "-"
+          }
+        ],
+        "conditions": [
+          "User has sufficient balance/shares",
+          "Contract has enough liquidity"
+        ],
+        "edgeCases": [
+          "Withdraw full balance",
+          "Withdraw zero",
+          "Insufficient liquidity"
+        ]
+      },
+      {
+        "id": "MF_6",
+        "name": "Withdrawal via withdrawFees()",
+        "trigger": "User calls FeeCollector.withdrawFees()",
+        "steps": [
+          {
+            "order": 1,
+            "action": "Burn/transfer shares",
+            "from": "User",
+            "to": "FeeCollector",
+            "asset": "LP/staked tokens",
+            "amount": "_shares"
+          },
+          {
+            "order": 2,
+            "action": "Transfer assets",
+            "from": "FeeCollector",
+            "to": "User",
+            "asset": "Underlying token",
+            "amount": "_amount"
+          },
+          {
+            "order": 3,
+            "action": "Emit Withdraw event",
+            "from": "FeeCollector",
+            "to": "Event Log",
+            "asset": "Event",
+            "amount": "-"
+          }
+        ],
+        "conditions": [
+          "User has sufficient balance/shares",
+          "Contract has enough liquidity"
+        ],
+        "edgeCases": [
+          "Withdraw full balance",
+          "Withdraw zero",
+          "Insufficient liquidity"
+        ]
+      },
+      {
+        "id": "MF_7",
+        "name": "Withdrawal via emergencyWithdraw()",
+        "trigger": "User calls FeeCollector.emergencyWithdraw()",
+        "steps": [
+          {
+            "order": 1,
+            "action": "Burn/transfer shares",
+            "from": "User",
+            "to": "FeeCollector",
+            "asset": "LP/staked tokens",
+            "amount": "_shares"
+          },
+          {
+            "order": 2,
+            "action": "Transfer assets",
+            "from": "FeeCollector",
+            "to": "User",
+            "asset": "Underlying token",
+            "amount": "_amount"
+          },
+          {
+            "order": 3,
+            "action": "Emit Withdraw event",
+            "from": "FeeCollector",
+            "to": "Event Log",
+            "asset": "Event",
+            "amount": "-"
+          }
+        ],
+        "conditions": [
+          "User has sufficient balance/shares",
+          "Contract has enough liquidity"
+        ],
+        "edgeCases": [
+          "Withdraw full balance",
+          "Withdraw zero",
+          "Insufficient liquidity"
+        ]
+      }
+    ],
+    "numericBehaviors": [
+      {
+        "variable": "totalSupply",
+        "contract": "SampleLendingProtocol",
+        "expectedRange": {
+          "min": 0,
+          "max": 1.1579e+77
+        },
+        "unit": "tokens",
+        "normalPattern": "Monotonically increasing with mints, decreasing with burns",
+        "anomalyThreshold": 10,
+        "examples": [
+          {
+            "scenario": "Mint 100 tokens",
+            "input": "+100",
+            "expectedOutput": "totalSupply += 100",
+            "explanation": "Standard mint increases supply"
+          },
+          {
+            "scenario": "Burn 50 tokens",
+            "input": "-50",
+            "expectedOutput": "totalSupply -= 50",
+            "explanation": "Standard burn decreases supply"
+          }
+        ]
+      },
+      {
+        "variable": "totalBorrowed",
+        "contract": "SampleLendingProtocol",
+        "expectedRange": {
+          "min": 0,
+          "max": 1.1579e+77
+        },
+        "unit": "unknown",
+        "normalPattern": "Unknown - requires manual analysis",
+        "anomalyThreshold": 20,
+        "examples": []
+      },
+      {
+        "variable": "reserveBalance",
+        "contract": "SampleLendingProtocol",
+        "expectedRange": {
+          "min": 0,
+          "max": 1.1579e+77
+        },
+        "unit": "tokens",
+        "normalPattern": "Changes on deposits, withdrawals, transfers",
+        "anomalyThreshold": 50,
+        "examples": [
+          {
+            "scenario": "User deposits 1000",
+            "input": "+1000",
+            "expectedOutput": "balance[user] += 1000",
+            "explanation": "Deposit adds to balance"
+          },
+          {
+            "scenario": "User withdraws all",
+            "input": "-balance",
+            "expectedOutput": "balance[user] = 0",
+            "explanation": "Full withdrawal zeros balance"
+          }
+        ]
+      },
+      {
+        "variable": "collateralFactor",
+        "contract": "SampleLendingProtocol",
+        "expectedRange": {
+          "min": 0,
+          "max": 1.1579e+77
+        },
+        "unit": "unknown",
+        "normalPattern": "Unknown - requires manual analysis",
+        "anomalyThreshold": 20,
+        "examples": []
+      },
+      {
+        "variable": "liquidationBonus",
+        "contract": "SampleLendingProtocol",
+        "expectedRange": {
+          "min": 0,
+          "max": 1.1579e+77
+        },
+        "unit": "unknown",
+        "normalPattern": "Unknown - requires manual analysis",
+        "anomalyThreshold": 20,
+        "examples": []
+      },
+      {
+        "variable": "interestRate",
+        "contract": "SampleLendingProtocol",
+        "expectedRange": {
+          "min": 0,
+          "max": 1
+        },
+        "unit": "rate per period",
+        "normalPattern": "Adjusts slowly based on utilization or governance",
+        "anomalyThreshold": 5,
+        "examples": [
+          {
+            "scenario": "Utilization increases",
+            "input": "utilization up 10%",
+            "expectedOutput": "rate += small delta",
+            "explanation": "Rate adjusts upward"
+          },
+          {
+            "scenario": "Governance sets rate",
+            "input": "newRate param",
+            "expectedOutput": "rate = newRate",
+            "explanation": "Direct governance control"
+          }
+        ]
+      },
+      {
+        "variable": "userCollateral",
+        "contract": "SampleLendingProtocol",
+        "expectedRange": {
+          "min": 0,
+          "max": 1.1579e+77
+        },
+        "unit": "unknown",
+        "normalPattern": "Unknown - requires manual analysis",
+        "anomalyThreshold": 20,
+        "examples": []
+      },
+      {
+        "variable": "userDebt",
+        "contract": "SampleLendingProtocol",
+        "expectedRange": {
+          "min": 0,
+          "max": 1.1579e+77
+        },
+        "unit": "unknown",
+        "normalPattern": "Unknown - requires manual analysis",
+        "anomalyThreshold": 20,
+        "examples": []
+      },
+      {
+        "variable": "spotPrice",
+        "contract": "OracleWrapper",
+        "expectedRange": {
+          "min": 0,
+          "max": 1000000000000
+        },
+        "unit": "price (USD/base)",
+        "normalPattern": "Updates on oracle calls, should follow market",
+        "anomalyThreshold": 5,
+        "examples": [
+          {
+            "scenario": "Normal oracle update",
+            "input": "new price feed",
+            "expectedOutput": "price ~= previous * (1 +/- 0.01)",
+            "explanation": "Small price movements"
+          },
+          {
+            "scenario": "Flash loan attack",
+            "input": "manipulated price",
+            "expectedOutput": "price deviates >> 5%",
+            "explanation": "Potential manipulation"
+          }
+        ]
+      },
+      {
+        "variable": "twapPrice",
+        "contract": "OracleWrapper",
+        "expectedRange": {
+          "min": 0,
+          "max": 1000000000000
+        },
+        "unit": "price (USD/base)",
+        "normalPattern": "Updates on oracle calls, should follow market",
+        "anomalyThreshold": 5,
+        "examples": [
+          {
+            "scenario": "Normal oracle update",
+            "input": "new price feed",
+            "expectedOutput": "price ~= previous * (1 +/- 0.01)",
+            "explanation": "Small price movements"
+          },
+          {
+            "scenario": "Flash loan attack",
+            "input": "manipulated price",
+            "expectedOutput": "price deviates >> 5%",
+            "explanation": "Potential manipulation"
+          }
+        ]
+      },
+      {
+        "variable": "lastUpdateTime",
+        "contract": "OracleWrapper",
+        "expectedRange": {
+          "min": 0,
+          "max": 1.1579e+77
+        },
+        "unit": "unknown",
+        "normalPattern": "Unknown - requires manual analysis",
+        "anomalyThreshold": 20,
+        "examples": []
+      },
+      {
+        "variable": "totalFeesCollected",
+        "contract": "FeeCollector",
+        "expectedRange": {
+          "min": 0,
+          "max": 1.1579e+77
+        },
+        "unit": "unknown",
+        "normalPattern": "Unknown - requires manual analysis",
+        "anomalyThreshold": 20,
+        "examples": []
+      },
+      {
+        "variable": "feesByToken",
+        "contract": "FeeCollector",
+        "expectedRange": {
+          "min": 0,
+          "max": 1.1579e+77
+        },
+        "unit": "unknown",
+        "normalPattern": "Unknown - requires manual analysis",
+        "anomalyThreshold": 20,
+        "examples": []
+      }
+    ],
+    "stateAuthority": [
+      {
+        "variable": "totalSupply",
+        "contract": "SampleLendingProtocol",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "totalBorrowed",
+        "contract": "SampleLendingProtocol",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "reserveBalance",
+        "contract": "SampleLendingProtocol",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "oracle",
+        "contract": "SampleLendingProtocol",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "collateralFactor",
+        "contract": "SampleLendingProtocol",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "liquidationBonus",
+        "contract": "SampleLendingProtocol",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "interestRate",
+        "contract": "SampleLendingProtocol",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "userCollateral",
+        "contract": "SampleLendingProtocol",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "userDebt",
+        "contract": "SampleLendingProtocol",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "hasDeposited",
+        "contract": "SampleLendingProtocol",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "owner",
+        "contract": "SampleLendingProtocol",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "guardian",
+        "contract": "SampleLendingProtocol",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "paused",
+        "contract": "SampleLendingProtocol",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "collateralToken",
+        "contract": "SampleLendingProtocol",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "borrowToken",
+        "contract": "SampleLendingProtocol",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "feeCollector",
+        "contract": "SampleLendingProtocol",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "admin",
+        "contract": "OracleWrapper",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "spotPrice",
+        "contract": "OracleWrapper",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "twapPrice",
+        "contract": "OracleWrapper",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "lastUpdateTime",
+        "contract": "OracleWrapper",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "protocol",
+        "contract": "FeeCollector",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "treasury",
+        "contract": "FeeCollector",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "admin",
+        "contract": "FeeCollector",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "totalFeesCollected",
+        "contract": "FeeCollector",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      },
+      {
+        "variable": "feesByToken",
+        "contract": "FeeCollector",
+        "whoCanWrite": [],
+        "howItChanges": "Unknown modification pattern",
+        "constraints": [],
+        "validationPresent": true
+      }
+    ],
+    "expectedBehaviors": [
+      {
+        "functionSig": "deposit()",
+        "preConditions": [
+          "!paused()"
+        ],
+        "postConditions": [],
+        "stateChanges": [
+          {
+            "variable": "userBalance",
+            "direction": "increase"
+          },
+          {
+            "variable": "totalSupply",
+            "direction": "increase"
+          }
+        ],
+        "revertConditions": [
+          "When require conditions fail"
+        ]
+      },
+      {
+        "functionSig": "borrow()",
+        "preConditions": [
+          "!paused()"
+        ],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": [
+          "When require conditions fail",
+          "Insufficient collateral",
+          "Protocol paused"
+        ]
+      },
+      {
+        "functionSig": "repay()",
+        "preConditions": [
+          "!paused()"
+        ],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": [
+          "When require conditions fail"
+        ]
+      },
+      {
+        "functionSig": "liquidate()",
+        "preConditions": [
+          "!paused()"
+        ],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": [
+          "When require conditions fail"
+        ]
+      },
+      {
+        "functionSig": "withdraw()",
+        "preConditions": [
+          "!paused()"
+        ],
+        "postConditions": [],
+        "stateChanges": [
+          {
+            "variable": "userBalance",
+            "direction": "decrease"
+          },
+          {
+            "variable": "totalSupply",
+            "direction": "decrease"
+          }
+        ],
+        "revertConditions": [
+          "When require conditions fail"
+        ]
+      },
+      {
+        "functionSig": "setOracle()",
+        "preConditions": [
+          "msg.sender == owner"
+        ],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": []
+      },
+      {
+        "functionSig": "setCollateralFactor()",
+        "preConditions": [
+          "msg.sender == owner"
+        ],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": [
+          "When require conditions fail"
+        ]
+      },
+      {
+        "functionSig": "pause()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": []
+      },
+      {
+        "functionSig": "unpause()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": []
+      },
+      {
+        "functionSig": "emergencyWithdraw()",
+        "preConditions": [
+          "msg.sender == owner"
+        ],
+        "postConditions": [],
+        "stateChanges": [
+          {
+            "variable": "userBalance",
+            "direction": "decrease"
+          },
+          {
+            "variable": "totalSupply",
+            "direction": "decrease"
+          }
+        ],
+        "revertConditions": []
+      },
+      {
+        "functionSig": "transferOwnership()",
+        "preConditions": [
+          "msg.sender == owner"
+        ],
+        "postConditions": [],
+        "stateChanges": [
+          {
+            "variable": "senderBalance",
+            "direction": "decrease"
+          },
+          {
+            "variable": "receiverBalance",
+            "direction": "increase"
+          }
+        ],
+        "revertConditions": [
+          "When require conditions fail"
+        ]
+      },
+      {
+        "functionSig": "calculateHealthFactor()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": []
+      },
+      {
+        "functionSig": "calculateHealthFactorWithCollateral()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": []
+      },
+      {
+        "functionSig": "getUserPosition()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": []
+      },
+      {
+        "functionSig": "getPrice()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": []
+      },
+      {
+        "functionSig": "getTWAP()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": []
+      },
+      {
+        "functionSig": "getPrice()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": []
+      },
+      {
+        "functionSig": "getTWAP()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": []
+      },
+      {
+        "functionSig": "isPriceFresh()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": []
+      },
+      {
+        "functionSig": "getDeviation()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": []
+      },
+      {
+        "functionSig": "getDeviationBps()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": []
+      },
+      {
+        "functionSig": "updatePrice()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": []
+      },
+      {
+        "functionSig": "transferAdmin()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [
+          {
+            "variable": "senderBalance",
+            "direction": "decrease"
+          },
+          {
+            "variable": "receiverBalance",
+            "direction": "increase"
+          }
+        ],
+        "revertConditions": [
+          "When require conditions fail"
+        ]
+      },
+      {
+        "functionSig": "setProtocol()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": [
+          "When require conditions fail"
+        ]
+      },
+      {
+        "functionSig": "collectFees()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": [
+          "When require conditions fail"
+        ]
+      },
+      {
+        "functionSig": "withdrawFees()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [
+          {
+            "variable": "userBalance",
+            "direction": "decrease"
+          },
+          {
+            "variable": "totalSupply",
+            "direction": "decrease"
+          }
+        ],
+        "revertConditions": [
+          "When require conditions fail"
+        ]
+      },
+      {
+        "functionSig": "emergencyWithdraw()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [
+          {
+            "variable": "userBalance",
+            "direction": "decrease"
+          },
+          {
+            "variable": "totalSupply",
+            "direction": "decrease"
+          }
+        ],
+        "revertConditions": [
+          "When require conditions fail"
+        ]
+      },
+      {
+        "functionSig": "updateTreasury()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [],
+        "revertConditions": [
+          "When require conditions fail"
+        ]
+      },
+      {
+        "functionSig": "transferAdmin()",
+        "preConditions": [],
+        "postConditions": [],
+        "stateChanges": [
+          {
+            "variable": "senderBalance",
+            "direction": "decrease"
+          },
+          {
+            "variable": "receiverBalance",
+            "direction": "increase"
+          }
+        ],
+        "revertConditions": [
+          "When require conditions fail"
+        ]
+      }
+    ],
+    "generatedAt": "2026-08-06T04:14:42.328Z"
+  },
+  "invariants": [
+    {
+      "id": "INV_1",
+      "category": "accounting",
+      "protocolType": "lending",
+      "template": "Total supply accounting must balance",
+      "instance": "sum(user_balances) == total_supply",
+      "severity": "critical",
+      "checkable": true,
+      "expression": "Σ balances == totalSupply",
+      "relatedStateVars": [
+        "totalSupply",
+        "balances"
+      ],
+      "relatedFunctions": [
+        "mint",
+        "burn",
+        "transfer"
+      ]
+    },
+    {
+      "id": "INV_2",
+      "category": "bounds",
+      "protocolType": "lending",
+      "template": "No underflow or overflow in arithmetic operations",
+      "instance": "All arithmetic must use SafeMath or Solidity 0.8+",
+      "severity": "critical",
+      "checkable": true,
+      "expression": "result >= 0 && result <= MAX_UINT256",
+      "relatedStateVars": [],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_3",
+      "category": "accounting",
+      "protocolType": "lending",
+      "template": "Collateral value must always cover borrowed amount",
+      "instance": "collateral_value >= borrow_amount * collateral_factor",
+      "severity": "critical",
+      "checkable": true,
+      "expression": "collateral[token] * price[token] >= borrow[token] * liquidationThreshold",
+      "relatedStateVars": [
+        "collateral",
+        "borrows"
+      ],
+      "relatedFunctions": [
+        "borrow",
+        "depositCollateral",
+        "liquidate"
+      ]
+    },
+    {
+      "id": "INV_4",
+      "category": "oracle",
+      "protocolType": "lending",
+      "template": "Oracle prices must be within acceptable bounds",
+      "instance": "price deviation < threshold (e.g., 5% from TWAP)",
+      "severity": "critical",
+      "checkable": true,
+      "expression": "|spotPrice - twapPrice| / twapPrice < maxDeviation",
+      "relatedStateVars": [
+        "oraclePrices"
+      ],
+      "relatedFunctions": [
+        "getPrice",
+        "liquidate"
+      ]
+    },
+    {
+      "id": "INV_5",
+      "category": "bounds",
+      "protocolType": "lending",
+      "template": "Interest rates must remain within configured bounds",
+      "instance": "0 <= interest_rate <= max_interest_rate",
+      "severity": "high",
+      "checkable": true,
+      "expression": "ratePerBlock >= 0 && ratePerBlock <= maxRate",
+      "relatedStateVars": [
+        "interestRate"
+      ],
+      "relatedFunctions": [
+        "accrueInterest"
+      ]
+    },
+    {
+      "id": "INV_6",
+      "category": "accounting",
+      "protocolType": "lending",
+      "template": "Exchange rate between underlying and cToken must be accurate",
+      "instance": "exchangeRate = totalUnderlying / totalSupply",
+      "severity": "critical",
+      "checkable": true,
+      "expression": "exchangeRate == cash + borrows - reserves / totalSupply",
+      "relatedStateVars": [
+        "totalBorrows",
+        "totalSupply",
+        "cash",
+        "reserves"
+      ],
+      "relatedFunctions": [
+        "exchangeRateCurrent",
+        "redeem",
+        "mint"
+      ]
+    },
+    {
+      "id": "INV_NB_TOTALSUPPLY",
+      "category": "bounds",
+      "protocolType": "lending",
+      "template": "totalSupply must stay within expected range",
+      "instance": "0 <= totalSupply <= 1.1579e+77",
+      "severity": "high",
+      "checkable": true,
+      "expression": "totalSupply >= 0 && totalSupply <= 1.1579e+77",
+      "relatedStateVars": [
+        "totalSupply"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_NB_TOTALBORROWED",
+      "category": "bounds",
+      "protocolType": "lending",
+      "template": "totalBorrowed must stay within expected range",
+      "instance": "0 <= totalBorrowed <= 1.1579e+77",
+      "severity": "high",
+      "checkable": true,
+      "expression": "totalBorrowed >= 0 && totalBorrowed <= 1.1579e+77",
+      "relatedStateVars": [
+        "totalBorrowed"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_NB_RESERVEBALANCE",
+      "category": "bounds",
+      "protocolType": "lending",
+      "template": "reserveBalance must stay within expected range",
+      "instance": "0 <= reserveBalance <= 1.1579e+77",
+      "severity": "high",
+      "checkable": true,
+      "expression": "reserveBalance >= 0 && reserveBalance <= 1.1579e+77",
+      "relatedStateVars": [
+        "reserveBalance"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_NB_COLLATERALFACTOR",
+      "category": "bounds",
+      "protocolType": "lending",
+      "template": "collateralFactor must stay within expected range",
+      "instance": "0 <= collateralFactor <= 1.1579e+77",
+      "severity": "high",
+      "checkable": true,
+      "expression": "collateralFactor >= 0 && collateralFactor <= 1.1579e+77",
+      "relatedStateVars": [
+        "collateralFactor"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_NB_LIQUIDATIONBONUS",
+      "category": "bounds",
+      "protocolType": "lending",
+      "template": "liquidationBonus must stay within expected range",
+      "instance": "0 <= liquidationBonus <= 1.1579e+77",
+      "severity": "high",
+      "checkable": true,
+      "expression": "liquidationBonus >= 0 && liquidationBonus <= 1.1579e+77",
+      "relatedStateVars": [
+        "liquidationBonus"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_NB_INTERESTRATE",
+      "category": "bounds",
+      "protocolType": "lending",
+      "template": "interestRate must stay within expected range",
+      "instance": "0 <= interestRate <= 1",
+      "severity": "high",
+      "checkable": true,
+      "expression": "interestRate >= 0 && interestRate <= 1",
+      "relatedStateVars": [
+        "interestRate"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_NB_USERCOLLATERAL",
+      "category": "bounds",
+      "protocolType": "lending",
+      "template": "userCollateral must stay within expected range",
+      "instance": "0 <= userCollateral <= 1.1579e+77",
+      "severity": "high",
+      "checkable": true,
+      "expression": "userCollateral >= 0 && userCollateral <= 1.1579e+77",
+      "relatedStateVars": [
+        "userCollateral"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_NB_USERDEBT",
+      "category": "bounds",
+      "protocolType": "lending",
+      "template": "userDebt must stay within expected range",
+      "instance": "0 <= userDebt <= 1.1579e+77",
+      "severity": "high",
+      "checkable": true,
+      "expression": "userDebt >= 0 && userDebt <= 1.1579e+77",
+      "relatedStateVars": [
+        "userDebt"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_NB_SPOTPRICE",
+      "category": "bounds",
+      "protocolType": "lending",
+      "template": "spotPrice must stay within expected range",
+      "instance": "0 <= spotPrice <= 1000000000000",
+      "severity": "high",
+      "checkable": true,
+      "expression": "spotPrice >= 0 && spotPrice <= 1000000000000",
+      "relatedStateVars": [
+        "spotPrice"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_NB_TWAPPRICE",
+      "category": "bounds",
+      "protocolType": "lending",
+      "template": "twapPrice must stay within expected range",
+      "instance": "0 <= twapPrice <= 1000000000000",
+      "severity": "high",
+      "checkable": true,
+      "expression": "twapPrice >= 0 && twapPrice <= 1000000000000",
+      "relatedStateVars": [
+        "twapPrice"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_NB_LASTUPDATETIME",
+      "category": "bounds",
+      "protocolType": "lending",
+      "template": "lastUpdateTime must stay within expected range",
+      "instance": "0 <= lastUpdateTime <= 1.1579e+77",
+      "severity": "high",
+      "checkable": true,
+      "expression": "lastUpdateTime >= 0 && lastUpdateTime <= 1.1579e+77",
+      "relatedStateVars": [
+        "lastUpdateTime"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_NB_TOTALFEESCOLLECTED",
+      "category": "bounds",
+      "protocolType": "lending",
+      "template": "totalFeesCollected must stay within expected range",
+      "instance": "0 <= totalFeesCollected <= 1.1579e+77",
+      "severity": "high",
+      "checkable": true,
+      "expression": "totalFeesCollected >= 0 && totalFeesCollected <= 1.1579e+77",
+      "relatedStateVars": [
+        "totalFeesCollected"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_NB_FEESBYTOKEN",
+      "category": "bounds",
+      "protocolType": "lending",
+      "template": "feesByToken must stay within expected range",
+      "instance": "0 <= feesByToken <= 1.1579e+77",
+      "severity": "high",
+      "checkable": true,
+      "expression": "feesByToken >= 0 && feesByToken <= 1.1579e+77",
+      "relatedStateVars": [
+        "feesByToken"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_TOTALSUPPLY",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "totalSupply must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "totalSupply"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_TOTALBORROWED",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "totalBorrowed must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "totalBorrowed"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_RESERVEBALANCE",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "reserveBalance must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "reserveBalance"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_ORACLE",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "oracle must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "oracle"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_COLLATERALFACTOR",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "collateralFactor must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "collateralFactor"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_LIQUIDATIONBONUS",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "liquidationBonus must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "liquidationBonus"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_INTERESTRATE",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "interestRate must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "interestRate"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_USERCOLLATERAL",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "userCollateral must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "userCollateral"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_USERDEBT",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "userDebt must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "userDebt"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_HASDEPOSITED",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "hasDeposited must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "hasDeposited"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_OWNER",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "owner must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "owner"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_GUARDIAN",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "guardian must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "guardian"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_PAUSED",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "paused must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "paused"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_COLLATERALTOKEN",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "collateralToken must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "collateralToken"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_BORROWTOKEN",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "borrowToken must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "borrowToken"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_FEECOLLECTOR",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "feeCollector must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "feeCollector"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_ADMIN",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "admin must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "admin"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_SPOTPRICE",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "spotPrice must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "spotPrice"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_TWAPPRICE",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "twapPrice must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "twapPrice"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_LASTUPDATETIME",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "lastUpdateTime must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "lastUpdateTime"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_PROTOCOL",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "protocol must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "protocol"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_TREASURY",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "treasury must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "treasury"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_TOTALFEESCOLLECTED",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "totalFeesCollected must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "totalFeesCollected"
+      ],
+      "relatedFunctions": []
+    },
+    {
+      "id": "INV_AUTH_FEESBYTOKEN",
+      "category": "permission",
+      "protocolType": "lending",
+      "template": "feesByToken must only be modified by authorized functions",
+      "instance": "",
+      "severity": "medium",
+      "checkable": false,
+      "expression": null,
+      "relatedStateVars": [
+        "feesByToken"
+      ],
+      "relatedFunctions": []
+    }
+  ],
+  "alertRules": [
+    {
+      "id": "ALERT_1",
+      "name": "CEI Pattern Violation - Potential Reentrancy",
+      "tier": "tier1",
+      "category": "reentrancy",
+      "severity": "critical",
+      "condition": {
+        "type": "pattern",
+        "field": "ceiPattern",
+        "operator": "eq",
+        "value": "violated"
+      },
+      "description": "Function has external calls after state modifications, violating Checks-Effects-Interactions pattern. This is a strong indicator of potential reentrancy vulnerability.",
+      "mitigation": "Reorder operations to perform all external calls after all state updates, or use reentrancy guards.",
+      "source": "runtime",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_2",
+      "name": "Missing Access Control on State-Changing Function",
+      "tier": "tier1",
+      "category": "access-control",
+      "severity": "critical",
+      "condition": {
+        "type": "absence",
+        "field": "modifiers",
+        "operator": "not-contains",
+        "value": "onlyOwner|onlyRole|require"
+      },
+      "description": "Public/external function modifies state but lacks explicit access control modifier.",
+      "mitigation": "Add appropriate access control modifiers based on intended permissions.",
+      "source": "runtime",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_3",
+      "name": "DelegateCall Detected - Execution Context Forwarding",
+      "tier": "tier1",
+      "category": "access-control",
+      "severity": "critical",
+      "condition": {
+        "type": "presence",
+        "field": "hasDelegateCall",
+        "operator": "eq",
+        "value": true
+      },
+      "description": "Function uses delegatecall which forwards execution context including storage. Malicious target contract can compromise entire contract.",
+      "mitigation": "Ensure delegatecall target is trusted, immutable, or governed by robust access control.",
+      "source": "runtime",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_4",
+      "name": "Unbounded Loop - Potential DoS Risk",
+      "tier": "tier1",
+      "category": "denial-of-service",
+      "severity": "medium",
+      "condition": {
+        "type": "presence",
+        "field": "hasLoop",
+        "operator": "eq",
+        "value": true
+      },
+      "description": "Function contains loop that may iterate over unbounded data structures. Could exceed block gas limit with sufficient data.",
+      "mitigation": "Add iteration limits, use pagination, or move loop logic off-chain.",
+      "source": "runtime",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_5",
+      "name": "Oracle Price Deviation Exceeds Threshold",
+      "tier": "tier2",
+      "category": "oracle-manipulation",
+      "severity": "critical",
+      "condition": {
+        "type": "threshold",
+        "field": "priceDeviationPercent",
+        "operator": "gte",
+        "value": 5,
+        "secondaryField": "expectedPrice"
+      },
+      "description": "Observed oracle price deviates more than 5% from expected/TWAP price. Possible manipulation attempt.",
+      "mitigation": "Use TWAP oracles, implement circuit breakers, add flash loan detection.",
+      "source": "xray",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_6",
+      "name": "Accounting Invariant Violation: Total supply accounting must balance...",
+      "tier": "tier2",
+      "category": "accounting",
+      "severity": "critical",
+      "condition": {
+        "type": "custom",
+        "field": "Σ balances == totalSupply",
+        "operator": "not-contains",
+        "value": "valid"
+      },
+      "description": "sum(user_balances) == total_supply",
+      "mitigation": "Review transaction that caused accounting inconsistency. May indicate fund leakage or calculation error.",
+      "source": "xray",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_7",
+      "name": "Accounting Invariant Violation: Collateral value must always cover borrowed amount...",
+      "tier": "tier2",
+      "category": "accounting",
+      "severity": "critical",
+      "condition": {
+        "type": "custom",
+        "field": "collateral[token] * price[token] >= borrow[token] * liquidationThreshold",
+        "operator": "not-contains",
+        "value": "valid"
+      },
+      "description": "collateral_value >= borrow_amount * collateral_factor",
+      "mitigation": "Review transaction that caused accounting inconsistency. May indicate fund leakage or calculation error.",
+      "source": "xray",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_8",
+      "name": "Accounting Invariant Violation: Exchange rate between underlying and cToken must b...",
+      "tier": "tier2",
+      "category": "accounting",
+      "severity": "critical",
+      "condition": {
+        "type": "custom",
+        "field": "exchangeRate == cash + borrows - reserves / totalSupply",
+        "operator": "not-contains",
+        "value": "valid"
+      },
+      "description": "exchangeRate = totalUnderlying / totalSupply",
+      "mitigation": "Review transaction that caused accounting inconsistency. May indicate fund leakage or calculation error.",
+      "source": "xray",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_9",
+      "name": "Flash Loan Attack Pattern: Flash Loan Attack",
+      "tier": "tier2",
+      "category": "flash-loan",
+      "severity": "high",
+      "condition": {
+        "type": "sequence",
+        "field": "balanceChanges",
+        "operator": "in-sequence",
+        "value": [
+          "large_deposit",
+          "manipulation_action",
+          "large_withdraw"
+        ]
+      },
+      "description": "Manipulate protocol state for profit",
+      "mitigation": "Check for balance changes within single transaction",
+      "source": "xray",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_10",
+      "name": "Anomalous Change in totalSupply",
+      "tier": "tier2",
+      "category": "unexpected-value",
+      "severity": "medium",
+      "condition": {
+        "type": "threshold",
+        "field": "SampleLendingProtocol.totalSupply",
+        "operator": "gt",
+        "value": 10
+      },
+      "description": "totalSupply changed by more than 10% from previous value. Expected behavior: Monotonically increasing with mints, decreasing with burns",
+      "mitigation": "Verify this change is legitimate. Check for manipulation or bugs.",
+      "source": "breakdown",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_11",
+      "name": "Anomalous Change in totalBorrowed",
+      "tier": "tier2",
+      "category": "unexpected-value",
+      "severity": "medium",
+      "condition": {
+        "type": "threshold",
+        "field": "SampleLendingProtocol.totalBorrowed",
+        "operator": "gt",
+        "value": 20
+      },
+      "description": "totalBorrowed changed by more than 20% from previous value. Expected behavior: Unknown - requires manual analysis",
+      "mitigation": "Verify this change is legitimate. Check for manipulation or bugs.",
+      "source": "breakdown",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_12",
+      "name": "Anomalous Change in reserveBalance",
+      "tier": "tier2",
+      "category": "unexpected-value",
+      "severity": "medium",
+      "condition": {
+        "type": "threshold",
+        "field": "SampleLendingProtocol.reserveBalance",
+        "operator": "gt",
+        "value": 50
+      },
+      "description": "reserveBalance changed by more than 50% from previous value. Expected behavior: Changes on deposits, withdrawals, transfers",
+      "mitigation": "Verify this change is legitimate. Check for manipulation or bugs.",
+      "source": "breakdown",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_13",
+      "name": "Anomalous Change in collateralFactor",
+      "tier": "tier2",
+      "category": "unexpected-value",
+      "severity": "medium",
+      "condition": {
+        "type": "threshold",
+        "field": "SampleLendingProtocol.collateralFactor",
+        "operator": "gt",
+        "value": 20
+      },
+      "description": "collateralFactor changed by more than 20% from previous value. Expected behavior: Unknown - requires manual analysis",
+      "mitigation": "Verify this change is legitimate. Check for manipulation or bugs.",
+      "source": "breakdown",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_14",
+      "name": "Anomalous Change in liquidationBonus",
+      "tier": "tier2",
+      "category": "unexpected-value",
+      "severity": "medium",
+      "condition": {
+        "type": "threshold",
+        "field": "SampleLendingProtocol.liquidationBonus",
+        "operator": "gt",
+        "value": 20
+      },
+      "description": "liquidationBonus changed by more than 20% from previous value. Expected behavior: Unknown - requires manual analysis",
+      "mitigation": "Verify this change is legitimate. Check for manipulation or bugs.",
+      "source": "breakdown",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_15",
+      "name": "Anomalous Change in interestRate",
+      "tier": "tier2",
+      "category": "unexpected-value",
+      "severity": "medium",
+      "condition": {
+        "type": "threshold",
+        "field": "SampleLendingProtocol.interestRate",
+        "operator": "gt",
+        "value": 5
+      },
+      "description": "interestRate changed by more than 5% from previous value. Expected behavior: Adjusts slowly based on utilization or governance",
+      "mitigation": "Verify this change is legitimate. Check for manipulation or bugs.",
+      "source": "breakdown",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_16",
+      "name": "Anomalous Change in userCollateral",
+      "tier": "tier2",
+      "category": "unexpected-value",
+      "severity": "medium",
+      "condition": {
+        "type": "threshold",
+        "field": "SampleLendingProtocol.userCollateral",
+        "operator": "gt",
+        "value": 20
+      },
+      "description": "userCollateral changed by more than 20% from previous value. Expected behavior: Unknown - requires manual analysis",
+      "mitigation": "Verify this change is legitimate. Check for manipulation or bugs.",
+      "source": "breakdown",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_17",
+      "name": "Anomalous Change in userDebt",
+      "tier": "tier2",
+      "category": "unexpected-value",
+      "severity": "medium",
+      "condition": {
+        "type": "threshold",
+        "field": "SampleLendingProtocol.userDebt",
+        "operator": "gt",
+        "value": 20
+      },
+      "description": "userDebt changed by more than 20% from previous value. Expected behavior: Unknown - requires manual analysis",
+      "mitigation": "Verify this change is legitimate. Check for manipulation or bugs.",
+      "source": "breakdown",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_18",
+      "name": "Anomalous Change in spotPrice",
+      "tier": "tier2",
+      "category": "unexpected-value",
+      "severity": "medium",
+      "condition": {
+        "type": "threshold",
+        "field": "OracleWrapper.spotPrice",
+        "operator": "gt",
+        "value": 5
+      },
+      "description": "spotPrice changed by more than 5% from previous value. Expected behavior: Updates on oracle calls, should follow market",
+      "mitigation": "Verify this change is legitimate. Check for manipulation or bugs.",
+      "source": "breakdown",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_19",
+      "name": "Anomalous Change in twapPrice",
+      "tier": "tier2",
+      "category": "unexpected-value",
+      "severity": "medium",
+      "condition": {
+        "type": "threshold",
+        "field": "OracleWrapper.twapPrice",
+        "operator": "gt",
+        "value": 5
+      },
+      "description": "twapPrice changed by more than 5% from previous value. Expected behavior: Updates on oracle calls, should follow market",
+      "mitigation": "Verify this change is legitimate. Check for manipulation or bugs.",
+      "source": "breakdown",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_20",
+      "name": "Anomalous Change in lastUpdateTime",
+      "tier": "tier2",
+      "category": "unexpected-value",
+      "severity": "medium",
+      "condition": {
+        "type": "threshold",
+        "field": "OracleWrapper.lastUpdateTime",
+        "operator": "gt",
+        "value": 20
+      },
+      "description": "lastUpdateTime changed by more than 20% from previous value. Expected behavior: Unknown - requires manual analysis",
+      "mitigation": "Verify this change is legitimate. Check for manipulation or bugs.",
+      "source": "breakdown",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_21",
+      "name": "Anomalous Change in totalFeesCollected",
+      "tier": "tier2",
+      "category": "unexpected-value",
+      "severity": "medium",
+      "condition": {
+        "type": "threshold",
+        "field": "FeeCollector.totalFeesCollected",
+        "operator": "gt",
+        "value": 20
+      },
+      "description": "totalFeesCollected changed by more than 20% from previous value. Expected behavior: Unknown - requires manual analysis",
+      "mitigation": "Verify this change is legitimate. Check for manipulation or bugs.",
+      "source": "breakdown",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_22",
+      "name": "Anomalous Change in feesByToken",
+      "tier": "tier2",
+      "category": "unexpected-value",
+      "severity": "medium",
+      "condition": {
+        "type": "threshold",
+        "field": "FeeCollector.feesByToken",
+        "operator": "gt",
+        "value": 20
+      },
+      "description": "feesByToken changed by more than 20% from previous value. Expected behavior: Unknown - requires manual analysis",
+      "mitigation": "Verify this change is legitimate. Check for manipulation or bugs.",
+      "source": "breakdown",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_23",
+      "name": "Unusual Gas Consumption Pattern",
+      "tier": "tier3",
+      "category": "gas-griefing",
+      "severity": "low",
+      "condition": {
+        "type": "threshold",
+        "field": "gasUsed",
+        "operator": "gte",
+        "value": 0.9
+      },
+      "description": "Transaction consumed unusually high percentage of gas limit. Could indicate griefing attack or infinite loop.",
+      "mitigation": "Monitor for repeated high-gas transactions from same address.",
+      "source": "runtime",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_24",
+      "name": "External Call Failed Silently",
+      "tier": "tier3",
+      "category": "external-call-failure",
+      "severity": "medium",
+      "condition": {
+        "type": "presence",
+        "field": "failedExternalCall",
+        "operator": "eq",
+        "value": true
+      },
+      "description": "External call returned false but execution continued. May lead to inconsistent state.",
+      "mitigation": "Check return values of external calls and revert on failure.",
+      "source": "runtime",
+      "enabled": true
+    },
+    {
+      "id": "ALERT_25",
+      "name": "Timestamp-Dependent Logic Detected",
+      "tier": "tier3",
+      "category": "timestamp-dependency",
+      "severity": "low",
+      "condition": {
+        "type": "presence",
+        "field": "usesBlockTimestamp",
+        "operator": "eq",
+        "value": true
+      },
+      "description": "Function uses block.timestamp for critical logic. Miners can manipulate this value slightly.",
+      "mitigation": "Avoid timestamp dependency for critical calculations or use wider time windows.",
+      "source": "runtime",
+      "enabled": true
+    }
+  ],
+  "generatedAt": "2026-08-06T04:14:42.331Z",
+  "summary": {
+    "protocolType": "lending",
+    "totalInvariants": 43,
+    "totalAlertRules": 25,
+    "enabledAlertRules": 25,
+    "criticalAlerts": 7,
+    "highAlerts": 1
+  }
+}

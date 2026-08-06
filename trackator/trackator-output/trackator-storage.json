@@ -1,0 +1,132 @@
+{
+  "timestamp": "2026-08-06T04:14:42.343Z",
+  "storageWriteGraph": {
+    "variableWriters": [],
+    "multiVariableWriters": [],
+    "contendedVariables": [],
+    "summary": {
+      "totalVariablesTracked": 0,
+      "totalWriteOperations": 0,
+      "totalReadOperations": 0,
+      "contendedVariableCount": 0,
+      "highRiskContentionCount": 0,
+      "permissionlessWriteCount": 0,
+      "valueBearingVariableCount": 0,
+      "crossContractDependencyCount": 0
+    }
+  },
+  "sharedStateMatrix": {
+    "entryPoints": [],
+    "sharedVariables": [],
+    "cells": [],
+    "riskSummary": {
+      "highRiskCells": 0,
+      "criticalIntersections": 0,
+      "totalIntersectionPoints": 0,
+      "averageRiskPerEntryPoint": 0
+    }
+  },
+  "writeExplanations": {
+    "explanations": [],
+    "unexplainedWrites": [],
+    "discoveredRules": []
+  },
+  "trustBoundaryMap": {
+    "boundaries": [
+      {
+        "id": "TB_1",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "External (unknown)",
+        "boundaryType": "external-call",
+        "mechanism": "external-call",
+        "sourceContract": "SampleLendingProtocol",
+        "sourceFunction": "deposit",
+        "trustAssumption": "External call will not re-enter before state updates complete",
+        "ifBreached": "Reentrancy attack possible - state may be manipulated mid-execution",
+        "strength": "weak",
+        "dataExposed": [
+          "contract storage",
+          "execution context"
+        ],
+        "stateModified": true,
+        "ceiOrdering": "unsafe"
+      },
+      {
+        "id": "TB_2",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "External (unknown)",
+        "boundaryType": "external-call",
+        "mechanism": "external-call",
+        "sourceContract": "SampleLendingProtocol",
+        "sourceFunction": "borrow",
+        "trustAssumption": "External call will not re-enter before state updates complete",
+        "ifBreached": "Reentrancy attack possible - state may be manipulated mid-execution",
+        "strength": "weak",
+        "dataExposed": [
+          "contract storage",
+          "execution context"
+        ],
+        "stateModified": true,
+        "ceiOrdering": "unsafe"
+      },
+      {
+        "id": "TB_3",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "External (unknown)",
+        "boundaryType": "external-call",
+        "mechanism": "external-call",
+        "sourceContract": "SampleLendingProtocol",
+        "sourceFunction": "repay",
+        "trustAssumption": "External call will not re-enter before state updates complete",
+        "ifBreached": "Reentrancy attack possible - state may be manipulated mid-execution",
+        "strength": "weak",
+        "dataExposed": [
+          "contract storage",
+          "execution context"
+        ],
+        "stateModified": true,
+        "ceiOrdering": "unsafe"
+      },
+      {
+        "id": "TB_4",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "External (unknown)",
+        "boundaryType": "external-call",
+        "mechanism": "external-call",
+        "sourceContract": "SampleLendingProtocol",
+        "sourceFunction": "liquidate",
+        "trustAssumption": "External call will not re-enter before state updates complete",
+        "ifBreached": "Reentrancy attack possible - state may be manipulated mid-execution",
+        "strength": "weak",
+        "dataExposed": [
+          "contract storage",
+          "execution context"
+        ],
+        "stateModified": true,
+        "ceiOrdering": "unsafe"
+      },
+      {
+        "id": "TB_5",
+        "sourceContext": "SampleLendingProtocol",
+        "targetContext": "External (unknown)",
+        "boundaryType": "external-call",
+        "mechanism": "external-call",
+        "sourceContract": "SampleLendingProtocol",
+        "sourceFunction": "withdraw",
+        "trustAssumption": "External call will not re-enter before state updates complete",
+        "ifBreached": "Reentrancy attack possible - state may be manipulated mid-execution",
+        "strength": "weak",
+        "dataExposed": [
+          "contract storage",
+          "execution context"
+        ],
+        "stateModified": true,
+        "ceiOrdering": "unsafe"
+      }
+    ],
+    "crossBoundaryFlows": [],
+    "vulnerableBoundaries": []
+  },
+  "highRiskFindings": [],
+  "recommendations": []
+}
