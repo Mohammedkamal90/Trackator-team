@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "token-state-graph",
+  "type": "object",
+  "required": ["schema_version", "tool", "targets", "diagnostics"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "tool": { "type": "object", "required": ["name", "version"] },
+    "generated_at": { "type": ["string", "null"] },
+    "input": { "type": "object" },
+    "config": { "type": "object" },
+    "diagnostics": {
+      "type": "object",
+      "required": ["warnings", "unresolved_calls", "unsupported_nodes", "truncated_entries"],
+      "additionalProperties": { "type": "array", "items": { "type": "string" } }
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["contract", "token_model", "state_vars", "entrypoints", "entrypoint_graph", "sequences", "divergence_sites", "sinks", "external_call_matrix"],
+        "properties": {
+          "contract": { "type": "string" },
+          "linearization": { "type": "array", "items": { "type": "string" } },
+          "token_model": {
+            "type": "object",
+            "required": ["ledger_types", "balance_vars", "supply_vars", "rate_drivers", "pair_vars", "balance_of_inputs"]
+          },
+          "state_vars": {
+            "type": "array",
+            "items": { "type": "object", "required": ["name", "type", "kind", "roles"] }
+          },
+          "entrypoints": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "signature", "access", "summary", "reverting_guards", "effect_groups"],
+              "properties": {
+                "access": { "type": "object", "required": ["class", "guards"], "properties": { "class": { "enum": ["permissionless", "owner-only", "role-gated", "self-only", "mixed", "constructor"] } } },
+                "summary": { "type": "object", "required": ["paths_enumerated", "paths_completing", "effect_groups", "truncated"] },
+                "effect_groups": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["group_id", "path_count", "constraints", "reads", "writes", "external_calls", "sinks", "divergence"],
+                    "properties": {
+                      "writes": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": ["var", "key", "key_class", "op", "delta", "roles", "pair_alias"],
+                          "properties": { "pair_alias": { "enum": ["definite", "possible", "no"] } }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "entrypoint_graph": { "type": "array", "items": { "type": "object", "required": ["from", "to", "via"] } },
+          "sequences": {
+            "type": "object",
+            "required": ["max_depth", "total_generated", "kept", "items"],
+            "properties": { "items": { "type": "array", "items": { "type": "object", "required": ["id", "steps", "score", "links", "touches"] } } }
+          },
+          "divergence_sites": { "type": "array", "items": { "type": "object", "required": ["id", "entry", "kind", "confidence", "detail"] } },
+          "sinks": { "type": "array", "items": { "type": "object", "required": ["id", "entry", "kind"] } },
+          "external_call_matrix": { "type": "array", "items": { "type": "object", "required": ["entry", "kind", "target", "function", "callback_surface"] } }
+        }
+      }
+    }
+  }
+}

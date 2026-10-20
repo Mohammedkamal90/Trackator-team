@@ -1,0 +1,19 @@
+{
+  "name": "token-walker",
+  "version": "0.1.0",
+  "description": "Deterministic, un-pruned token state & path extractor (token-state-graph.json) for ERC-20 / tax / reflection / pair-integrated tokens",
+  "main": "dist/index.js",
+  "bin": { "token-walker": "dist/index.js" },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "npm run build && node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@solidity-parser/parser": "^0.20.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.0",
+    "typescript": "^5.4.0"
+  }
+}
