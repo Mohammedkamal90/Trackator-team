@@ -1,14 +1,67 @@
 # token-walker
 
 Deterministic, **un-pruned** state & path extractor for token contracts (ERC-20, tax, reflection, pair-integrated, vault-style).
-It does **not** judge. It emits `token-state-graph.json`: every reachable state transition per entrypoint, the cross-entrypoint
+It does **not** judge. It emits a completing-path report and an `R-` reverted-path companion: every reachable state transition per entrypoint, the cross-entrypoint
 dependency graph, sinks, accounting-divergence sites and an external-call matrix — for downstream agents / Foundry fuzzers.
 
 ```
-node dist/index.js <file.sol | dir> -o token-state-graph.json [--contract Name] [--depth 4] [--max-paths 20000]
-                   [--max-seq 3000] [--include-privileged] [--raw-paths] [--quiet] [--no-timestamp]
+node dist/index.js <file.sol | dir> [-o token-state-graph.json] [--contract A,B] [--exclude substr] [--depth 2-6] [--max-paths N]
+                   [--max-seq N] [--include-privileged] [--no-env] [--raw-paths] [--abs-paths] [--strict] [--quiet] [--no-timestamp]
+exit codes: 0 ok · 1 runtime/no input · 2 usage · 3 i/o · 4 --strict violation
 npm run build && npm test
 ```
+
+## Run it on any project
+Needs Node ≥ 18 + npm. No solc, no Foundry/Hardhat build, no compiled artifacts — it only parses `.sol` source.
+
+**1. One-time setup** (from anywhere):
+```bash
+TW=/run/media/glitch/Glitch/Data/Audit-Agents/Trackator-team/token-walker
+cd $TW && npm install --include=dev && npm run build        # `--include=dev` matters if NODE_ENV=production
+```
+**2. Make it callable from any directory** — pick one:
+```bash
+# a) wrapper script (self-locating, auto-builds on first use)
+$TW/token-walker.sh <project|file.sol> [options]
+# b) shell alias (add to ~/.bashrc / ~/.zshrc)
+alias token-walker='node /run/media/glitch/Glitch/Data/Audit-Agents/Trackator-team/token-walker/dist/index.js'
+# c) PATH — installed this way on this machine (symlink lives on ext4 home, target on the drive):
+mkdir -p ~/.local/bin && ln -sf $TW/token-walker.sh ~/.local/bin/token-walker
+#    + ensure ~/.bashrc has:  export PATH="$HOME/.local/bin:$PATH"   then `source ~/.bashrc` (or open a new terminal)
+```
+**3. Run it from the project you are auditing:**
+```bash
+cd ~/audits/SomeToken
+token-walker src/Token.sol -o token-state-graph.json                     # single / flattened file
+token-walker . --exclude /lib/,/test/,/script/,/mocks/ --contract MyToken  # Foundry / Hardhat repo (recommended form)
+token-walker contracts --exclude /node_modules/,/mocks/                  # Hardhat: point at the contracts dir
+token-walker . --contract TokenA,TokenB                                  # several tokens in one run (one `targets[]` entry each)
+```
+How it picks targets: every non-abstract **leaf** contract (not inherited by another); if any leaf has `transfer` + `balanceOf`, only the token-like
+leaves are analyzed. In a repo with mocks/routers/pairs that auto-pick is often wrong ⇒ **always pass `--contract`** and `--exclude` for `lib/`, `test/`, `script/`.
+`--exclude` matches substrings of the absolute path (so use `/lib/`, not `lib`). Skipped automatically: `node_modules`, `out`, `cache`, `artifacts`,
+`broadcast`, `typechain*`, `.git`. Excluded files are listed in `diagnostics.excluded_files`.
+
+**Checklist for a clean run**
+* Same contract name in two files ⇒ only the later one is analyzed (warning; `--strict` fails). Exclude the duplicate or use a flattened file.
+* Read the console summary: any `INCOMPLETE` row or non-zero `warnings/unresolved/incomplete` means the inventory for that entrypoint is **not** complete.
+* Inline-assembly-heavy or proxy/diamond code: the tool will flag it, not model it. Run it on the implementation contract, not the proxy.
+* Pin the evidence: `input.files[].sha256` + `input.tree_sha256` identify exactly what was analyzed; `--no-timestamp` gives byte-identical output.
+* CI / gate: `token-walker . --contract X --exclude /lib/ --strict --quiet -o out.json` ⇒ exit 4 if anything was parse-failed, duplicated or incomplete.
+
+**Read the result** (`jq` recipes; `T=.targets[0]`):
+```bash
+J=token-state-graph.json
+jq -r '.targets[0].sequences.items[:10][] | "\(.score) \(.steps|join(" -> "))"' $J                  # ranked attack-chain leads
+jq -r '.targets[0].divergence_sites[] | "\(.confidence) \(.kind) \(.entry) :: \(.detail)"' $J     # accounting-divergence sites
+jq -r '.targets[0].divergence_sites[] | select(.magnitude_hint=="user_controlled_unscaled") | .entry' $J   # permissionless rate-driver writes
+jq -r '.targets[0].entrypoints[] | select(.access.class=="permissionless" and .mutability!="view") | .id' $J
+jq -r '.targets[0].entrypoints[] | select(.summary.complete|not) | "\(.id): \(.summary.incomplete_reasons|join(","))"' $J   # what NOT to trust
+jq -r '.targets[0].external_call_matrix[] | select(.callback_surface=="yes") | "\(.entry) \(.kind) \(.target).\(.function)"' $J
+jq '.targets[0].entrypoints[] | select(.name=="transfer") | .effect_groups[0].writes[].delta' $J       # exact state deltas
+```
+Feeding downstream: hand `token-state-graph.json` (or the `sequences` / `divergence_sites` arrays) to the redteam agent / a Foundry fork-test generator;
+validate it with `schema/token-state-graph.schema.json` (ajv) before consuming. Typical per-run cost: seconds for one token (YFSX ≈ 2 s; whole Foundry repo with libs ≈ 10 s).
 
 ## Why it exists (gap vs `tracaktor-walker`)
 Measured on `YFSX/YfsxCoin.sol` with `tracaktor-walker`: `transfer` path list was truncated at the cap, **0 of 397 paths contained
@@ -32,15 +85,22 @@ Language: TypeScript + `@solidity-parser/parser` (parse-only: no solc/build need
 
 ### Path semantics (what "un-pruned" means here)
 * Every completing path of every public/external function is enumerated (cap `--max-paths`, truncation is reported, never silent).
-* `require(c)` adds `c` as a constraint on the surviving path; the failing arm is recorded under `reverting_guards`
-  (it writes nothing, so it is not a state-transition path). `if (c) revert()` is handled the same way.
-* Only **self-contradicting** combinations are skipped (same canonical condition decided twice, or a local folded to a literal) — a
-  feasible path is never dropped.
+* `require(c)` forks into a completing `c` arm and reverting `!c` arm. Both carry chronological branch and terminal events; `if/else` paths are recorded similarly.
+* Only **self-contradicting** combinations are skipped (same canonical condition decided twice, or a local folded to a literal). Apart from the
+  reported cap truncation, a feasible path is never dropped.
 * Paths with identical effects are **grouped** (`effect_groups[].path_count`, up to `maxConstraintSets` distinct constraint sets kept).
   `--raw-paths` additionally dumps every path with its full ordered trace.
-* Loops: body is explored 0 and 1 times (`loop_unrolled_once` flag).
+* Loops: 0 and 1 iterations. Static conditions are honoured (`while(false)` has no body path; `while(true)` has no 0-iteration path; a loop that cannot
+  exit after 1 iteration yields no completing path unless `break`/`return`). For-initializer values are kept (first iteration sees `i = 1`). The exit
+  condition is assumed false after the iteration. Any loop whose body writes state or calls out sets `loop_effects_bounded` ⇒ entrypoint **incomplete**
+  (only one iteration modeled). Pure loops only get the `loop_unrolled_once` approximation marker.
+* Condition memo: a write to V (or any non-view external call, for state-dependent conditions) invalidates earlier decisions about conditions mentioning V.
+* Group key = ordered writes/calls **with source lines** + pair-relevant equality facts, so alias/location-derived findings hold for every group member.
 
-## token-state-graph.json (schema_version 1.0)
+## Reports (schema_version 1.4)
+Each entrypoint has `execution_paths[]`, an ordered trace with branch conditions, reads, writes, calls, call chain, and terminal outcome. The primary report contains completing paths; its `R-` companion contains reverted/failed paths. With one target and no `-o`, filenames are `<Contract>-state-graph.json` and `R-<Contract>-state-graph.json`. With explicit `-o`, the companion is `R-<basename>`. Existing effect groups and graph summaries remain available.
+
+## token-state-graph.json
 Formal schema: `schema/token-state-graph.schema.json`. Shape:
 ```
 { schema_version, tool, generated_at, input{path,files}, config, diagnostics{warnings,unresolved_calls,unsupported_nodes,truncated_entries},
@@ -80,11 +140,33 @@ entrypoints (`--include-privileged` to add owner-gated). Raw edges are always co
 collapsed** by touch-signature (best 3 shortest per signature, `equivalent_variants` = hidden count) so permutations don't drown signal.
 Score favors `user_controlled_unscaled` rate-driver writes and ENV pair primitives; it is a *triage order*, not a verdict.
 
+## Soundness model (v0.4.0)
+Every entrypoint reports `summary.complete` + `summary.incomplete_reasons`. An entrypoint is **incomplete** (and any sequence using it carries
+`flags.involves_incomplete_entry`) when it hit: path-cap truncation, an unresolved/opaque call, an unresolved modifier, an unsupported
+statement/expression, a depth/recursion limit, or an ambiguous same-arity overload. `--strict` turns any of these (or parse errors) into exit code 4.
+Never treat an incomplete entrypoint as a full inventory.
+
+Cap truncation keeps a deterministic **evenly-strided sample** of the frontier (not the tail), and reports `states_generated`,
+`paths_discarded_by_cap`, `peak_frontier`. These are implementation work counters, not an exact count of every path ever created.
+
 ## Known limits (read before trusting output)
-1. Parse-only: no type system. Contract-typed state vars are recognised by declared type; `using for` is resolved by function name/arity.
-2. Inline assembly is **not** modeled (flag `unmodeled_assembly` + warning). Cross-contract calls are recorded, not followed.
-3. Loops: 0/1 iterations; `break/continue` approximated. Ternaries with effects are merged (`ternary_effects_merged`).
+1. Parse-only: no type system. Same-arity overloads are all explored and flagged (not type-resolved). Contract-typed vars are recognised by declared type;
+   unknown interfaces fall back to a name heuristic for "view" only when the target is a state variable (`view_basis` says which).
+2. Inline assembly is **not** modeled (flag `unmodeled_assembly`, entrypoint marked incomplete-by-warning). Cross-contract calls are recorded, not followed.
+3. Loops: 0 and 1 iterations (`continue`/`break`/do-while handled; no fixed-point). Ternaries with effects are merged (`ternary_effects_merged`).
+   Modifier arguments are evaluated without forking; `return` inside a modifier is approximated.
 4. Constraints are text, not solved. No feasibility check beyond syntactic self-contradiction.
-5. `pair_alias: definite` needs an `x == pair` constraint on the path; `possible` means the key is a parameter. Nothing proves a pair is *not* excluded from rewards etc. — that is on-chain state the tool cannot see.
-6. Role tags are heuristics (names + what `balanceOf` reads). Wrong tag ⇒ wrong divergence label, never a dropped path.
-7. A divergence site / sequence is a **lead**. Confirm with a fork PoC and a profit number before reporting.
+5. Access: `role-gated` needs a role-tagged or role-named subject (`owner|admin|operator|…`); other `msg.sender == x` / `map[msg.sender]` shapes are `unknown`. Name-based roles set `access.uncertain`.
+   `_msgSender()` is rendered as `msg.sender` (no ERC-2771 trusted-forwarder model). Access class `permissionless` means *no auth-shaped guard found on any path*;
+   `unknown`/`mixed` carry `access.uncertain`. Signature-based or off-chain authorisation is not recognised.
+6. `pair_alias: definite` needs an `x == pair` constraint or a pair-var key. One pair per pair-role variable; chain/pool identity is not resolved.
+   Nothing proves a pair is *not* excluded from rewards — that is on-chain state.
+7. Role tags are heuristics (names + what `balanceOf` reads). `confidence`: `definite` = observed fact, `inferred` = name/role based; each divergence has a `basis`.
+   Wrong tag ⇒ wrong label, never a dropped path. Mutex evidence = set-before/reset-after on the path + `mutex_checked_by` (entrypoints whose constraints test the lock);
+   boolean locks only (no `1/0` or enum locks).
+8. Source resolution is by contract name over all collected `.sol` files (no import/remapping resolution). Duplicate names warn; use `--exclude` to scope.
+9. A divergence site / sequence is a **lead**. Confirm with a fork PoC and a profit number before reporting.
+
+## Tests
+`npm test` (30 tests; CLI is spawned via `process.execPath`): semantic fixture matrix (loops, overloads, unresolved calls/modifiers, base-ctor args, access classes, truncation fairness,
+grouping, view classification, pair-model evidence), CLI exit codes, `--strict`, schema validation (ajv, `additionalProperties:false`), determinism, provenance.

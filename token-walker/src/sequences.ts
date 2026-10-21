@@ -10,12 +10,12 @@ export function envNodes(model: TokenModel): NodeFacts[] {
   const bal = new Set(model.balance_vars);
   const mk = (id: string, reads: string[], writes: string[], div: string[]): NodeFacts => ({
     id, access: 'permissionless', reads: new Set([...reads, ...bal]), writes: new Set([...writes, ...bal]),
-    accountingWrites: new Set([...writes, ...bal]), divergenceKinds: new Set(div), sinkKinds: new Set(['env_pair_primitive']), hints: new Set<string>(),
+    accountingWrites: new Set([...writes, ...bal]), divergenceKinds: new Set(div), sinkKinds: new Set(['env_pair_primitive']), hints: new Set<string>(), incomplete: false,
     mutates: true, viewOnly: false, selfFeedback: false,
   });
   return [
     { id: `${ENV_PREFIX}pair.sync()`, access: 'permissionless', reads: new Set(['PAIR_BALANCE']), writes: new Set(['PAIR_RESERVE']),
-      accountingWrites: new Set(['PAIR_RESERVE']), divergenceKinds: new Set<string>(), sinkKinds: new Set(['env_pair_primitive']), hints: new Set<string>(), mutates: true, viewOnly: false, selfFeedback: false },
+      accountingWrites: new Set(['PAIR_RESERVE']), divergenceKinds: new Set<string>(), sinkKinds: new Set(['env_pair_primitive']), hints: new Set<string>(), incomplete: false, mutates: true, viewOnly: false, selfFeedback: false },
     mk(`${ENV_PREFIX}pair.skim(to)`, ['PAIR_BALANCE', 'PAIR_RESERVE'], ['PAIR_BALANCE'], ['pair_surplus_extraction']),
     mk(`${ENV_PREFIX}pair.swap(...)`, ['PAIR_BALANCE', 'PAIR_RESERVE'], ['PAIR_BALANCE', 'PAIR_RESERVE'], []),
   ];
@@ -31,8 +31,8 @@ export function buildGraph(nodes: NodeFacts[], relevant: Set<string>, cfg: Walke
     edges.push({ from: a.id, to: b.id, via, via_accounting: acct });
     if (acct.length) { const l = adj.get(a.id) ?? []; l.push({ to: b, via: acct }); adj.set(a.id, l); }
   }
-  const startOk = (n: NodeFacts) => !n.viewOnly && n.mutates && n.access !== 'constructor' &&
-    (cfg.includePrivileged || n.access === 'permissionless' || n.access === 'mixed');
+  const openAccess = (n: NodeFacts) => n.access === 'permissionless' || n.access === 'mixed' || n.access === 'unknown';   // unknown ⇒ not proven gated; flagged access_uncertain
+  const startOk = (n: NodeFacts) => !n.viewOnly && n.mutates && n.access !== 'constructor' && (cfg.includePrivileged || openAccess(n));
   const out: any[] = []; let total = 0;
   const score = (path: NodeFacts[]) => {
     let s = 0; const dk = new Set<string>();
@@ -48,7 +48,7 @@ export function buildGraph(nodes: NodeFacts[], relevant: Set<string>, cfg: Walke
       out.push({
         steps: path.map(n => n.id), length: path.length, score: score(path), links: [...links],
         touches: { divergence: [...dk], sinks: [...sk], accounting_vars: [...av] },
-        flags: { contains_env: path.some(n => n.id.startsWith(ENV_PREFIX)), all_permissionless: path.every(n => n.access === 'permissionless' || n.access === 'mixed' || n.id.startsWith(ENV_PREFIX)), repeatable_steps: path.filter(n => n.selfFeedback).map(n => n.id) },
+        flags: { involves_incomplete_entry: path.some(n => n.incomplete), access_uncertain: path.some(n => n.access === 'unknown' || n.access === 'mixed'), contains_env: path.some(n => n.id.startsWith(ENV_PREFIX)), all_permissionless: path.every(n => n.access === 'permissionless' || n.id.startsWith(ENV_PREFIX)), repeatable_steps: path.filter(n => n.selfFeedback).map(n => n.id) },
       });
       if (out.length > cfg.maxSequences * 4) { out.sort((a, b) => b.score - a.score); out.length = cfg.maxSequences * 2; }
     }
@@ -56,7 +56,7 @@ export function buildGraph(nodes: NodeFacts[], relevant: Set<string>, cfg: Walke
     const last = path[path.length - 1];
     for (const e of adj.get(last.id) ?? []) {
       if (path.includes(e.to)) continue;
-      if (!(cfg.includePrivileged || e.to.access === 'permissionless' || e.to.access === 'mixed')) continue;
+      if (!(cfg.includePrivileged || openAccess(e.to))) continue;
       path.push(e.to); links.push({ from: last.id, to: e.to.id, via: e.via }); dfs(path, links); path.pop(); links.pop();
     }
   };

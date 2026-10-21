@@ -39,15 +39,23 @@ export class Index {
   fileSrc = new Map<string, string>();
   files: string[] = [];
   warnings: string[] = [];
+  parseErrors: string[] = [];
+  failedFiles: string[] = [];
+  duplicates: string[] = [];
   private linCache = new Map<string, string[]>();
 
-  static collectSol(root: string): string[] {
+  static collectSol(root: string, errors: string[] = []): string[] {
     const out: string[] = [];
     const skip = new Set(['node_modules', 'artifacts', 'cache', 'out', '.git', 'broadcast', 'typechain', 'typechain-types']);
+    const seen = new Set<string>();
     const walk = (p: string) => {
-      const st = fs.statSync(p);
-      if (st.isFile()) { if (p.endsWith('.sol')) out.push(p); return; }
-      for (const e of fs.readdirSync(p)) { if (!skip.has(e)) walk(path.join(p, e)); }
+      try {
+        const real = fs.realpathSync(p);
+        if (seen.has(real)) return; seen.add(real);                 // symlink-cycle / duplicate guard
+        const st = fs.statSync(p);
+        if (st.isFile()) { if (p.endsWith('.sol')) out.push(p); return; }
+        for (const e of fs.readdirSync(p)) { if (!skip.has(e)) walk(path.join(p, e)); }
+      } catch (e: any) { errors.push(`${p}: ${e.code ?? ''} ${e.message}`); }   // broken symlink / EACCES etc: reported, not fatal
     };
     walk(root);
     return out.sort();
@@ -56,10 +64,11 @@ export class Index {
   addFile(file: string) {
     const src = fs.readFileSync(file, 'utf8');
     this.fileSrc.set(file, src);
-    this.files.push(file);
     let ast: any;
     try { ast = parser.parse(src, { loc: true, range: true, tolerant: true }); }
-    catch (e: any) { this.warnings.push(`parse failed: ${file}: ${e.message}`); return; }
+    catch (e: any) { this.warnings.push(`parse failed: ${file}: ${e.message}`); this.failedFiles.push(file); return; }
+    for (const er of ast.errors ?? []) this.parseErrors.push(`${file}:${er.line}:${er.column} ${er.message}`);
+    this.files.push(file);
     for (const n of ast.children) if (n.type === 'ContractDefinition') this.addContract(n, file, src);
   }
 
@@ -105,7 +114,7 @@ export class Index {
         if (isMod) c.modifiers.set(f.name, f); else c.fns.push(f);
       }
     }
-    if (this.contracts.has(c.name)) this.warnings.push(`duplicate contract name ${c.name} (${file}); later definition wins`);
+    if (this.contracts.has(c.name)) { const m = `duplicate contract name ${c.name}: ${this.contracts.get(c.name)!.file} vs ${file}; later definition wins (earlier one is NOT analyzed)`; this.warnings.push(m); this.duplicates.push(m); }
     this.contracts.set(c.name, c);
   }
 
@@ -135,7 +144,10 @@ export class Index {
 
   allVars(contract: string): Map<string, VarInfo> {
     const m = new Map<string, VarInfo>();
-    for (const cn of [...this.lin(contract)].reverse()) for (const [k, v] of this.contracts.get(cn)!.vars) m.set(k, v);
+    for (const cn of [...this.lin(contract)].reverse()) for (const [k, v] of this.contracts.get(cn)!.vars) {
+      if (m.has(k) && m.get(k)!.contract !== v.contract) this.warnings.push(`state variable '${k}' declared in both ${m.get(k)!.contract} and ${v.contract} (pre-0.6 shadowing): analysis merges them by name`);
+      m.set(k, v);
+    }
     return m;
   }
   findFn(contract: string, name: string, argc: number): FnInfo | null {
@@ -146,6 +158,16 @@ export class Index {
     }
     return null;
   }
+  /** all same-name/same-arity candidates in the most-derived contract that declares one (overloads ⇒ >1) */
+  findFns(contract: string, name: string, argc: number, after?: string): FnInfo[] {
+    let lin = this.lin(contract);
+    if (after) { const i = lin.indexOf(after); lin = i >= 0 ? lin.slice(i + 1) : lin; }
+    for (const cn of lin) {
+      const hits = this.contracts.get(cn)!.fns.filter(f => f.name === name && f.params.length === argc && f.kind === 'function' && f.node.body);
+      if (hits.length) return hits;
+    }
+    return [];
+  }
   findModifier(contract: string, name: string): FnInfo | null {
     for (const cn of this.lin(contract)) { const m = this.contracts.get(cn)!.modifiers.get(name); if (m) return m; }
     return null;
@@ -154,6 +176,17 @@ export class Index {
     const libs: string[] = [];
     for (const cn of this.lin(contract)) for (const u of this.contracts.get(cn)!.usings) if (!libs.includes(u.lib)) libs.push(u.lib);
     return libs;
+  }
+  /** base-constructor argument nodes supplied by inheritance clauses and constructor modifier-invocations */
+  baseCtorArgs(contract: string): Map<string, any[]> {
+    const m = new Map<string, any[]>();
+    for (const cn of this.lin(contract)) {
+      const c = this.contracts.get(cn)!;
+      for (const b of c.node.baseContracts || []) if (b.arguments?.length && !m.has(b.baseName.namePath)) m.set(b.baseName.namePath, b.arguments);
+      const ctor = c.fns.find(f => f.kind === 'constructor');
+      for (const mo of ctor?.modifiers ?? []) if (this.contracts.has(mo.name) && mo.args.length && !m.has(mo.name)) m.set(mo.name, mo.args);
+    }
+    return m;
   }
   isContractName(n: string): boolean { return this.contracts.has(n); }
   isLibrary(n: string): boolean { return this.contracts.get(n)?.kind === 'library'; }

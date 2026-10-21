@@ -1,55 +1,436 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "token-state-graph",
+  "$id": "token-state-graph.schema.json",
+  "title": "token-state-graph (schema_version 1.5)",
   "type": "object",
-  "required": ["schema_version", "tool", "targets", "diagnostics"],
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "amm_selection",
+    "report_outcome",
+    "summary",
+    "tool",
+    "generated_at",
+    "input",
+    "config",
+    "targets",
+    "diagnostics"
+  ],
   "properties": {
-    "schema_version": { "const": "1.0" },
-    "tool": { "type": "object", "required": ["name", "version"] },
-    "generated_at": { "type": ["string", "null"] },
-    "input": { "type": "object" },
-    "config": { "type": "object" },
+    "schema_version": {
+      "const": "1.5"
+    },
+    "report_outcome": {
+      "enum": [
+        "completes",
+        "reverts"
+      ]
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version",
+        "parser",
+        "node"
+      ],
+      "properties": {
+        "name": {
+          "const": "token-walker"
+        },
+        "version": {
+          "type": "string"
+        },
+        "parser": {
+          "type": "string"
+        },
+        "node": {
+          "type": "string"
+        }
+      }
+    },
+    "generated_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "tree_sha256",
+        "files"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "sha256",
+              "bytes"
+            ],
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        "tree_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "config": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maxPathsPerEntry",
+        "maxCallDepth",
+        "maxSeqDepth",
+        "maxSequences",
+        "includePrivileged",
+        "rawPaths",
+        "maxConstraintSets",
+        "envModel"
+      ],
+      "properties": {
+        "maxPathsPerEntry": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxCallDepth": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxSeqDepth": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 6
+        },
+        "maxSequences": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "includePrivileged": {
+          "type": "boolean"
+        },
+        "rawPaths": {
+          "type": "boolean"
+        },
+        "maxConstraintSets": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "envModel": {
+          "type": "boolean"
+        }
+      }
+    },
     "diagnostics": {
       "type": "object",
-      "required": ["warnings", "unresolved_calls", "unsupported_nodes", "truncated_entries"],
-      "additionalProperties": { "type": "array", "items": { "type": "string" } }
+      "additionalProperties": false,
+      "required": [
+        "warnings",
+        "unresolved_calls",
+        "unsupported_nodes",
+        "truncated_entries",
+        "parse_errors",
+        "failed_files",
+        "excluded_files",
+        "incomplete_entries"
+      ],
+      "patternProperties": {
+        ".*": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
     },
     "targets": {
       "type": "array",
       "items": {
-        "type": "object",
-        "required": ["contract", "token_model", "state_vars", "entrypoints", "entrypoint_graph", "sequences", "divergence_sites", "sinks", "external_call_matrix"],
-        "properties": {
-          "contract": { "type": "string" },
-          "linearization": { "type": "array", "items": { "type": "string" } },
-          "token_model": {
+        "$ref": "#/definitions/target"
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run",
+        "targets"
+      ],
+      "properties": {
+        "run": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "warnings",
+            "unresolved",
+            "unsupported",
+            "truncated",
+            "incomplete",
+            "parse_errors",
+            "failed_files"
+          ],
+          "properties": {
+            "warnings": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unresolved": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unsupported": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "truncated": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "incomplete": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "parse_errors": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "failed_files": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "targets": {
+          "type": "array",
+          "items": {
             "type": "object",
-            "required": ["ledger_types", "balance_vars", "supply_vars", "rate_drivers", "pair_vars", "balance_of_inputs"]
-          },
-          "state_vars": {
-            "type": "array",
-            "items": { "type": "object", "required": ["name", "type", "kind", "roles"] }
-          },
-          "entrypoints": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "required": ["id", "signature", "access", "summary", "reverting_guards", "effect_groups"],
-              "properties": {
-                "access": { "type": "object", "required": ["class", "guards"], "properties": { "class": { "enum": ["permissionless", "owner-only", "role-gated", "self-only", "mixed", "constructor"] } } },
-                "summary": { "type": "object", "required": ["paths_enumerated", "paths_completing", "effect_groups", "truncated"] },
-                "effect_groups": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "required": ["group_id", "path_count", "constraints", "reads", "writes", "external_calls", "sinks", "divergence"],
-                    "properties": {
-                      "writes": {
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "required": ["var", "key", "key_class", "op", "delta", "roles", "pair_alias"],
-                          "properties": { "pair_alias": { "enum": ["definite", "possible", "no"] } }
+            "additionalProperties": false,
+            "required": [
+              "contract",
+              "report_outcome",
+              "ledger_types",
+              "balance_vars",
+              "supply_vars",
+              "rate_drivers",
+              "pair_vars",
+              "divergence_kinds",
+              "sink_kinds",
+              "access_counts",
+              "entrypoints",
+              "table_text",
+              "sequences"
+            ],
+            "properties": {
+              "contract": {
+                "type": "string"
+              },
+              "report_outcome": {
+                "enum": [
+                  "completes",
+                  "reverts"
+                ]
+              },
+              "ledger_types": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "balance_vars": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "supply_vars": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "rate_drivers": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "pair_vars": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "divergence_kinds": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "sink_kinds": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "access_counts": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "table_text": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "entrypoints": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "access",
+                    "access_uncertain",
+                    "mutability",
+                    "paths",
+                    "groups",
+                    "divergence",
+                    "sinks",
+                    "status",
+                    "incomplete_reasons"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "access": {
+                      "type": "string"
+                    },
+                    "access_uncertain": {
+                      "type": "boolean"
+                    },
+                    "mutability": {
+                      "type": "string"
+                    },
+                    "paths": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "groups": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "divergence": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": 0
+                    },
+                    "sinks": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": 0
+                    },
+                    "status": {
+                      "enum": [
+                        "ok",
+                        "INCOMPLETE"
+                      ]
+                    },
+                    "incomplete_reasons": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "sequences": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "generated",
+                  "kept",
+                  "max_depth",
+                  "top"
+                ],
+                "properties": {
+                  "generated": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "kept": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "max_depth": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "top": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "score",
+                        "steps",
+                        "incomplete",
+                        "access_uncertain"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "score": {
+                          "type": "number"
+                        },
+                        "steps": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "incomplete": {
+                          "type": "boolean"
+                        },
+                        "access_uncertain": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -57,16 +438,1340 @@
                 }
               }
             }
-          },
-          "entrypoint_graph": { "type": "array", "items": { "type": "object", "required": ["from", "to", "via"] } },
-          "sequences": {
+          }
+        }
+      }
+    },
+    "amm_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "models",
+        "source"
+      ],
+      "properties": {
+        "models": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "v2",
+              "v3",
+              "v4"
+            ]
+          }
+        },
+        "source": {
+          "enum": [
+            "cli_argument",
+            "interactive_user_input",
+            "backward_compatible_default"
+          ]
+        }
+      }
+    }
+  },
+  "definitions": {
+    "strarr": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confidence": {
+      "enum": [
+        "definite",
+        "inferred",
+        "possible",
+        "possible_param"
+      ]
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "file",
+        "linearization",
+        "token_model",
+        "attacker_capabilities",
+        "state_vars",
+        "entrypoints",
+        "env_model",
+        "entrypoint_graph",
+        "sequences",
+        "divergence_sites",
+        "sinks",
+        "external_call_matrix",
+        "amm_models"
+      ],
+      "properties": {
+        "contract": {
+          "type": "string"
+        },
+        "file": {
+          "type": "string"
+        },
+        "linearization": {
+          "$ref": "#/definitions/strarr"
+        },
+        "token_model": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "ledger_types",
+            "balance_vars",
+            "supply_vars",
+            "rate_drivers",
+            "allowance_vars",
+            "fee_vars",
+            "exclusion_vars",
+            "pair_vars",
+            "router_vars",
+            "owner_vars",
+            "treasury_vars",
+            "mutex_vars",
+            "toggle_vars",
+            "threshold_vars",
+            "balance_of_inputs",
+            "evidence"
+          ],
+          "properties": {
+            "ledger_types": {
+              "$ref": "#/definitions/strarr"
+            },
+            "balance_vars": {
+              "$ref": "#/definitions/strarr"
+            },
+            "supply_vars": {
+              "$ref": "#/definitions/strarr"
+            },
+            "rate_drivers": {
+              "$ref": "#/definitions/strarr"
+            },
+            "allowance_vars": {
+              "$ref": "#/definitions/strarr"
+            },
+            "fee_vars": {
+              "$ref": "#/definitions/strarr"
+            },
+            "exclusion_vars": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "var",
+                  "subrole"
+                ],
+                "properties": {
+                  "var": {
+                    "type": "string"
+                  },
+                  "subrole": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "pair_vars": {
+              "$ref": "#/definitions/strarr"
+            },
+            "router_vars": {
+              "$ref": "#/definitions/strarr"
+            },
+            "owner_vars": {
+              "$ref": "#/definitions/strarr"
+            },
+            "treasury_vars": {
+              "$ref": "#/definitions/strarr"
+            },
+            "mutex_vars": {
+              "$ref": "#/definitions/strarr"
+            },
+            "toggle_vars": {
+              "$ref": "#/definitions/strarr"
+            },
+            "threshold_vars": {
+              "$ref": "#/definitions/strarr"
+            },
+            "balance_of_inputs": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "per_account_maps",
+                "global_inputs"
+              ],
+              "properties": {
+                "per_account_maps": {
+                  "$ref": "#/definitions/strarr"
+                },
+                "global_inputs": {
+                  "$ref": "#/definitions/strarr"
+                }
+              }
+            },
+            "evidence": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/strarr"
+              }
+            }
+          }
+        },
+        "attacker_capabilities": {
+          "$ref": "#/definitions/strarr"
+        },
+        "state_vars": {
+          "type": "array",
+          "items": {
             "type": "object",
-            "required": ["max_depth", "total_generated", "kept", "items"],
-            "properties": { "items": { "type": "array", "items": { "type": "object", "required": ["id", "steps", "score", "links", "touches"] } } }
-          },
-          "divergence_sites": { "type": "array", "items": { "type": "object", "required": ["id", "entry", "kind", "confidence", "detail"] } },
-          "sinks": { "type": "array", "items": { "type": "object", "required": ["id", "entry", "kind"] } },
-          "external_call_matrix": { "type": "array", "items": { "type": "object", "required": ["entry", "kind", "target", "function", "callback_surface"] } }
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "contract",
+              "type",
+              "kind",
+              "key_types",
+              "value_type",
+              "visibility",
+              "constant",
+              "immutable",
+              "initial",
+              "line",
+              "file",
+              "roles"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "contract": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "scalar",
+                  "mapping",
+                  "array",
+                  "struct"
+                ]
+              },
+              "key_types": {
+                "$ref": "#/definitions/strarr"
+              },
+              "value_type": {
+                "type": "string"
+              },
+              "visibility": {
+                "type": "string"
+              },
+              "constant": {
+                "type": "boolean"
+              },
+              "immutable": {
+                "type": "boolean"
+              },
+              "initial": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "line": {
+                "type": "integer"
+              },
+              "file": {
+                "type": "string"
+              },
+              "roles": {
+                "$ref": "#/definitions/strarr"
+              }
+            }
+          }
+        },
+        "entrypoints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/entrypoint"
+          }
+        },
+        "env_model": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled",
+            "assumptions",
+            "pair_vars",
+            "nodes"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "assumptions": {
+              "$ref": "#/definitions/strarr"
+            },
+            "pair_vars": {
+              "$ref": "#/definitions/strarr"
+            },
+            "nodes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "reads",
+                  "writes"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "reads": {
+                    "$ref": "#/definitions/strarr"
+                  },
+                  "writes": {
+                    "$ref": "#/definitions/strarr"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "entrypoint_graph": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "from",
+              "to",
+              "via",
+              "via_accounting"
+            ],
+            "properties": {
+              "from": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              },
+              "via": {
+                "$ref": "#/definitions/strarr"
+              },
+              "via_accounting": {
+                "$ref": "#/definitions/strarr"
+              }
+            }
+          }
+        },
+        "sequences": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "max_depth",
+            "total_generated",
+            "kept",
+            "collapsed_by",
+            "truncated",
+            "items"
+          ],
+          "properties": {
+            "max_depth": {
+              "type": "integer"
+            },
+            "total_generated": {
+              "type": "integer"
+            },
+            "kept": {
+              "type": "integer"
+            },
+            "collapsed_by": {
+              "type": "string"
+            },
+            "truncated": {
+              "type": "boolean"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "steps",
+                  "length",
+                  "score",
+                  "links",
+                  "touches",
+                  "flags",
+                  "equivalent_variants"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^SEQ-[0-9]{4,}$"
+                  },
+                  "steps": {
+                    "$ref": "#/definitions/strarr"
+                  },
+                  "length": {
+                    "type": "integer",
+                    "minimum": 2
+                  },
+                  "score": {
+                    "type": "number"
+                  },
+                  "links": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "from",
+                        "to",
+                        "via"
+                      ],
+                      "properties": {
+                        "from": {
+                          "type": "string"
+                        },
+                        "to": {
+                          "type": "string"
+                        },
+                        "via": {
+                          "$ref": "#/definitions/strarr"
+                        }
+                      }
+                    }
+                  },
+                  "touches": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "divergence",
+                      "sinks",
+                      "accounting_vars"
+                    ],
+                    "properties": {
+                      "divergence": {
+                        "$ref": "#/definitions/strarr"
+                      },
+                      "sinks": {
+                        "$ref": "#/definitions/strarr"
+                      },
+                      "accounting_vars": {
+                        "$ref": "#/definitions/strarr"
+                      }
+                    }
+                  },
+                  "flags": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "involves_incomplete_entry",
+                      "access_uncertain",
+                      "contains_env",
+                      "all_permissionless",
+                      "repeatable_steps"
+                    ],
+                    "properties": {
+                      "involves_incomplete_entry": {
+                        "type": "boolean"
+                      },
+                      "access_uncertain": {
+                        "type": "boolean"
+                      },
+                      "contains_env": {
+                        "type": "boolean"
+                      },
+                      "all_permissionless": {
+                        "type": "boolean"
+                      },
+                      "repeatable_steps": {
+                        "$ref": "#/definitions/strarr"
+                      }
+                    }
+                  },
+                  "equivalent_variants": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "divergence_sites": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "entry",
+              "kind",
+              "confidence",
+              "basis",
+              "line",
+              "fn",
+              "detail",
+              "note",
+              "group_count",
+              "groups"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "entry": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "pair_balance_written_by_token_logic",
+                  "implicit_balance_shift",
+                  "supply_mutation",
+                  "balance_credit_without_debit",
+                  "balance_debit_without_credit",
+                  "third_party_debit",
+                  "contract_balance_triggered_sink",
+                  "zero_slippage_swap"
+                ]
+              },
+              "confidence": {
+                "enum": [
+                  "definite",
+                  "inferred",
+                  "possible"
+                ]
+              },
+              "basis": {
+                "type": "string"
+              },
+              "line": {
+                "type": "integer"
+              },
+              "fn": {
+                "type": "string"
+              },
+              "detail": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              },
+              "magnitude_hint": {
+                "enum": [
+                  "no_user_control",
+                  "user_controlled_fee_scaled",
+                  "user_controlled_unscaled"
+                ]
+              },
+              "operand_params": {
+                "$ref": "#/definitions/strarr"
+              },
+              "group_count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "groups": {
+                "$ref": "#/definitions/strarr"
+              }
+            }
+          }
+        },
+        "sinks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "entry",
+              "kind",
+              "line",
+              "fn",
+              "target",
+              "call",
+              "group_count",
+              "groups"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "entry": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "line": {
+                "type": "integer"
+              },
+              "fn": {
+                "type": "string"
+              },
+              "target": {
+                "type": "string"
+              },
+              "call": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "target_class": {
+                "enum": [
+                  "state_var",
+                  "param",
+                  "caller",
+                  "this",
+                  "constant",
+                  "derived",
+                  "unknown"
+                ]
+              },
+              "zero_min_out": {
+                "type": "boolean"
+              },
+              "group_count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "groups": {
+                "$ref": "#/definitions/strarr"
+              }
+            }
+          }
+        },
+        "external_call_matrix": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "entry",
+              "group_count",
+              "line",
+              "fn",
+              "kind",
+              "target",
+              "target_class",
+              "target_type",
+              "function",
+              "args",
+              "value",
+              "likely_view",
+              "view_basis",
+              "callback_surface",
+              "state_writes_after_call",
+              "mutex_guard"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "entry": {
+                "type": "string"
+              },
+              "group_count": {
+                "type": "integer"
+              },
+              "line": {
+                "type": "integer"
+              },
+              "fn": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "external",
+                  "native_transfer",
+                  "native_send",
+                  "low_level_call",
+                  "delegatecall",
+                  "staticcall",
+                  "selfdestruct",
+                  "create"
+                ]
+              },
+              "target": {
+                "type": "string"
+              },
+              "target_class": {
+                "enum": [
+                  "state_var",
+                  "param",
+                  "caller",
+                  "this",
+                  "constant",
+                  "derived",
+                  "unknown"
+                ]
+              },
+              "target_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "function": {
+                "type": "string"
+              },
+              "args": {
+                "$ref": "#/definitions/strarr"
+              },
+              "value": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "likely_view": {
+                "type": "boolean"
+              },
+              "view_basis": {
+                "enum": [
+                  "declared",
+                  "name_heuristic",
+                  "unknown"
+                ]
+              },
+              "callback_surface": {
+                "enum": [
+                  "yes",
+                  "possible",
+                  "no"
+                ]
+              },
+              "state_writes_after_call": {
+                "$ref": "#/definitions/strarr"
+              },
+              "mutex_guard": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "mutex_checked_by": {
+                "$ref": "#/definitions/strarr"
+              }
+            }
+          }
+        },
+        "amm_models": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "model",
+                  "status",
+                  "result"
+                ],
+                "properties": {
+                  "model": {
+                    "const": "v2"
+                  },
+                  "status": {
+                    "const": "implemented"
+                  },
+                  "result": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "environment_nodes",
+                      "entrypoint_graph",
+                      "sequences"
+                    ],
+                    "properties": {
+                      "environment_nodes": {
+                        "$ref": "#/definitions/strarr"
+                      },
+                      "entrypoint_graph": {
+                        "$ref": "#/definitions/target/properties/entrypoint_graph"
+                      },
+                      "sequences": {
+                        "$ref": "#/definitions/target/properties/sequences"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "model",
+                  "status",
+                  "reason"
+                ],
+                "properties": {
+                  "model": {
+                    "enum": [
+                      "v3",
+                      "v4"
+                    ]
+                  },
+                  "status": {
+                    "const": "unsupported"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "write": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "idx",
+        "var",
+        "key",
+        "key_class",
+        "op",
+        "operand",
+        "delta",
+        "line",
+        "fn",
+        "in_loop",
+        "roles",
+        "pair_alias",
+        "ext_derived"
+      ],
+      "properties": {
+        "idx": {
+          "type": "integer"
+        },
+        "var": {
+          "type": "string"
+        },
+        "key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "key_class": {
+          "enum": [
+            "caller",
+            "this",
+            "param",
+            "state_addr",
+            "constant",
+            "loop_var",
+            "other",
+            "none"
+          ]
+        },
+        "op": {
+          "type": "string"
+        },
+        "operand": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "delta": {
+          "type": "string"
+        },
+        "line": {
+          "type": "integer"
+        },
+        "fn": {
+          "type": "string"
+        },
+        "in_loop": {
+          "type": "boolean"
+        },
+        "roles": {
+          "$ref": "#/definitions/strarr"
+        },
+        "pair_alias": {
+          "enum": [
+            "definite",
+            "possible",
+            "no"
+          ]
+        },
+        "ext_derived": {
+          "type": "boolean"
+        }
+      }
+    },
+    "effect_group": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "group_id",
+        "path_count",
+        "outcome",
+        "flags",
+        "call_chain_union",
+        "representative",
+        "constraint_sets_total",
+        "constraint_sets_truncated",
+        "constraint_sets",
+        "reads_scope",
+        "reads",
+        "writes",
+        "external_calls",
+        "sinks",
+        "divergence",
+        "pseudo"
+      ],
+      "properties": {
+        "group_id": {
+          "type": "string"
+        },
+        "path_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "outcome": {
+          "const": "completes"
+        },
+        "flags": {
+          "$ref": "#/definitions/strarr"
+        },
+        "call_chain_union": {
+          "$ref": "#/definitions/strarr"
+        },
+        "representative": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "note",
+            "call_chain",
+            "eq_facts",
+            "constraints"
+          ],
+          "properties": {
+            "note": {
+              "type": "string"
+            },
+            "call_chain": {
+              "$ref": "#/definitions/strarr"
+            },
+            "eq_facts": {
+              "$ref": "#/definitions/strarr"
+            },
+            "constraints": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "text",
+                  "kind",
+                  "line",
+                  "fn"
+                ],
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "enum": [
+                      "require",
+                      "if",
+                      "loop",
+                      "ternary",
+                      "modifier"
+                    ]
+                  },
+                  "line": {
+                    "type": "integer"
+                  },
+                  "fn": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "constraint_sets_total": {
+          "type": "integer"
+        },
+        "constraint_sets_truncated": {
+          "type": "boolean"
+        },
+        "constraint_sets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reads_scope": {
+          "const": "union"
+        },
+        "reads": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "var",
+              "key",
+              "line",
+              "fn"
+            ],
+            "properties": {
+              "var": {
+                "type": "string"
+              },
+              "key": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "line": {
+                "type": "integer"
+              },
+              "fn": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "writes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/write"
+          }
+        },
+        "external_calls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "target",
+              "target_class",
+              "function",
+              "args",
+              "value",
+              "likely_view",
+              "line"
+            ],
+            "properties": {
+              "kind": {
+                "type": "string"
+              },
+              "target": {
+                "type": "string"
+              },
+              "target_class": {
+                "type": "string"
+              },
+              "function": {
+                "type": "string"
+              },
+              "args": {
+                "$ref": "#/definitions/strarr"
+              },
+              "value": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "likely_view": {
+                "type": "boolean"
+              },
+              "line": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "sinks": {
+          "$ref": "#/definitions/strarr"
+        },
+        "divergence": {
+          "$ref": "#/definitions/strarr"
+        },
+        "pseudo": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "reads",
+            "writes"
+          ],
+          "properties": {
+            "reads": {
+              "$ref": "#/definitions/strarr"
+            },
+            "writes": {
+              "$ref": "#/definitions/strarr"
+            }
+          }
+        }
+      }
+    },
+    "entrypoint": {
+      "type": "object",
+      "required": [
+        "id",
+        "contract",
+        "name",
+        "kind",
+        "signature",
+        "visibility",
+        "mutability",
+        "payable",
+        "params",
+        "modifiers",
+        "line",
+        "file",
+        "access",
+        "constraint_state_vars",
+        "summary",
+        "reverting_guards",
+        "reads_union",
+        "writes_union",
+        "effect_groups",
+        "execution_paths"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "signature": {
+          "type": "string"
+        },
+        "payable": {
+          "type": "boolean"
+        },
+        "access": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "class",
+            "guards",
+            "uncertain"
+          ],
+          "properties": {
+            "class": {
+              "enum": [
+                "permissionless",
+                "owner-only",
+                "role-gated",
+                "self-only",
+                "mixed",
+                "unknown",
+                "constructor"
+              ]
+            },
+            "guards": {
+              "$ref": "#/definitions/strarr"
+            },
+            "uncertain": {
+              "type": "boolean"
+            }
+          }
+        },
+        "constraint_state_vars": {
+          "$ref": "#/definitions/strarr"
+        },
+        "summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "paths_enumerated",
+            "paths_completing",
+            "paths_reverting",
+            "effect_groups",
+            "reverting_guards",
+            "states_generated",
+            "paths_discarded_by_cap",
+            "peak_frontier",
+            "truncated",
+            "cap",
+            "flags",
+            "complete",
+            "incomplete_reasons",
+            "approximations"
+          ],
+          "properties": {
+            "paths_enumerated": {
+              "type": "integer"
+            },
+            "paths_completing": {
+              "type": "integer"
+            },
+            "paths_reverting": {
+              "type": "integer"
+            },
+            "effect_groups": {
+              "type": "integer"
+            },
+            "reverting_guards": {
+              "type": "integer"
+            },
+            "states_generated": {
+              "type": "integer"
+            },
+            "paths_discarded_by_cap": {
+              "type": "integer"
+            },
+            "peak_frontier": {
+              "type": "integer"
+            },
+            "truncated": {
+              "type": "boolean"
+            },
+            "cap": {
+              "type": "integer"
+            },
+            "flags": {
+              "$ref": "#/definitions/strarr"
+            },
+            "complete": {
+              "type": "boolean"
+            },
+            "incomplete_reasons": {
+              "$ref": "#/definitions/strarr"
+            },
+            "approximations": {
+              "$ref": "#/definitions/strarr"
+            }
+          }
+        },
+        "reverting_guards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "cond",
+              "kind",
+              "line",
+              "fn",
+              "count"
+            ],
+            "properties": {
+              "cond": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "line": {
+                "type": "integer"
+              },
+              "fn": {
+                "type": "string"
+              },
+              "count": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "reads_union": {
+          "$ref": "#/definitions/strarr"
+        },
+        "writes_union": {
+          "$ref": "#/definitions/strarr"
+        },
+        "effect_groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/effect_group"
+          }
+        },
+        "paths": {
+          "type": "array"
+        },
+        "execution_paths": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "path_id",
+              "outcome",
+              "call_chain",
+              "branch_conditions",
+              "constraints",
+              "trace",
+              "effects_committed",
+              "failure",
+              "flags",
+              "return_value"
+            ],
+            "properties": {
+              "path_id": {
+                "type": "string"
+              },
+              "outcome": {
+                "enum": [
+                  "completes",
+                  "reverts",
+                  "failed"
+                ]
+              },
+              "call_chain": {
+                "$ref": "#/definitions/strarr"
+              },
+              "branch_conditions": {
+                "type": "array"
+              },
+              "constraints": {
+                "$ref": "#/definitions/strarr"
+              },
+              "trace": {
+                "type": "array"
+              },
+              "effects_committed": {
+                "type": "boolean"
+              },
+              "failure": {
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "flags": {
+                "$ref": "#/definitions/strarr"
+              },
+              "return_value": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
         }
       }
     }

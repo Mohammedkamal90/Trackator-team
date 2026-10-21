@@ -1,5 +1,5 @@
 // token-walker :: state.ts — symbolic execution state + small text helpers
-import { Ev, Constraint } from './types';
+import { Ev, Constraint, PathFailure } from './types';
 import { FnInfo } from './parse';
 
 export interface Lv { name: string; keys: string[]; fields: string[] }
@@ -17,7 +17,8 @@ export class State {
   flags: string[] = [];
   refs = new Map<string, Lv>();        // local storage-pointer aliases
   loopVars = new Set<string>();
-  halt: 'none' | 'return' | 'revert' | 'break' = 'none';
+  halt: 'none' | 'return' | 'revert' | 'break' | 'continue' = 'none';
+  failure: PathFailure | null = null;
   ret: string | null = null;
   retParts: string[] | null = null;
   loopDepth = 0;
@@ -35,7 +36,8 @@ export class State {
     c.flags = [...this.flags];
     c.refs = new Map(this.refs);
     c.loopVars = new Set(this.loopVars);
-    c.halt = this.halt; c.ret = this.ret; c.retParts = this.retParts ? [...this.retParts] : null;
+    c.halt = this.halt; c.failure = this.failure ? { ...this.failure } : null;
+    c.ret = this.ret; c.retParts = this.retParts ? [...this.retParts] : null;
     c.loopDepth = this.loopDepth;
     return c;
   }

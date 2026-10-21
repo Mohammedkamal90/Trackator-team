@@ -11,7 +11,7 @@ export interface TokenModel {
   evidence: Record<string, string[]>;
 }
 
-export interface BalanceOfFacts { reads: { var: string; key: string | null }[]; param: string | null; totalSupplyReads: string[] }
+export interface BalanceOfFacts { reads: { var: string; key: string | null }[]; param: string | null; totalSupplyReads: string[]; writtenVars?: Set<string> }
 
 const ADDR = /address/;
 const isUint = (t: string) => /^u?int\d*$/.test(t.split(' ')[0]);
@@ -35,7 +35,10 @@ export function classify(ix: Index, target: string, bo: BalanceOfFacts): { roles
       else { perAcct.add(b); add(b, 'balance', 'read by balanceOf keyed by account'); }
     } else if (vi.kind !== 'mapping') { globals.add(b); }
   }
-  for (const g of globals) add(g, 'rate_driver', 'global state read by balanceOf (shifts every holder implicitly when written)');
+  for (const g of globals) {
+    if (bo.writtenVars && !bo.writtenVars.has(g)) { add(g, 'balance_of_readonly_input', 'read by balanceOf but never written outside the constructor'); globals.delete(g); }
+    else add(g, 'rate_driver', 'global state read by balanceOf (shifts every holder implicitly when written)');
+  }
   for (const s of bo.totalSupplyReads) if (vars.has(base(s))) add(base(s), 'supply', 'read by totalSupply()');
 
   for (const [name, v] of vars) {
@@ -43,7 +46,7 @@ export function classify(ix: Index, target: string, bo: BalanceOfFacts): { roles
     if (v.kind === 'mapping' && v.keyTypes.length === 2 && isUint(v.valueType)) add(name, 'allowance', 'mapping(address=>mapping(address=>uint))');
     else if (v.kind === 'mapping' && v.keyTypes.length === 1 && isUint(v.valueType) && /balance|owned|holder|^_?[rt]owned|shares|gons/.test(n)) add(name, 'balance', 'name+type');
     if (v.kind === 'scalar' && isUint(t) && /(^|_)(total ?supply|[rt]total|supply)$/.test(n)) add(name, 'supply', 'name');
-    if (v.kind === 'scalar' && isUint(t) && /(rtotal|ttotal|reflection|gonsperfragment|scalingfactor|rebase|index$)/.test(n)) add(name, 'rate_driver', 'name');
+    if (v.kind === 'scalar' && isUint(t) && /(rtotal|ttotal|reflection|gonsperfragment|scalingfactor|rebase|index$)/.test(n) && (!bo.writtenVars || bo.writtenVars.has(name))) add(name, 'rate_driver', 'name (and written outside constructor)');
     if (v.kind === 'scalar' && isUint(t) && /fee|tax|burnrate|divisor|bps|commission/.test(n) && !/feetotal|totalfee|previous/.test(n)) add(name, 'fee', 'name');
     if (/previous.*(fee|tax)/.test(n)) add(name, 'fee_backup', 'name');
     if (/feetotal|totalfees/.test(n)) add(name, 'fee_accumulator', 'name');
@@ -92,6 +95,6 @@ export function classify(ix: Index, target: string, bo: BalanceOfFacts): { roles
   return { roles, model };
 }
 
-export const ACCOUNTING_ROLES = ['balance', 'supply', 'rate_driver', 'allowance', 'fee', 'reward_exclusion', 'fee_exempt', 'pair', 'threshold', 'mutex', 'fee_accumulator'];
+export const ACCOUNTING_ROLES = ['balance', 'supply', 'rate_driver', 'allowance', 'fee', 'reward_exclusion', 'fee_exempt', 'pair', 'threshold', 'mutex', 'fee_accumulator', 'owner'];
 export function isAccounting(roles: string[] | undefined): boolean { return !!roles?.some(r => ACCOUNTING_ROLES.includes(r)); }
 export type { VarInfo };

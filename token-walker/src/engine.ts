@@ -4,7 +4,7 @@ import { WalkerConfig, Diagnostics, PathRec, RevertGuard, KeyClass, CallEv, Writ
 import { State, Lv, adopt, canon, stripParens, splitTop, splitCommaTop, wrapsWhole } from './state';
 
 interface Res { st: State; v: string; parts?: string[] | null }
-export interface EntryResult { paths: PathRec[]; reverts: RevertGuard[]; truncated: boolean; enumerated: number }
+export interface EntryResult { paths: PathRec[]; revertedPaths: PathRec[]; reverts: RevertGuard[]; truncated: boolean; enumerated: number; statesGenerated: number; discarded: number; peakFrontier: number; error?: string }
 
 const ELEM = /^(u?int\d*|bytes\d*|bool|string|address|byte)$/;
 const ARITH: Record<string, string> = { add: '+', sub: '-', mul: '*', div: '/', mod: '%' };
@@ -17,6 +17,7 @@ export class Walker {
   vars: Map<string, VarInfo>;
   reverts = new Map<string, RevertGuard>();
   truncated = false;
+  discarded = 0; peak = 0; generated = 0;
   entryParams = new Set<string>();
   private warned = new Set<string>();
 
@@ -28,7 +29,7 @@ export class Walker {
 
   // ───────────────────────── entry runners ─────────────────────────
   runEntry(fn: FnInfo): EntryResult {
-    this.reverts = new Map(); this.truncated = false;
+    this.reverts = new Map(); this.truncated = false; this.discarded = 0; this.peak = 0; this.generated = 0;
     this.entryParams = new Set(fn.params.map((p, i) => p.name || `_p${i}`));
     const st = new State();
     const key = `${fn.contract}.${fn.name}`;
@@ -44,7 +45,7 @@ export class Walker {
   }
 
   runConstructor(): EntryResult {
-    this.reverts = new Map(); this.truncated = false; this.entryParams = new Set();
+    this.reverts = new Map(); this.truncated = false; this.discarded = 0; this.peak = 0; this.generated = 0; this.entryParams = new Set();
     const st = new State(); st.fnStack.push(`${this.target}.constructor`); st.chain.push(`${this.target}.constructor`);
     for (const cn of [...this.ix.lin(this.target)].reverse()) {
       for (const v of this.ix.contracts.get(cn)!.vars.values()) {
@@ -53,12 +54,20 @@ export class Walker {
       }
     }
     let states: State[] = [st];
+    const baseArgs = this.ix.baseCtorArgs(this.target);
     for (const cn of [...this.ix.lin(this.target)].reverse()) {
       const ctor = this.ix.contracts.get(cn)!.fns.find(f => f.kind === 'constructor');
       if (!ctor) continue;
       const next: State[] = [];
       for (const s of states) {
-        const args = ctor.params.map((p, i) => p.name || `_p${i}`);
+        let args = ctor.params.map((p, i) => p.name || `_p${i}`);
+        const spec = baseArgs.get(cn);
+        if (spec && spec.length === ctor.params.length) {
+          const tmp = new State(); tmp.fnStack.push(`${this.target}.constructor`);
+          for (const c2 of this.ix.lin(this.target)) for (const f of this.ix.contracts.get(c2)!.fns) if (f.kind === 'constructor') f.params.forEach((p, i) => tmp.top.set(p.name || `_p${i}`, p.name || `_p${i}`));
+          args = spec.map(a => this.evalPure(a, tmp));
+          if (tmp.trace.some(e => e.k === 'R')) this.warn(this.diag.warnings, `base-constructor argument for ${cn} reads state; evaluated against symbolic constructor parameters only`);
+        }
         for (const r of this.callInline(ctor, args, s, `${cn}.constructor`)) next.push(r.st);
       }
       states = next;
@@ -67,9 +76,14 @@ export class Walker {
   }
 
   private finish(states: State[]): EntryResult {
-    const done = states.filter(s => s.halt !== 'revert');
-    const paths: PathRec[] = done.map(s => ({ chain: s.chain, constraints: s.conds, eqFacts: s.eq, trace: s.trace, flags: s.flags, ret: s.ret }));
-    return { paths, reverts: [...this.reverts.values()], truncated: this.truncated, enumerated: states.length };
+    const make = (s: State): PathRec => {
+      const outcome = s.halt === 'revert' ? 'reverts' : 'completes';
+      if (s.trace[s.trace.length - 1]?.k !== 'X') s.trace.push({ k: 'X', outcome, reason: s.failure?.reason ?? null, line: s.failure?.line ?? 0, fn: s.failure?.fn ?? s.curFn });
+      return { outcome, chain: s.chain, constraints: s.conds, eqFacts: s.eq, trace: s.trace, flags: s.flags, ret: s.ret, failure: s.failure };
+    };
+    const paths = states.filter(s => s.halt !== 'revert').map(make);
+    const revertedPaths = states.filter(s => s.halt === 'revert').map(make);
+    return { paths, revertedPaths, reverts: [...this.reverts.values()], truncated: this.truncated, enumerated: states.length, statesGenerated: this.generated, discarded: this.discarded, peakFrontier: this.peak };
   }
 
   // ───────────────────────── statements ─────────────────────────
@@ -82,7 +96,12 @@ export class Walker {
         for (const r of this.execStmt(s, st)) next.push(r);
       }
       cur = next;
-      if (cur.length > this.cfg.maxPathsPerEntry) { cur.length = this.cfg.maxPathsPerEntry; this.truncated = true; }
+      this.generated += cur.length; if (cur.length > this.peak) this.peak = cur.length;
+      if (cur.length > this.cfg.maxPathsPerEntry) {            // deterministic, evenly-strided sample (not a tail cut)
+        const cap = this.cfg.maxPathsPerEntry; const step = cur.length / cap; const keep: State[] = [];
+        for (let i = 0; i < cap; i++) keep.push(cur[Math.floor(i * step)]);
+        this.discarded += cur.length - cap; cur = keep; this.truncated = true;
+      }
     }
     return cur;
   }
@@ -91,7 +110,8 @@ export class Walker {
     if (!n) return [st];
     const line = n.loc?.start.line ?? 0;
     switch (n.type) {
-      case 'Block': case 'UncheckedStatement': return this.execStmts(n.statements, [st]);
+      case 'Block': return this.execStmts(n.statements ?? [], [st]);
+      case 'UncheckedStatement': return this.execStmt(n.block, st);      // parser ≥0.17: { block: Block }
       case 'ExpressionStatement': {
         const e = n.expression;
         if (e.type === 'Identifier' && e.name === '_' && st.modStack.length) return this.placeholder(st);
@@ -109,11 +129,29 @@ export class Walker {
         for (const a of n.eventCall.arguments) { const nx: State[] = []; for (const s of cur) for (const r of this.evalExpr(a, s)) nx.push(r.st); cur = nx; }
         return cur;
       }
-      case 'RevertStatement': st.halt = 'revert'; this.recordRevert('(unconditional)', 'revert', line, st.curFn); return [st];
-      case 'BreakStatement': case 'ContinueStatement': st.halt = 'break'; return [st];
+      case 'RevertStatement': st.halt = 'revert'; st.failure = { kind: 'revert', reason: '(unconditional)', line, fn: st.curFn }; st.trace.push({ k: 'X', outcome: 'reverts', reason: '(unconditional)', line, fn: st.curFn }); this.recordRevert('(unconditional)', 'revert', line, st.curFn); return [st];
+      case 'BreakStatement': st.halt = 'break'; return [st];
+      case 'ContinueStatement': st.halt = 'continue'; return [st];
       case 'TryStatement': return this.execTry(n, st);
       case 'InlineAssemblyStatement': st.addFlag('unmodeled_assembly'); this.warn(this.diag.warnings, `inline assembly in ${st.curFn} (line ${line}) is NOT modeled — sstore/call effects missing`); return [st];
-      default: this.warn(this.diag.unsupported_nodes, `${n.type} (line ${line})`); return [st];
+      default: {
+        this.warn(this.diag.unsupported_nodes, `${n.type} (line ${line})`); st.addFlag(`unsupported_stmt:${n.type}`);
+        let cur: State[] = [st];                                  // conservative: still execute/visit children so nested effects reach the trace
+        for (const k of Object.keys(n)) {
+          if (k === 'loc' || k === 'range') continue; const c = (n as any)[k];
+          for (const ch of Array.isArray(c) ? c : [c]) {
+            if (!ch || typeof ch !== 'object' || typeof ch.type !== 'string') continue;
+            const nx: State[] = [];
+            for (const s2 of cur) {
+              if (s2.halt !== 'none') { nx.push(s2); continue; }
+              if (/Statement$|^Block$/.test(ch.type)) for (const r of this.execStmt(ch, s2)) nx.push(r);
+              else for (const r of this.evalExpr(ch, s2)) nx.push(r.st);
+            }
+            cur = nx;
+          }
+        }
+        return cur;
+      }
     }
   }
 
@@ -140,40 +178,65 @@ export class Walker {
     for (const r of this.evalExpr(n.condition, st)) {
       const s = r.st; const known = this.decide(s, r.v);
       const doT = known !== false; const doF = known !== true;
+      let allRevert = false;
       if (doT) {
-        const t = doF ? s.clone() : s; if (known === null) this.assume(t, r.v, 'T', 'if', line);
-        for (const x of this.execStmt(n.trueBody, t)) { if (x.halt === 'revert') this.recordRevert(stripParens(r.v), 'if-revert', line, x.curFn); out.push(x); }
+        const t = doF ? s.clone() : s; this.assume(t, r.v, 'T', 'if', line);
+        const tres = this.execStmt(n.trueBody, t);
+        allRevert = tres.length > 0 && tres.every(x => x.halt === 'revert');
+        for (const x of tres) { if (x.halt === 'revert') { const reason = stripParens(r.v); this.recordRevert(reason, 'if-revert', line, x.curFn); x.failure = { kind: 'if-revert', reason, condition: reason, line, fn: x.curFn }; for (let i = x.trace.length - 1; i >= 0; i--) if (x.trace[i].k === 'X') { (x.trace[i] as any).reason = reason; break; } } out.push(x); }
       }
       if (doF) {
-        if (known === null) this.assume(s, r.v, 'F', 'if', line);
+        // `if (bad) revert();` ⇒ the surviving arm is a REQUIRE-style guard (needed for access-class evidence)
+        this.assume(s, r.v, 'F', allRevert ? 'require' : 'if', line);
         if (n.falseBody) { for (const x of this.execStmt(n.falseBody, s)) out.push(x); } else out.push(s);
       }
     }
     return out;
   }
 
+  private markLoopEffects(st: State, base: number) {
+    if (st.trace.slice(base).some(e => e.k === 'W' || e.k === 'C')) st.addFlag('loop_effects_bounded');   // only 1 iteration modeled
+  }
+
   private execLoop(n: any, st: State, line: number): State[] {
+    const isFor = n.type === 'ForStatement', isDo = n.type === 'DoWhileStatement';
     let starts: State[] = [st];
-    if (n.type === 'ForStatement' && n.initExpression) {
-      starts = this.execStmt(n.initExpression, st);
+    if (isFor && n.initExpression) {
+      starts = this.execStmt(n.initExpression, st);                 // initializer values are KEPT (first iteration sees them)
       for (const s of starts) if (n.initExpression.type === 'VariableDeclarationStatement')
-        for (const v of n.initExpression.variables) if (v) { s.top.set(v.name, v.name); s.loopVars.add(v.name); }
+        for (const v of n.initExpression.variables) if (v) s.loopVars.add(v.name);
     }
+    const condNode = isFor ? n.conditionExpression : n.condition;
+    // one iteration: body → (continue clears) → increment → exit-condition check. `break`/`return` leave immediately.
+    const iterate = (s: State): State[] => {
+      s.loopDepth++; s.addFlag('loop_unrolled_once');
+      const base = s.trace.length; const res: State[] = [];
+      for (const b of this.execStmt(n.body, s)) {
+        if (b.halt === 'break') { b.halt = 'none'; b.loopDepth--; this.markLoopEffects(b, base); res.push(b); continue; }
+        if (b.halt === 'continue') b.halt = 'none';
+        if (b.halt !== 'none') { b.loopDepth--; this.markLoopEffects(b, base); res.push(b); continue; }
+        const nx = isFor && n.loopExpression ? this.execStmt(n.loopExpression, b) : [b];
+        for (const x of nx) {
+          if (x.halt !== 'none' || !condNode) { x.loopDepth--; this.markLoopEffects(x, base); res.push(x); continue; }
+          for (const r of this.evalExpr(condNode, x)) {
+            const known = this.decide(r.st, r.v);
+            if (known === true) continue;                           // cond still true ⇒ would iterate again; no 1-iteration exit exists
+            this.assume(r.st, r.v, 'F', 'loop', line);   // exit requires the condition to be false now
+            r.st.loopDepth--; this.markLoopEffects(r.st, base); res.push(r.st);
+          }
+        }
+      }
+      return res;
+    };
     const out: State[] = [];
     for (const s0 of starts) {
-      const condNode = n.type === 'ForStatement' ? n.conditionExpression : n.condition;
+      if (isDo) { for (const x of iterate(s0)) out.push(x); continue; }          // do-while: mandatory first iteration
       const conds: Res[] = condNode ? this.evalExpr(condNode, s0) : [{ st: s0, v: 'true' }];
       for (const r of conds) {
-        const s = r.st;
-        const skip = s.clone(); this.assume(skip, r.v, 'F', 'loop', line); out.push(skip);          // 0 iterations
-        this.assume(s, r.v, 'T', 'loop', line); s.loopDepth++;                                        // 1 iteration
-        s.addFlag('loop_unrolled_once');
-        for (const b of this.execStmt(n.body, s)) {
-          if (b.halt === 'break') b.halt = 'none';
-          if (b.halt === 'none' && n.type === 'ForStatement' && n.loopExpression) {
-            for (const x of this.execStmt(n.loopExpression, b)) { x.loopDepth--; out.push(x); }
-          } else { b.loopDepth--; out.push(b); }
-        }
+        const s = r.st; const known = this.decide(s, r.v);
+        const doIter = known !== false, doSkip = known !== true;
+        if (doSkip) { const skip = doIter ? s.clone() : s; this.assume(skip, r.v, 'F', 'loop', line); out.push(skip); }   // 0 iterations
+        if (doIter) { this.assume(s, r.v, 'T', 'loop', line); for (const x of iterate(s)) out.push(x); }                    // 1 iteration
       }
     }
     return out;
@@ -199,7 +262,8 @@ export class Walker {
   }
   private assume(st: State, cond: string, arm: 'T' | 'F', kind: any, line: number) {
     const text = stripParens(cond);
-    st.conds.push({ text: arm === 'T' ? text : `!(${text})`, arm, kind, line, fn: st.curFn });
+    st.conds.push({ text: arm === 'T' ? text : this.negate(text), arm, kind, line, fn: st.curFn });
+    st.trace.push({ k: 'B', condition: text, arm, kind, line, fn: st.curFn });
     const { t, neg } = canon(cond);
     const truth = arm === 'T' ? !neg : neg;
     st.decided.set(t, truth);
@@ -214,12 +278,24 @@ export class Walker {
     }
     void facts;
   }
-  private requireLike(st: State, cond: string, kind: string, line: number) {
+  private negate(text: string): string {
+    if (!text.includes('&&') && !text.includes('||')) {
+      const m = /^(.+?) (==|!=) (.+)$/.exec(text);
+      if (m) return `${m[1]} ${m[2] === '==' ? '!=' : '=='} ${m[3]}`;
+    }
+    return text.startsWith('!') && wrapsWhole(text.slice(1)) ? stripParens(text.slice(1)) : `!(${text})`;
+  }
+  private requireLike(st: State, cond: string, kind: string, line: number): State[] {
     const known = this.decide(st, cond);
-    if (known === true) return;
     this.recordRevert(stripParens(cond), kind, line, st.curFn);
-    if (known === false) { st.halt = 'revert'; return; }
+    if (known === true) { this.assume(st, cond, 'T', 'require', line); return [st]; }
+    if (known === false) { st.halt = 'revert'; st.failure = { kind, reason: stripParens(cond), condition: stripParens(cond), line, fn: st.curFn }; st.trace.push({ k: 'B', condition: stripParens(cond), arm: 'F', kind: 'require', line, fn: st.curFn }); st.trace.push({ k: 'X', outcome: 'reverts', reason: stripParens(cond), line, fn: st.curFn }); return [st]; }
+    const failed = st.clone();
+    this.assume(failed, cond, 'F', 'require', line); failed.halt = 'revert';
+    failed.failure = { kind, reason: stripParens(cond), condition: stripParens(cond), line, fn: failed.curFn };
+    failed.trace.push({ k: 'X', outcome: 'reverts', reason: stripParens(cond), line, fn: failed.curFn });
     this.assume(st, cond, 'T', 'require', line);
+    return [st, failed];
   }
   private recordRevert(cond: string, kind: string, line: number, fn: string) {
     const k = `${fn}|${line}|${cond}`; const g = this.reverts.get(k);
@@ -229,6 +305,9 @@ export class Walker {
   // ───────────────────────── modifiers / calls ─────────────────────────
   private runWithModifiers(fn: FnInfo, idx: number, st: State, fnFrameIdx: number): State[] {
     const mods = fn.modifiers.filter(m => this.ix.findModifier(this.target, m.name));
+    if (idx === 0) for (const m of fn.modifiers) if (!this.ix.findModifier(this.target, m.name) && !this.ix.isContractName(m.name)) {
+      st.addFlag(`unresolved_modifier:${m.name}`); this.warn(this.diag.warnings, `modifier '${m.name}' on ${fn.contract}.${fn.name} not found — its guard/effects are MISSING`);
+    }
     if (idx >= mods.length) return this.execStmts(fn.node.body.statements, [st]);
     const m = mods[idx]; const md = this.ix.findModifier(this.target, m.name)!;
     const args: string[] = [];
@@ -251,6 +330,20 @@ export class Walker {
       if (r.halt === 'return') r.halt = 'none';               // modifier epilogue still runs after body `return`
     }
     return res;
+  }
+
+  /** same-name/same-arity overloads cannot be told apart without types ⇒ explore all, flag ambiguity */
+  private callCandidates(fns: FnInfo[], args: string[], st: State): Res[] {
+    if (fns.length === 1) return this.callFn(fns[0], args, st);
+    this.warn(this.diag.warnings, `overload ambiguity: ${fns[0].name}/${args.length} has ${fns.length} candidates — all explored (flag overload_ambiguous)`);
+    const out: Res[] = [];
+    fns.forEach((f, i) => { const s = i === fns.length - 1 ? st : st.clone(); s.addFlag(`overload_ambiguous:${f.name}`); for (const r of this.callFn(f, args, s)) out.push(r); });
+    return out;
+  }
+
+  private opaqueCall(st: State, fnName: string, args: string[], line: number, why: string): void {
+    st.addFlag(why);
+    this.pushCall(st, { kind: 'external', target: '<opaque>', targetClass: 'unknown', targetType: null, fn: fnName, args, value: null, likelyView: false, viewBasis: 'unknown', line });
   }
 
   private callFn(fn: FnInfo, args: string[], st: State): Res[] {
@@ -347,7 +440,17 @@ export class Walker {
     if (vi && (vi.constant || vi.immutable)) return;
     st.trace.push({ k: 'R', var: this.lvVar(lv), key: lv.keys.length ? lv.keys.join(', ') : null, line, fn: st.curFn });
   }
+  /** a write to V makes every remembered decision about a condition mentioning V stale */
+  private invalidate(st: State, name: string) {
+    const re = new RegExp(`\\b${name.replace(/[$]/g, '\\$')}\\b`);
+    for (const k of [...st.decided.keys()]) if (re.test(k)) st.decided.delete(k);
+  }
+  /** an external call may re-enter and change any state: forget decisions that depend on state */
+  private invalidateStateConds(st: State) {
+    for (const k of [...st.decided.keys()]) if ((k.match(/[A-Za-z_]\w*/g) ?? []).some(i => this.vars.has(i))) st.decided.delete(k);
+  }
   private recordWrite(lv: Lv, op: string, val: string | null, st: State, line: number) {
+    this.invalidate(st, lv.name);
     const L = this.lvText(lv); let o = op; let operand = val;
     if (op === '=' && val !== null) {
       const pre = `(${L} `;
@@ -359,7 +462,8 @@ export class Walker {
     const delta = ['++', '--', 'delete', 'pop'].includes(o) ? (o === 'delete' ? `delete ${L}` : o === 'pop' ? `${L}.pop()` : `${L}${o}`)
       : o === '=' ? `${L} = ${val}` : o === 'push' ? `${L}.push(${val})` : `${L} ${o} ${operand}`;
     const key = lv.keys.length ? lv.keys.join(', ') : null;
-    st.trace.push({ k: 'W', var: this.lvVar(lv), key, keyClass: this.keyClassOf(key), op: o, operand, delta, expr: val ?? '', line, fn: st.curFn, inLoop: st.loopDepth > 0 });
+    let kc = this.keyClassOf(key); if (st.loopDepth > 0 && kc === 'constant' && /^\d+$/.test(splitCommaTop(key!)[0])) kc = 'loop_var';
+    st.trace.push({ k: 'W', var: this.lvVar(lv), key, keyClass: kc, op: o, operand, delta, expr: val ?? '', line, fn: st.curFn, inLoop: st.loopDepth > 0 });
   }
 
   private assignTo(lhs: any, val: string, op: string, st: State, line: number, parts?: string[] | null) {
@@ -428,7 +532,14 @@ export class Walker {
       case 'NewExpression': return [{ st, v: `new ${n.typeName?.namePath ?? '?'}` }];
       case 'ElementaryTypeName': return [{ st, v: n.name }];
       case 'TypeNameExpression': return [{ st, v: n.typeName?.name ?? n.typeName?.namePath ?? '?' }];
-      default: this.warn(this.diag.unsupported_nodes, `expr ${n.type} (line ${line})`); return [{ st, v: `<${n.type}>` }];
+      default: {
+        this.warn(this.diag.unsupported_nodes, `expr ${n.type} (line ${line})`); st.addFlag(`unmodeled_expr:${n.type}`);
+        for (const k of Object.keys(n)) {                      // conservative: still visit children for reads/writes/calls
+          if (k === 'loc' || k === 'range') continue; const c = (n as any)[k];
+          for (const ch of Array.isArray(c) ? c : [c]) if (ch && typeof ch === 'object' && typeof ch.type === 'string') this.evalPure(ch, st);
+        }
+        return [{ st, v: `<${n.type}>` }];
+      }
     }
   }
 
@@ -478,7 +589,7 @@ export class Walker {
     return 'unknown';
   }
 
-  private pushCall(st: State, c: Omit<CallEv, 'k' | 'callerFn'>) { st.trace.push({ k: 'C', callerFn: st.curFn, ...c }); }
+  private pushCall(st: State, c: Omit<CallEv, 'k' | 'callerFn'>) { st.trace.push({ k: 'C', callerFn: st.curFn, ...c }); if (!c.likelyView) this.invalidateStateConds(st); }
 
   private evalCall(n: any, st: State, line: number): Res[] {
     let callee = n.expression; let valueNode: any = null;
@@ -489,7 +600,7 @@ export class Walker {
     // special forms that must not pre-evaluate message args
     if (callee.type === 'Identifier' && (callee.name === 'require' || callee.name === 'assert')) {
       const out: Res[] = [];
-      for (const r of this.evalExpr(n.arguments[0], st)) { this.requireLike(r.st, r.v, callee.name, line); out.push({ st: r.st, v: '' }); }
+      for (const r of this.evalExpr(n.arguments[0], st)) for (const next of this.requireLike(r.st, r.v, callee.name, line)) out.push({ st: next, v: '' });
       return out;
     }
     const out: Res[] = [];
@@ -505,15 +616,17 @@ export class Walker {
     const plain = (v: string): Res[] => [{ st, v }];
     if (callee.type === 'Identifier') {
       const name = callee.name;
-      if (name === 'revert') { st.halt = 'revert'; this.recordRevert('(unconditional)', 'revert', line, st.curFn); return plain(''); }
+      if (name === 'revert') { st.halt = 'revert'; st.failure = { kind: 'revert', reason: '(unconditional)', line, fn: st.curFn }; st.trace.push({ k: 'X', outcome: 'reverts', reason: '(unconditional)', line, fn: st.curFn }); this.recordRevert('(unconditional)', 'revert', line, st.curFn); return plain(''); }
       if (name === 'address' || name === 'payable') return plain(args[0] === 'this' ? 'this' : /^\d+$/.test(args[0] ?? '') ? `address(${args[0]})` : (args[0] ?? ''));
       if (ELEM.test(name)) return plain(`${name}(${args.join(', ')})`);
       if (name === 'selfdestruct' || name === 'suicide') { this.pushCall(st, { kind: 'selfdestruct', target: args[0] ?? '', targetClass: this.classifyTarget(args[0] ?? ''), targetType: null, fn: 'selfdestruct', args, value: null, likelyView: false, line }); return plain(''); }
       if (this.ix.isContractName(name)) return plain(`${name}(${args.join(', ')})`);       // interface/contract conversion
       if (BUILTIN_FN.has(name)) return plain(`${name}(${args.join(', ')})`);
-      const fn = this.ix.findFn(this.target, name, args.length);
-      if (fn) return this.callFn(fn, args, st);
-      this.warn(this.diag.unresolved_calls, `${name}/${args.length} (line ${line}) — treated as opaque`);
+      const fns = this.ix.findFns(this.target, name, args.length);
+      if (fns.length) return this.callCandidates(fns, args, st);
+      if (/^[A-Z]/.test(name)) return plain(`${name}(${args.join(', ')})`);               // struct / enum / error / event constructor
+      this.warn(this.diag.unresolved_calls, `${name}/${args.length} (line ${line}) — emitted as opaque call event`);
+      this.opaqueCall(st, name, args, line, `unresolved_call:${name}`);
       return plain(`${name}(${args.join(', ')})`);
     }
     if (callee.type === 'ElementaryTypeName') {
@@ -528,22 +641,30 @@ export class Walker {
       }
       return plain('new[]');                                   // new address[](n), new bytes(n): memory allocation only
     }
-    if (callee.type !== 'MemberAccess') return plain(`<call ${callee.type}>(${args.join(', ')})`);
+    if (callee.type !== 'MemberAccess') {
+      this.warn(this.diag.unsupported_nodes, `call through ${callee.type} (line ${line})`);
+      try { this.evalPure(callee, st); } catch { /* receiver reads only */ }
+      this.opaqueCall(st, `<${callee.type}>`, args, line, `unmodeled_call:${callee.type}`);
+      return plain(`<call ${callee.type}>(${args.join(', ')})`);
+    }
 
     const member = callee.memberName; const baseNode = callee.expression;
     if (baseNode.type === 'Identifier') {
       const bn = baseNode.name;
       if (bn === 'abi') return plain(`abi.${member}(${args.join(', ')})`);
       if (bn === 'super') {
-        const cur = st.curFn.split('.')[0]; const lin = this.ix.lin(this.target); const i = lin.indexOf(cur);
-        for (const cn of lin.slice(i + 1)) { const f = this.ix.contracts.get(cn)!.fns.find(x => x.name === member && x.params.length === args.length && x.node.body); if (f) return this.callFn(f, args, st); }
+        const cur = st.curFn.split('.')[0];
+        const fs = this.ix.findFns(this.target, member, args.length, cur);
+        if (fs.length) return this.callCandidates(fs, args, st);
+        this.opaqueCall(st, `super.${member}`, args, line, `unresolved_call:super.${member}`);
         return plain(`super.${member}(${args.join(', ')})`);
       }
-      if (bn === 'this') { const f = this.ix.findFn(this.target, member, args.length); st.addFlag('self_external_call'); if (f) return this.callFn(f, args, st); }
+      if (bn === 'this') { const fs = this.ix.findFns(this.target, member, args.length); st.addFlag('self_external_call'); if (fs.length) return this.callCandidates(fs, args, st); }
       if (!this.isLocal(bn, st) && !this.vars.has(bn) && this.ix.isContractName(bn)) {
         if (/safemath/i.test(bn) && ARITH[member] && args.length >= 2) return plain(`(${args[0]} ${ARITH[member]} ${args[1]})`);
-        const f = this.ix.findFn(bn, member, args.length);
-        if (f) return this.callFn(f, args, st);
+        const fs = this.ix.findFns(bn, member, args.length);
+        if (fs.length) return this.callCandidates(fs, args, st);
+        this.opaqueCall(st, `${bn}.${member}`, args, line, `unresolved_call:${bn}.${member}`);
         return plain(`${bn}.${member}(${args.join(', ')})`);
       }
     }
@@ -553,8 +674,8 @@ export class Walker {
       // using-for library binding (SafeMath, Address, ...)
       for (const lib of this.ix.usingLibs(this.target)) {
         if (/safemath/i.test(lib) && ARITH[member] && args.length >= 1) return plain(`(${baseText} ${ARITH[member]} ${args[0]})`);
-        const f = this.ix.findFn(lib, member, args.length + 1);
-        if (f) return this.callFn(f, [baseText, ...args], st);
+        const fs = this.ix.findFns(lib, member, args.length + 1);
+        if (fs.length) return this.callCandidates(fs, [baseText, ...args], st);
       }
       // state array mutation
       if ((member === 'push' || member === 'pop') && baseNode.type !== 'CallExpression') {
@@ -572,7 +693,13 @@ export class Walker {
     }
     // ordinary external call
     const type = ctype ?? (this.vars.get(baseText)?.type ?? null);
-    this.pushCall(st, { kind: 'external', target: baseText, targetClass: this.classifyTarget(baseText), targetType: type, fn: member, args, value, likelyView: VIEW_EXT.has(member), line });
+    const tclass = this.classifyTarget(baseText);
+    let likelyView = false; let viewBasis: 'declared' | 'name_heuristic' | 'unknown' = 'unknown';
+    const known = type && this.ix.contracts.has(type) ? this.ix.lin(type).flatMap(cn => this.ix.contracts.get(cn)!.fns).filter(f => f.name === member && f.params.length === args.length) : [];
+    if (known.length) { likelyView = known.every(f => f.mutability === 'view' || f.mutability === 'pure'); viewBasis = 'declared'; }   // declared mutability wins
+    else if (VIEW_EXT.has(member) && (tclass === 'state_var' || tclass === 'constant') && type) { likelyView = true; viewBasis = 'name_heuristic'; }
+    // attacker-controlled / unknown targets are NEVER assumed view: a "balanceOf" on a param-supplied contract can run arbitrary code
+    this.pushCall(st, { kind: 'external', target: baseText, targetClass: tclass, targetType: type, fn: member, args, value, likelyView, viewBasis, line });
     return plain(`ext<${baseText}.${member}>(${args.join(', ')})`);
   }
 }
