@@ -7,9 +7,23 @@ dependency graph, sinks, accounting-divergence sites and an external-call matrix
 ```
 node dist/index.js <file.sol | dir> [-o token-state-graph.json] [--contract A,B] [--exclude substr] [--depth 2-6] [--max-paths N]
                    [--max-seq N] [--include-privileged] [--no-env] [--raw-paths] [--abs-paths] [--strict] [--quiet] [--no-timestamp]
+node dist/index.js <Pair.sol> <Token.sol> --bind-token token0=TokenContract [--bind-token token1=OtherToken] [--scenario JSON] [--amm v2] [-o pool-report.json]
 exit codes: 0 ok · 1 runtime/no input · 2 usage · 3 i/o · 4 --strict violation
 npm run build && npm test
 ```
+
+## V2 Pair-to-token source analysis
+
+Pool-context mode accepts one V2 Pair source and one token source. It interprets the parsed `skim`, `sync`, and `swap` ASTs and writes a single JSON report. It does not add the standalone mode's synthetic `ENV:pair.*` nodes. A token-slot binding is an explicit source-analysis assumption; it is not evidence of a deployed Pair address or token address.
+
+```bash
+node dist/index.js /path/to/PancakePair.sol /path/to/ARK.sol \
+  --amm v2 --bind-token token0=ARK --bind-token token1=ARK \
+  --scenario '{"skim":{"to":"recipient"},"swap":{"amount0Out":1,"amount1Out":0,"to":"recipient","data":"0x"}}' \
+  -o pool-report.json
+```
+
+Omit scenario fields to leave those transaction arguments symbolic. In particular, an unknown `swap.data` can stop at callback dispatch; that path is reported unresolved. `--max-paths` sets the number of paths retained per entrypoint (Pool mode defaults to 100); path interpretation itself is not bounded by that report cap. Reports label normal returns and reverts as static candidates, include source hashes and trace details, and set `full_analysis` to `false`. Pool mode supports V2 only; V3/V4 selections are rejected explicitly.
 
 ## Run it on any project
 Needs Node ≥ 18 + npm. No solc, no Foundry/Hardhat build, no compiled artifacts — it only parses `.sol` source.

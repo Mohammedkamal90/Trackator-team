@@ -10,19 +10,23 @@ import { classify, isAccounting } from './model';
 import { analyzeEntry, NodeFacts } from './analyze';
 import { buildGraph, envNodes } from './sequences';
 import { DEFAULT_CONFIG, Diagnostics, WalkerConfig } from './types';
+import { buildPoolContextReport, PoolContextError } from './pool-context';
 
 const VERSION = '0.5.0';
 const HELP = `token-walker ${VERSION}
 usage: token-walker <file.sol | dir> [options]
+       token-walker <Pair.sol> <Token.sol> --bind-token token0=TokenContract [options]
   -o, --out <file>           output path (default token-state-graph.json)
   --contract <A[,B]>         analyze these contracts (error if unknown)
   --exclude <substr[,..]>    skip source files whose path contains any substring
   --depth <2-6>              sequence depth (default 4)
-  --max-paths <n>            per-entrypoint completing-path cap (default 20000)
+  --max-paths <n>            per-entrypoint path cap (default 20000 standalone, 100 Pool mode)
   --max-seq <n>              max sequences kept (default 3000)
   --include-privileged       allow owner/role-gated entrypoints in sequences
   --no-env                   do not add synthetic ENV:pair.* nodes
   --amm <v2[,v3,v4]>         select AMM analysis scenarios (default: V2)
+  --bind-token <slot=Name>   Pool mode source binding (repeat for token0/token1)
+  --scenario <json>          Pool mode arguments, e.g. '{"swap":{"amount0Out":1,"amount1Out":0,"to":"recipient","data":"0x"}}'
   --raw-paths                also dump every path with ordered trace
   --abs-paths                record absolute input path in output (default: relative/basename)
   --no-timestamp             omit generated_at (byte-identical output)
@@ -70,7 +74,7 @@ async function chooseAmm(args: any): Promise<{ models: AmmModel[]; source: 'cli_
 }
 
 function parseArgs(argv: string[]) {
-  const a: any = { cfg: { ...DEFAULT_CONFIG }, out: null, outProvided: false, summary: true, timestamp: true, absPaths: false, strict: false, exclude: [] as string[] };
+  const a: any = { cfg: { ...DEFAULT_CONFIG }, out: null, outProvided: false, summary: true, timestamp: true, absPaths: false, strict: false, exclude: [], tokenBindings: [] as string[] };
   const rest: string[] = [];
   for (let i = 0; i < argv.length; i++) {
     const x = argv[i];
@@ -78,9 +82,11 @@ function parseArgs(argv: string[]) {
       case '-o': case '--out': a.out = strArg(x, argv[++i]); a.outProvided = true; break;
       case '--contract': a.contract = strArg(x, argv[++i]); break;
       case '--amm': a.amm = parseAmm(strArg(x, argv[++i])); break;
+      case '--bind-token': a.tokenBindings.push(strArg(x, argv[++i])); break;
+      case '--scenario': a.scenario = strArg(x, argv[++i]); break;
       case '--exclude': a.exclude = strArg(x, argv[++i]).split(',').filter(Boolean); break;
       case '--depth': a.cfg.maxSeqDepth = intArg(x, argv[++i], 2, 6); break;
-      case '--max-paths': a.cfg.maxPathsPerEntry = intArg(x, argv[++i], 1, 1_000_000); break;
+      case '--max-paths': a.cfg.maxPathsPerEntry = intArg(x, argv[++i], 1, 1_000_000); a.maxPathsProvided = true; break;
       case '--max-seq': a.cfg.maxSequences = intArg(x, argv[++i], 1, 1_000_000); break;
       case '--include-privileged': a.cfg.includePrivileged = true; break;
       case '--no-env': a.cfg.envModel = false; break;
@@ -96,8 +102,11 @@ function parseArgs(argv: string[]) {
     }
   }
   if (!a.help) {
-    if (rest.length !== 1) throw new UsageError(rest.length ? `expected exactly one input path, got ${rest.length}` : 'missing input path');
+    if (rest.length !== 1 && rest.length !== 2) throw new UsageError(rest.length ? `expected one standalone input or Pair.sol plus Token.sol, got ${rest.length} paths` : 'missing input path');
     a.input = rest[0];
+    if (rest.length === 2) a.tokenInput = rest[1];
+    if (rest.length === 1 && (a.tokenBindings.length || a.scenario)) throw new UsageError('--bind-token and --scenario require Pair.sol and Token.sol inputs');
+    if (rest.length === 2 && (a.contract || a.exclude.length)) throw new UsageError('--contract and --exclude are standalone-mode options');
   }
   return a;
 }
@@ -112,6 +121,34 @@ async function main(): Promise<number> {
   catch (e: any) { if (e instanceof UsageError) { console.error(`error: ${e.message}\n\n${HELP}`); return 2; } throw e; }
 
   const cfg: WalkerConfig = args.cfg;
+  if (args.tokenInput) {
+    if (ammSelection.models.some(model => model !== 'v2')) {
+      console.error(`error: Pool-context execution supports V2 only; selected: ${ammSelection.models.join(', ')}. No other model was run.`); return 2;
+    }
+    const pairRoot = path.resolve(args.input);
+    const tokenRoot = path.resolve(args.tokenInput);
+    for (const [label, rootPath] of [['Pair', pairRoot], ['Token', tokenRoot]] as const) {
+      if (!fs.existsSync(rootPath)) { console.error(`error: ${label} input not found: ${rootPath}`); return 2; }
+      if (!fs.statSync(rootPath).isFile() && !fs.statSync(rootPath).isDirectory()) { console.error(`error: ${label} input is not a Solidity file or directory: ${rootPath}`); return 2; }
+    }
+    if (!args.out) args.out = 'pool-context-state-graph.json';
+    const outAbs = path.resolve(args.out);
+    if (!fs.existsSync(path.dirname(outAbs))) { console.error(`error: output directory does not exist: ${path.dirname(outAbs)}`); return 3; }
+    try {
+      const poolPathCap = args.maxPathsProvided ? cfg.maxPathsPerEntry : Math.min(100, cfg.maxPathsPerEntry);
+      const report = buildPoolContextReport({ pairRoot, tokenRoot, bindings: args.tokenBindings, scenarioText: args.scenario, ammSelection, maxPaths: poolPathCap, absPaths: args.absPaths });
+      fs.writeFileSync(outAbs, JSON.stringify(report, (_key, value) => typeof value === 'bigint' ? value.toString() : value, 1));
+      if (args.summary) {
+        const counts = report.summary;
+        console.error(`pool-context v2: resolved=${counts.resolved_paths} conditional=${counts.conditional_paths} unresolved=${counts.unresolved_paths} reverted=${counts.revert_candidates} normal_return_candidates=${counts.normal_return_candidates}`);
+        console.error(`wrote ${args.out} (${(fs.statSync(outAbs).size / 1024).toFixed(0)} KB)`);
+      }
+      return 0;
+    } catch (e: any) {
+      if (e instanceof PoolContextError) { console.error(`error: ${e.message}`); return 2; }
+      throw e;
+    }
+  }
   const root = path.resolve(args.input);
   if (!fs.existsSync(root)) { console.error(`error: input not found: ${args.input}`); return 1; }
 

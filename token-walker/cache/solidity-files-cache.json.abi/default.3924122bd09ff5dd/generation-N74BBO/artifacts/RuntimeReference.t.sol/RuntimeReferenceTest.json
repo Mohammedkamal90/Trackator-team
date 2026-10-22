@@ -1,0 +1,1 @@
+{"abi":[{"type":"function","name":"testCalleeRevertRollsBackTheWholeTransaction","inputs":[],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"testSuccessfulCallCommitsBothContractsInOrder","inputs":[],"outputs":[],"stateMutability":"nonpayable"}],"id":2}

@@ -1,0 +1,1 @@
+{"abi":[{"type":"function","name":"transfer","inputs":[{"name":"shouldFail","type":"bool","internalType":"bool"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"nonpayable"}],"id":0}
